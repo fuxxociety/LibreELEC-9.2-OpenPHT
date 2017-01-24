@@ -1,5 +1,5 @@
 ################################################################################
-#      This file is part of LibreELEC - https://LibreELEC.tv
+#      This file is part of LibreELEC - http://www.libreelec.tv
 #      Copyright (C) 2016 Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
@@ -16,25 +16,19 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="sonarr"
-PKG_VERSION="2.0.0.4409"
+PKG_NAME="libaio"
+PKG_VERSION="0.3.110-1"
 PKG_ARCH="any"
-PKG_LICENSE="GPLv3"
-PKG_SITE="https://sonarr.tv"
-PKG_URL="http://update.sonarr.tv/v2/master/mono/NzbDrone.master.$PKG_VERSION.mono.tar.gz"
-PKG_SOURCE_DIR="NzbDrone"
-PKG_DEPENDS_TARGET="toolchain libmediainfo"
-PKG_SECTION="service/downloadmanager"
-PKG_SHORTDESC="Smart PVR for newsgroup and bittorrent users."
+PKG_LICENSE="GPL"
+PKG_SITE="http://http://lse.sourceforge.net/io/aio.html"
+PKG_URL="https://git.fedorahosted.org/cgit/libaio.git/snapshot/$PKG_NAME-$PKG_VERSION.tar.gz"
+PKG_DEPENDS_TARGET="toolchain"
+PKG_SECTION="depends"
+PKG_SHORTDESC="Kernel Asynchronous I/O (AIO) Support for Linux"
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-make_target() {
-  : # nothing to do here
-}
-
-makeinstall_target() {
-  mkdir -p $INSTALL/opt/sonarr
-  cp -PR * $INSTALL/opt/sonarr/
+pre_build_target() {
+  strip_lto
 }
