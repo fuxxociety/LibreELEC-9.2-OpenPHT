@@ -168,7 +168,6 @@ post_makeinstall_target() {
       cp -P $PKG_DIR/default.d/*.conf $INSTALL/usr/share/services
 
     mkdir -p $INSTALL/usr/lib/samba
-      cp $PKG_DIR/scripts/samba-autoshare $INSTALL/usr/lib/samba
       cp $PKG_DIR/scripts/smbd-config $INSTALL/usr/lib/samba
   fi
 }
