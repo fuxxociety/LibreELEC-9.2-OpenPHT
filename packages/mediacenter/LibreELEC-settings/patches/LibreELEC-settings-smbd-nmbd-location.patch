@@ -1,0 +1,24 @@
+From 96eabe09822d91b10bfc3429ccc769dbf8afddb5 Mon Sep 17 00:00:00 2001
+From: MilhouseVH <milhouseVH.github@nmacleod.com>
+Date: Sun, 19 Mar 2017 20:31:22 +0000
+Subject: [PATCH] change smbd and nmbd location
+
+---
+ src/defaults.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/defaults.py b/src/defaults.py
+index 8b346e5..0c46772 100644
+--- a/src/defaults.py
++++ b/src/defaults.py
+@@ -63,8 +63,8 @@
+ services = {
+     'ENABLED': True,
+     'KERNEL_CMD': '/proc/cmdline',
+-    'SAMBA_NMDB': '/usr/bin/nmbd',
+-    'SAMBA_SMDB': '/usr/bin/smbd',
++    'SAMBA_NMDB': '/usr/sbin/nmbd',
++    'SAMBA_SMDB': '/usr/sbin/smbd',
+     'D_SAMBA_SECURE': '0',
+     'D_SAMBA_USERNAME': 'libreelec',
+     'D_SAMBA_PASSWORD': 'libreelec',
