@@ -40,7 +40,7 @@ OEM_APPS_COMMON=" \
   sdl-jstest \
   tcpdump \
   ttf-tlwg \
-  unfs3 \
+  nfs-utils \
   vim"
 
 OEM_APPS_GENERIC=" \
