@@ -4,4 +4,4 @@
  Type=forking
  PIDFile=/var/run/rpc.statd.pid
  ExecStart=/usr/sbin/rpc.statd
-+ExecStartPre=mkdir -p /var/lib/nfs/sm /var/lib/nfs/sm.bak
++ExecStartPre=/usr/bin/mkdir -p /var/lib/nfs/sm /var/lib/nfs/sm.bak
