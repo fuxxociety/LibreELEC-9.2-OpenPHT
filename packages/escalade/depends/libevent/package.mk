@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="libevent"
-PKG_VERSION="2.0.22-stable"
+PKG_VERSION="2.1.8-stable"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"
 PKG_SITE="http://libevent.org/"
@@ -28,14 +28,12 @@ PKG_DEPENDS_TARGET="toolchain libressl zlib"
 PKG_SECTION="devel"
 PKG_SHORTDESC="libevent: A library for asynchronous event notification"
 PKG_LONGDESC="The libevent API provides a mechanism to execute a callback function when a specific event occurs on a file descriptor or after a timeout has been reached. It is meant to replace the asynchronous event loop found in event-driven network servers."
+
 PKG_IS_ADDON="no"
+PKG_AUTORECONF="no"
 
-PKG_AUTORECONF="yes"
-
-PKG_MAINTAINER="unofficial.addon.pro"
-
-PKG_CONFIGURE_OPTS_TARGET="--disable-shared --enable-static --enable-openssl"
+PKG_CONFIGURE_OPTS_TARGET="--enable-openssl --disable-debug-mode"
 
 post_makeinstall_target() {
-  rm -r $INSTALL
+  rm -rf $INSTALL/usr/bin
 }
