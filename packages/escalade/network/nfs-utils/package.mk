@@ -32,21 +32,4 @@ post_makeinstall_target() {
   cp nfs.conf $INSTALL/usr/config/
   cp utils/mount/nfsmount.conf $INSTALL/usr/config/
   cp $PKG_DIR/config/* $INSTALL/usr/config/
-
-  # This was needed for showmount to work locally
-  wget https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xml
-  gawk '
-BEGIN {
-        print "# Full data: https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xml\n"
-	FS="[<>]"
-}
-
-{
-	if (/<record/) { n=u=p=c=0 }
-	if (/<name/ && !/\(/) n=$3
-	if (/<number/) u=$3
-	if (/<protocol/) p=$3
-	if (/Unassigned/ || /Reserved/ || /historic/) c=1
-	if (/<\/record/ && n && u && p && !c) printf "%-15s %5i/%s\n", n,u,p
-}' service-names-port-numbers.xml > $INSTALL/etc/services
 }
