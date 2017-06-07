@@ -17,12 +17,12 @@
 ################################################################################
 
 PKG_NAME="libnfs"
-PKG_VERSION="1.11.0"
+PKG_VERSION="128ac2f"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/sahlberg/libnfs"
-PKG_URL="https://github.com/sahlberg/libnfs/archive/$PKG_NAME-$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="$PKG_NAME-$PKG_NAME-$PKG_VERSION"
+PKG_URL="https://github.com/sahlberg/libnfs/archive/$PKG_VERSION.tar.gz"
+PKG_SOURCE_DIR="$PKG_NAME-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="network"
 PKG_SHORTDESC="libnfs: a client library for accessing NFS shares over a network."
