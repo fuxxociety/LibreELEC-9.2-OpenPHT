@@ -17,11 +17,12 @@
 ################################################################################
 
 PKG_NAME="tigervnc-system"
-PKG_VERSION="1.7.0"
+PKG_VERSION="1.8.0"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="http://www.tigervnc.org"
 PKG_URL="https://github.com/TigerVNC/tigervnc/archive/v$PKG_VERSION.tar.gz"
+PKG_SOURCE_DIR="tigervnc-$PKG_VERSION"
 PKG_DEPENDS_TARGET="toolchain cmake:host libX11 libXext libXtst zlib libjpeg-turbo"
 PKG_SECTION="service"
 PKG_SHORTDESC="TigerVNC server"
@@ -30,10 +31,6 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 PKG_CMAKE_OPTS_TARGET="-DBUILD_VIEWER=off"
-
-post_unpack() {
-  mv $BUILD/tigervnc-$PKG_VERSION $BUILD/$PKG_NAME-$PKG_VERSION
-}
 
 post_makeinstall_target() {
   rm $INSTALL/usr/bin/vncserver
