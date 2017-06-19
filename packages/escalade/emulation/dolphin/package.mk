@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="dolphin"
-PKG_VERSION="d7faba5"
+PKG_VERSION="68fef47"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/dolphin-emu/dolphin"
@@ -29,10 +29,11 @@ PKG_SHORTDESC="Dolphin GameCube/Wii emulator"
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-PKG_CMAKE_OPTS_TARGET="-DSYSTEM_PORTAUDIO_EXITCODE=0 -DENABLE_LTO=on -DUSE_SHARED_ENET=on"
+PKG_CMAKE_OPTS_TARGET="-DSYSTEM_PORTAUDIO_EXITCODE=0 -DENABLE_LTO=off -DUSE_SHARED_ENET=on"
 
 pre_configure_target() {
   strip_gold
+  strip_lto
 }
 
 pre_make_target() {
