@@ -32,3 +32,5 @@ PKG_AUTORECONF="no"
 pre_configure_target() {
   export SYSROOT_PREFIX
 }
+
+PKG_CONFIGURE_OPTS_TARGET="ac_cv_prog_HAVE_SDL=yes"
