@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="desmume-libretro"
-PKG_VERSION="63ed05b"
+PKG_VERSION="73531d7"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/desmume"
@@ -32,6 +32,7 @@ PKG_AUTORECONF="no"
 
 pre_build_target() {
   export GIT_VERSION=$PKG_VERSION
+  export LIBS=-lpthread
 }
 
 post_unpack() {
