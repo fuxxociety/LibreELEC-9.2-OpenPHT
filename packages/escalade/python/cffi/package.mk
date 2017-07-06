@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="cffi"
-PKG_VERSION="1.9"
+PKG_VERSION="1.10"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://cffi.readthedocs.org"
