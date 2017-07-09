@@ -22,7 +22,7 @@ PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://rtmpdump.mplayerhq.hu/"
 PKG_URL="http://repo.or.cz/rtmpdump.git/snapshot/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain zlib openssl"
+PKG_DEPENDS_TARGET="toolchain zlib gnutls"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="rtmpdump: a toolkit for RTMP streams."
 PKG_LONGDESC="rtmpdump is a toolkit for RTMP streams. All forms of RTMP are supported, including rtmp://, rtmpt://, rtmpe://, rtmpte://, and rtmps://."
@@ -41,7 +41,7 @@ make_target() {
        LD="$LD" \
        AR="$AR" \
        SHARED=no \
-       CRYPTO="OPENSSL" \
+       CRYPTO="GNUTLS" \
        OPT="" \
        XCFLAGS="$CFLAGS" \
        XLDFLAGS="$LDFLAGS" \
@@ -58,7 +58,7 @@ makeinstall_target() {
        LD="$LD" \
        AR="$AR" \
        SHARED=no \
-       CRYPTO="OPENSSL" \
+       CRYPTO="GNUTLS" \
        OPT="" \
        XCFLAGS="$CFLAGS" \
        XLDFLAGS="$LDFLAGS" \
@@ -74,7 +74,7 @@ makeinstall_target() {
        LD="$LD" \
        AR="$AR" \
        SHARED=no \
-       CRYPTO="OPENSSL" \
+       CRYPTO="GNUTLS" \
        OPT="" \
        XCFLAGS="$CFLAGS" \
        XLDFLAGS="$LDFLAGS" \
