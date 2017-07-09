@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="openssl-compat"
-PKG_VERSION="1.0.2k"
+PKG_VERSION="1.0.2l"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"
@@ -82,6 +82,6 @@ configure_target() {
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib
-  cp libcrypto.so $INSTALL/usr/lib/libcrypto-compat.so
-  cp libssl.so $INSTALL/usr/lib/libssl-compat.so
+  cp libcrypto.so $INSTALL/usr/lib/libcrypto.so.1.0.0
+  cp libssl.so $INSTALL/usr/lib/libssl.so.1.0.0
 }
