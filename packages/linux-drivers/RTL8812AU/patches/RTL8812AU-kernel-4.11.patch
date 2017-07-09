@@ -25,3 +25,14 @@ index 82e27c5..d866551 100644
 -- 
 2.7.4
 
+--- a/os_dep/linux/ioctl_cfg80211.c	2017-07-09 02:33:29.472009031 +0200
++++ b/os_dep/linux/ioctl_cfg80211.c	2017-07-09 02:33:42.112141847 +0200
+@@ -3970,7 +3970,7 @@
+ 	mon_ndev->type = ARPHRD_IEEE80211_RADIOTAP;
+ 	strncpy(mon_ndev->name, name, IFNAMSIZ);
+ 	mon_ndev->name[IFNAMSIZ - 1] = 0;
+-	mon_ndev->destructor = rtw_ndev_destructor;
++	mon_ndev->priv_destructor = rtw_ndev_destructor;
+ 	
+ #if (LINUX_VERSION_CODE>=KERNEL_VERSION(2,6,29))
+ 	mon_ndev->netdev_ops = &rtw_cfg80211_monitor_if_ops;
