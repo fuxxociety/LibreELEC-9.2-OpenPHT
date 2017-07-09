@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="openssl"
-PKG_VERSION="1.0.2l"
+PKG_VERSION="1.1.0f"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"
@@ -37,18 +37,12 @@ PKG_CONFIGURE_OPTS_SHARED="--openssldir=/etc/ssl \
                            shared \
                            threads \
                            no-ec2m \
-                           no-gmp \
-                           no-jpake \
-                           no-krb5 \
-                           no-libunbound \
                            no-md2 \
                            no-rc5 \
                            no-rfc3779
                            no-sctp \
                            no-ssl-trace \
-                           no-ssl2 \
                            no-ssl3 \
-                           no-store \
                            no-unit-test \
                            no-weak-ssl-ciphers \
                            no-zlib \
@@ -95,10 +89,8 @@ configure_target() {
 }
 
 makeinstall_target() {
-  make INSTALL_PREFIX=$INSTALL install_sw
-  make INSTALL_PREFIX=$SYSROOT_PREFIX install_sw
-  chmod 755 $INSTALL/usr/lib/*.so*
-  chmod 755 $INSTALL/usr/lib/engines/*.so
+  make DESTDIR=$INSTALL install_sw install_ssldirs
+  make DESTDIR=$SYSROOT_PREFIX install_sw
 }
 
 post_makeinstall_target() {
