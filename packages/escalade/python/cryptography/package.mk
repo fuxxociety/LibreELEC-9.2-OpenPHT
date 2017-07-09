@@ -17,20 +17,18 @@
 ################################################################################
 
 PKG_NAME="cryptography"
-PKG_VERSION="1.9"
+PKG_VERSION="9d5fc3e"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="https://github.com/pyca/cryptography"
 PKG_URL="https://github.com/pyca/cryptography/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain Python distutilscross:host cffi:host cffi enum idna ipaddress pyasn1 six"
+PKG_DEPENDS_TARGET="toolchain Python distutilscross:host cffi:host cffi enum idna ipaddress pyasn1 six asn1crypto"
 PKG_SECTION="python/devel"
 PKG_SHORTDESC="Provides cryptographic recipes and primitives to Python developers"
-PKG_LONGDESC="Includes both high level recipes, and low level interfaces to common cryptographic algorithms such as symmetric ciphers, message digests and key derivation functions. For example, to encrypt something with cryptography’s high level symmetric encryption recipe"
+PKG_LONGDESC="Includes both high level recipes, and low level interfaces to common cryptographic algorithms such as symmetric ciphers, message digests and key derivation functions. For example, to encrypt something with cryptography's high level symmetric encryption recipe"
 PKG_IS_ADDON="no"
 
 PKG_AUTORECONF="no"
-
-PKG_MAINTAINER="unofficial.addon.pro"
 
 pre_make_target() {
   export PYTHONXCPREFIX="$SYSROOT_PREFIX/usr"
