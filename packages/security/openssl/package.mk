@@ -61,7 +61,7 @@ configure_host() {
 }
 
 makeinstall_host() {
-  make INSTALL_PREFIX=$TOOLCHAIN install_sw
+  make DESTDIR=$TOOLCHAIN install_sw
 }
 
 pre_configure_target() {
