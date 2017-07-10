@@ -40,7 +40,7 @@ make_target() {
        CC="$CC" \
        LD="$LD" \
        AR="$AR" \
-       SHARED=no \
+       SHARED=yes \
        CRYPTO="GNUTLS" \
        OPT="" \
        XCFLAGS="$CFLAGS" \
@@ -57,7 +57,7 @@ makeinstall_target() {
        CC="$CC" \
        LD="$LD" \
        AR="$AR" \
-       SHARED=no \
+       SHARED=yes \
        CRYPTO="GNUTLS" \
        OPT="" \
        XCFLAGS="$CFLAGS" \
@@ -73,7 +73,7 @@ makeinstall_target() {
        CC="$CC" \
        LD="$LD" \
        AR="$AR" \
-       SHARED=no \
+       SHARED=yes \
        CRYPTO="GNUTLS" \
        OPT="" \
        XCFLAGS="$CFLAGS" \
