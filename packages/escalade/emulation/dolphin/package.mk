@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="dolphin"
-PKG_VERSION="68fef47"
+PKG_VERSION="dcb4386"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/dolphin-emu/dolphin"
@@ -38,7 +38,7 @@ pre_configure_target() {
 
 pre_make_target() {
   find . -name flags.make -exec sed -i "s:isystem :I:g" \{} \;
-  export VERBOSE=1
+  #export VERBOSE=1
 }
 
 post_makeinstall_target() {
