@@ -14,6 +14,11 @@ PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-documentation"
 
+if [ "$PROJECT" = "$RPi2" ]; then
+  PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --enable-arm-neon"
+fi
+
 post_makeinstall_target() {
   rm -rf $INSTALL/usr/bin
 }
+
