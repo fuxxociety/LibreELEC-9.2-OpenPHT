@@ -1,9 +1,9 @@
 --- a/Makefile	2017-04-05 12:10:13.564647818 +0200
 +++ b/Makefile	2017-04-05 12:10:21.881389176 +0200
-@@ -2,7 +2,7 @@
- 
- STATIC_LINKING := 0
+@@ -4,7 +4,7 @@
  AR             := ar
+ INSTALL        := install
+ STRIP          := strip
 -GIT_VERSION := " $(shell git rev-parse --short HEAD)"
 +GIT_VERSION ?= " $(shell git rev-parse --short HEAD)"
  
