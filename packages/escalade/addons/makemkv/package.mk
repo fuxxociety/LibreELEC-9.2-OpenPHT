@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="makemkv"
-PKG_VERSION="1.10.5"
+PKG_VERSION="1.10.6"
 PKG_ARCH="x86_64"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.makemkv.com/forum2/viewforum.php?f=3"
@@ -34,7 +34,7 @@ PKG_ADDON_REPOVERSION="8.0"
 
 PKG_AUTORECONF="no"
 
-PKG_CONFIGURE_OPTS_TARGET="--disable-gui --enable-noec"
+PKG_CONFIGURE_OPTS_TARGET="--disable-gui"
 
 post_unpack() {
   mv $BUILD/${PKG_NAME}-oss-${PKG_VERSION} $BUILD/$PKG_NAME-$PKG_VERSION
@@ -70,5 +70,5 @@ addon() {
   cp $PKG_BUILD/out/libmakemkv.so.[0-9] $ADDON_BUILD/$PKG_ADDON_ID/lib
   cp $PKG_BUILD/out/libdriveio.so.[0-9] $ADDON_BUILD/$PKG_ADDON_ID/lib
   cp $PKG_BUILD/out/libmmbd.so.[0-9] $ADDON_BUILD/$PKG_ADDON_ID/lib
-  cp -PL $(get_build_dir libressl)/.install_pkg/usr/lib/libcrypto.so.?? $ADDON_BUILD/$PKG_ADDON_ID/lib
+  cp -PL $(get_build_dir openssl)/.install_pkg/usr/lib/libcrypto.so.1.1 $ADDON_BUILD/$PKG_ADDON_ID/lib
 }
