@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="vim"
-PKG_VERSION="8.0.0022"
+PKG_VERSION="8.0.0722"
 PKG_ARCH="any"
 PKG_LICENSE="VIM"
 PKG_SITE="http://www.vim.org/"
@@ -37,19 +37,20 @@ PKG_CONFIGURE_OPTS_TARGET="vim_cv_toupper_broken=no \
                            vim_cv_getcwd_broken=no \
                            vim_cv_stat_ignores_slash=yes \
                            vim_cv_memmove_handles_overlap=yes \
+                           vim_cv_tgent=zero \
                            ac_cv_sizeof_int=4 \
                            ac_cv_small_wchar_t=no \
 			   --enable-selinux=no \
                            --enable-gui=no \
                            --with-compiledby=LibreELEC \
-                           --with-features=huge \
+                           --with-features=normal \
                            --with-tlib=ncurses \
                            --without-x"
 
 pre_configure_target() {
   cd ..
   rm -rf .$TARGET_NAME
-  export LIBS="-lcurses -lterminfo"
+  export LIBS="-lterminfo"
 }
 
 post_makeinstall_target() {
