@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="glibc"
-PKG_VERSION="2.25"
+PKG_VERSION="2.26"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.gnu.org/software/libc/"
@@ -49,6 +49,7 @@ PKG_CONFIGURE_OPTS_TARGET="BASH_SHELL=/bin/sh \
                            --without-cvs \
                            --without-gd \
                            --enable-obsolete-rpc \
+			   --enable-obsolete-nsl \
                            --disable-build-nscd \
                            --disable-nscd \
                            --enable-lock-elision \
@@ -118,6 +119,9 @@ echo "rootsbindir=/usr/bin" >> configparms
 }
 
 post_makeinstall_target() {
+# xlocale.h was renamed - create symlink for compatibility
+  ln -sf $SYSROOT_PREFIX/usr/include/bits/types/__locale_t.h $SYSROOT_PREFIX/usr/include/xlocale.h
+
 # we are linking against ld.so, so symlink
   ln -sf $(basename $INSTALL/usr/lib/ld-*.so) $INSTALL/usr/lib/ld.so
 
