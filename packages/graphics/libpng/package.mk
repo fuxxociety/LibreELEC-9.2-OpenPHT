@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="libpng"
-PKG_VERSION="1.6.25"
+PKG_VERSION="1.6.29"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.libpng.org/"
@@ -36,6 +36,10 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_lib_z_zlibVersion=yes"
 
 if [ "$PROJECT" = "RPi2" ]; then
   PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --enable-arm-neon=yes"
+fi
+
+if [ "$TARGET_ARCH" = "x86_64" ]; then
+  PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --enable-intel-sse"
 fi
 
 PKG_CONFIGURE_OPTS_HOST="--enable-static --disable-shared"
