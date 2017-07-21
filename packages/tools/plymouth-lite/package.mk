@@ -58,4 +58,7 @@ makeinstall_init() {
     else
       cp $PKG_DIR/splash/splash-*.png $INSTALL/splash
     fi
+
+  mkdir -p $INSTALL/usr/lib
+    cp -a $(get_build_dir libpng)/.install_pkg/usr/lib/libpng*so* $INSTALL/usr/lib/
 }
