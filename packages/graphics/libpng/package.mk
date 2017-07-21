@@ -34,7 +34,7 @@ PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="ac_cv_lib_z_zlibVersion=yes"
 
-if [[ "$PROJECT" =~ "RPi" ]]; then
+if [ "$PROJECT" = "RPi2" ]; then
   PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --enable-arm-neon=yes"
 fi
 
