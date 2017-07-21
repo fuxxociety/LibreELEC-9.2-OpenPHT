@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="cryptography"
-PKG_VERSION="9d5fc3e"
+PKG_VERSION="2.0"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="https://github.com/pyca/cryptography"
