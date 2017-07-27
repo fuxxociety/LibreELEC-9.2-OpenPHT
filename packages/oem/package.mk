@@ -41,7 +41,7 @@ OEM_APPS_COMMON=" \
   tcpdump \
   ttf-tlwg \
   nfs-utils \
-  vim"
+  vim-system"
 
 OEM_APPS_GENERIC=" \
   google-chrome \
