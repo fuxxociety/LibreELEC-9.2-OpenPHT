@@ -16,12 +16,13 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="dstat"
+PKG_NAME="dstat-system"
 PKG_VERSION="4c47a34"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://dag.wiee.rs/home-made/dstat"
 PKG_URL="https://github.com/dagwieers/dstat/archive/$PKG_VERSION.tar.gz"
+PKG_SOURCE_DIR="dstat-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain Python"
 PKG_SECTION="tools"
 PKG_SHORTDESC="Versatile resource statistics tool"
