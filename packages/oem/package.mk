@@ -32,7 +32,7 @@ PKG_AUTORECONF="no"
 
 OEM_APPS_COMMON=" \
   dstat-system \
-  htop \
+  htop-system \
   nmon-system \
   plexmediaserver-script \
   rsync \
