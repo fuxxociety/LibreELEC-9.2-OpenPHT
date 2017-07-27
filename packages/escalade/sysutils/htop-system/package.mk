@@ -16,12 +16,13 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="htop"
+PKG_NAME="htop-system"
 PKG_VERSION="2.0.2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://hisham.hm/htop"
 PKG_URL="https://github.com/hishamhm/htop/archive/$PKG_VERSION.tar.gz"
+PKG_SOURCE_DIR="htop-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain netbsd-curses"
 PKG_SECTION="tools"
 PKG_SHORTDESC="An interactive process viewer for Unix"
