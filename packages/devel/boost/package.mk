@@ -76,7 +76,7 @@ makeinstall_target() {
                                 --with-regex -sICU_PATH="$SYSROOT_PREFIX/usr" \
                                 install
 
-  $ROOT/$TOOLCHAIN/bin/bjam -d2 --toolset=gcc link=shared \
+  $TOOLCHAIN/bin/bjam -d2 --toolset=gcc link=shared \
                                 --prefix=$INSTALL/usr \
                                 --ignore-site-config \
                                 --layout=system \
