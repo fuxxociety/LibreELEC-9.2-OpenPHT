@@ -38,8 +38,8 @@ PKG_CONFIGURE_OPTS_TARGET="LIBPNG_CFLAGS=-I$SYSROOT_PREFIX/usr/include \
                            --with-zlib"
 
 # host specific configure options
-PKG_CONFIGURE_OPTS_HOST="LIBPNG_CFLAGS=-I$ROOT/$TOOLCHAIN/include \
-                           LIBPNG_LDFLAGS=-L$ROOT/$TOOLCHAIN/lib \
+PKG_CONFIGURE_OPTS_HOST="LIBPNG_CFLAGS=-I$TOOLCHAIN/include \
+                           LIBPNG_LDFLAGS=-L$TOOLCHAIN/lib \
                            --with-zlib"
 
 post_makeinstall_target() {
