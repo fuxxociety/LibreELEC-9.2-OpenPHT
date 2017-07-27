@@ -22,7 +22,7 @@ PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="http://curl.haxx.se"
 PKG_URL="http://curl.haxx.se/download/curl-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS_TARGET="toolchain zlib libressl rtmpdump"
+PKG_DEPENDS_TARGET="toolchain zlib openssl rtmpdump"
 PKG_SECTION="escalade/depends"
 PKG_SHORTDESC="libcurl without versioned symbols"
 
