@@ -49,7 +49,7 @@ PKG_CMAKE_OPTS_HOST="-DLLVM_INCLUDE_TOOLS=ON \
                      -DLLVM_ENABLE_WERROR=OFF \
                      -DLLVM_ENABLE_ZLIB=OFF \
                      -DLLVM_OPTIMIZED_TABLEGEN=ON \
-                     -DCMAKE_INSTALL_RPATH=$ROOT/$TOOLCHAIN/lib"
+                     -DCMAKE_INSTALL_RPATH=$TOOLCHAIN/lib"
 
 make_host() {
   make llvm-config llvm-tblgen
