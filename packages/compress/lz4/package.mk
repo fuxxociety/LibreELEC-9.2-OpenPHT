@@ -37,13 +37,13 @@ make_host() {
 }
 
 makeinstall_host() {
-  mkdir -p $ROOT/$TOOLCHAIN/bin
-    cp -f programs/lz4 $ROOT/$TOOLCHAIN/bin
-    cp -f programs/lz4c $ROOT/$TOOLCHAIN/bin
-  mkdir -p $ROOT/$TOOLCHAIN/include
-    cp -f lib/lz4.h $ROOT/$TOOLCHAIN/include
-    cp -f lib/lz4hc.h $ROOT/$TOOLCHAIN/include
-    cp -f lib/lz4frame.h $ROOT/$TOOLCHAIN/include
-  mkdir -p $ROOT/$TOOLCHAIN/lib
-    cp -f lib/liblz4.a $ROOT/$TOOLCHAIN/lib
+  mkdir -p $TOOLCHAIN/bin
+    cp -f programs/lz4 $TOOLCHAIN/bin
+    cp -f programs/lz4c $TOOLCHAIN/bin
+  mkdir -p $TOOLCHAIN/include
+    cp -f lib/lz4.h $TOOLCHAIN/include
+    cp -f lib/lz4hc.h $TOOLCHAIN/include
+    cp -f lib/lz4frame.h $TOOLCHAIN/include
+  mkdir -p $TOOLCHAIN/lib
+    cp -f lib/liblz4.a $TOOLCHAIN/lib
 }
