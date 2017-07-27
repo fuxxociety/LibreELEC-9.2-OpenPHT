@@ -31,7 +31,7 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 OEM_APPS_COMMON=" \
-  dstat \
+  dstat-system \
   htop \
   nmon-system \
   plexmediaserver-script \
