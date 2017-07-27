@@ -34,9 +34,9 @@ PKG_AUTORECONF="no"
 
 post_patch() {
   mkdir -p $PKG_BUILD/.$HOST_NAME
-  cp -r $PKG_BUILD/* $ROOT/$PKG_BUILD/.$HOST_NAME
+  cp -r $PKG_BUILD/* $PKG_BUILD/.$HOST_NAME
   mkdir -p $PKG_BUILD/.$TARGET_NAME 
-  cp -r $PKG_BUILD/* $ROOT/$PKG_BUILD/.$TARGET_NAME
+  cp -r $PKG_BUILD/* $PKG_BUILD/.$TARGET_NAME
 }
 
 
