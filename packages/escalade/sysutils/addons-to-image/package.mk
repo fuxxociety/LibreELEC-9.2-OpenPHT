@@ -41,8 +41,8 @@ make_target() {
 makeinstall_target() {
   for ADDON_ID in $PKG_ADDONS_INCLUDE; do
     mkdir -p $INSTALL/usr/share/kodi/addons/$ADDON_ID
-    cp -PR $ROOT/$BUILD/addons/$ADDON_ID/*$ADDON_ID $INSTALL/usr/share/kodi/addons
-    KODI_ADDON_MANIFEST="$ROOT/$BUILD/image/system/usr/share/kodi/system/addon-manifest.xml"
+    cp -PR $BUILD/addons/$ADDON_ID/*$ADDON_ID $INSTALL/usr/share/kodi/addons
+    KODI_ADDON_MANIFEST="$BUILD/image/system/usr/share/kodi/system/addon-manifest.xml"
     xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "$ADDON_ID" $KODI_ADDON_MANIFEST
   done
 }

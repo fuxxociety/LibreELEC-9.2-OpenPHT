@@ -30,7 +30,7 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 pre_make_host() {
-  export CFLAGS="-I$ROOT/$TOOLCHAIN/include/python2.7 $CFLAGS"
+  export CFLAGS="-I$TOOLCHAIN/include/python2.7 $CFLAGS"
   export LDSHARED="$CC -shared"
 }
 
@@ -39,5 +39,5 @@ make_host() {
 }
 
 makeinstall_host() {
-  python setup.py install --prefix=$ROOT/$TOOLCHAIN
+  python setup.py install --prefix=$TOOLCHAIN
 }

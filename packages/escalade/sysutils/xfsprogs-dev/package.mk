@@ -33,7 +33,7 @@ PKG_AUTORECONF="no"
 PKG_CONFIGURE_OPTS_TARGET="--enable-shared=no --with-gnu-ld --host=$TARGET_NAME --build=$HOST_NAME"
 
 pre_configure_target() {
-  cd $ROOT/$PKG_BUILD
+  cd $PKG_BUILD
   rm -rf $TARGET_NAME
   make configure
 }

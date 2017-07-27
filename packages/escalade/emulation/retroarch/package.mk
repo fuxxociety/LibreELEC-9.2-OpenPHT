@@ -35,7 +35,7 @@ unpack() {
   cd $PKG_BUILD
   git reset --hard $PKG_VERSION
   rm -rf .git
-  cd $ROOT
+  cd -
 }
 
 if [ "$OPENGLES_SUPPORT" = yes ]; then
@@ -85,8 +85,8 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-vg \
 
 pre_configure_target() {
   strip_lto # workaround for https://github.com/libretro/RetroArch/issues/1078
-  cd $ROOT/$PKG_BUILD
-  export PKG_CONF_PATH=$ROOT/$BUILD/toolchain/bin/pkg-config
+  cd $PKG_BUILD
+  export PKG_CONF_PATH=$TOOLCHAIN/bin/pkg-config
   echo $PKG_VERSION > .gitversion
 }
 
@@ -98,11 +98,11 @@ make_target() {
 makeinstall_target() {
   mkdir -p $INSTALL/usr/bin
   mkdir -p $INSTALL/etc
-    cp $ROOT/$PKG_BUILD/retroarch $INSTALL/usr/bin
-    cp $ROOT/$PKG_BUILD/retroarch.cfg $INSTALL/etc
+    cp $PKG_BUILD/retroarch $INSTALL/usr/bin
+    cp $PKG_BUILD/retroarch.cfg $INSTALL/etc
   mkdir -p $INSTALL/usr/share/retroarch/video_filters
-    cp $ROOT/$PKG_BUILD/gfx/video_filters/*.so $INSTALL/usr/share/retroarch/video_filters
-    cp $ROOT/$PKG_BUILD/gfx/video_filters/*.filt $INSTALL/usr/share/retroarch/video_filters
+    cp $PKG_BUILD/gfx/video_filters/*.so $INSTALL/usr/share/retroarch/video_filters
+    cp $PKG_BUILD/gfx/video_filters/*.filt $INSTALL/usr/share/retroarch/video_filters
     cp $PKG_DIR/scripts/* $INSTALL/usr/bin
   
   # General configuration

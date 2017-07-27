@@ -59,7 +59,7 @@ pre_configure_target() {
 }
 
 post_makeinstall_target() {
-  mkdir -p $ROOT/$TOOLCHAIN/bin
+  mkdir -p $TOOLCHAIN/bin
   $SED "s:\(['=\" ]\)/usr:\\1$SYSROOT_PREFIX/usr:g" $SYSROOT_PREFIX/usr/bin/sdl-config
   $SED "s:echo\ \-L/usr.*:echo\ \-lSDL:g" $SYSROOT_PREFIX/usr/bin/sdl-config
   rm -rf $INSTALL/usr/bin

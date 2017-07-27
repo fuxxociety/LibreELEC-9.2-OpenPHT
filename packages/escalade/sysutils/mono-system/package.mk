@@ -65,7 +65,7 @@ configure_target() {
 
 makeinstall_target() {
   export MAKEFLAGS="-j1"
-  make -C "$ROOT/$PKG_BUILD/.$HOST_NAME" install DESTDIR="$INSTALL"
-  make -C "$ROOT/$PKG_BUILD/.$TARGET_NAME" install DESTDIR="$INSTALL"
+  make -C "$PKG_BUILD/.$HOST_NAME" install DESTDIR="$INSTALL"
+  make -C "$PKG_BUILD/.$TARGET_NAME" install DESTDIR="$INSTALL"
   $STRIP "$INSTALL/usr/bin/mono"
 }

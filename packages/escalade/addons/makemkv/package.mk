@@ -38,7 +38,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-gui"
 
 post_unpack() {
   mv $BUILD/${PKG_NAME}-oss-${PKG_VERSION} $BUILD/$PKG_NAME-$PKG_VERSION
-  cd $ROOT/$PKG_BUILD
+  cd $PKG_BUILD
   wget "http://www.makemkv.com/download/${PKG_NAME}-bin-${PKG_VERSION}.tar.gz"
   tar zxf ${PKG_NAME}-bin-${PKG_VERSION}.tar.gz
   mv ${PKG_NAME}-bin-${PKG_VERSION} bin
@@ -48,7 +48,7 @@ post_unpack() {
 
 pre_configure_target() {
 # makemkv fails to build in subdirs
-  cd $ROOT/$PKG_BUILD
+  cd $PKG_BUILD
     rm -rf .$TARGET_NAME
 }
 

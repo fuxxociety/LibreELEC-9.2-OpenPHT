@@ -58,8 +58,8 @@ PKG_CONFIGURE_OPTS_SHARED="--openssldir=/etc/ssl \
 
 pre_configure_target() {
   export MAKEFLAGS=-j1
-  mkdir -p $ROOT/$PKG_BUILD/.$TARGET_NAME
-  cp -a $ROOT/$PKG_BUILD/* $ROOT/$PKG_BUILD/.$TARGET_NAME/
+  mkdir -p $PKG_BUILD/.$TARGET_NAME
+  cp -a $PKG_BUILD/* $PKG_BUILD/.$TARGET_NAME/
 
   case $TARGET_ARCH in
     x86_64)
@@ -76,7 +76,7 @@ pre_configure_target() {
 }
 
 configure_target() {
-  cd $ROOT/$PKG_BUILD/.$TARGET_NAME
+  cd $PKG_BUILD/.$TARGET_NAME
   ./Configure --prefix=/usr $PKG_CONFIGURE_OPTS_SHARED $PLATFORM_FLAGS $OPENSSL_TARGET
 }
 

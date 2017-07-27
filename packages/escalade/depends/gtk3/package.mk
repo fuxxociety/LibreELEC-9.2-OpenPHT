@@ -15,7 +15,7 @@ PKG_IS_ADDON="no"
 
 PKG_AUTORECONF="no"
 
-PKG_CONFIGURE_OPTS_TARGET="ac_cv_path_GLIB_GENMARSHAL=$ROOT/$TOOLCHAIN/bin/glib-genmarshal \
+PKG_CONFIGURE_OPTS_TARGET="ac_cv_path_GLIB_GENMARSHAL=$TOOLCHAIN/bin/glib-genmarshal \
                            --disable-glibtest \
                            --enable-modules \
                            --enable-explicit-deps=no \

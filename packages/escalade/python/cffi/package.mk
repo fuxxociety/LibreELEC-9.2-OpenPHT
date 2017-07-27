@@ -46,7 +46,7 @@ pre_build_target() {
 }
 
 pre_make_host() {
-  export CFLAGS="-I$ROOT/$TOOLCHAIN/include/python2.7 $CFLAGS"
+  export CFLAGS="-I$TOOLCHAIN/include/python2.7 $CFLAGS"
   export LDSHARED="$CC -shared"
   cd .$HOST_NAME
 }
@@ -71,7 +71,7 @@ makeinstall_target() {
 }
 
 makeinstall_host() {
-  python setup.py install --prefix=$ROOT/$TOOLCHAIN
+  python setup.py install --prefix=$TOOLCHAIN
 }
 
 post_makeinstall_target() {
