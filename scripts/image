@@ -207,7 +207,7 @@ $SCRIPTS/install debug
 
 # Enable addons
   if [ -n "$ADDON_ENABLE" ]; then
-    KODI_ADDON_MANIFEST="$ROOT/$BUILD/image/system/usr/share/kodi/system/addon-manifest.xml"
+    KODI_ADDON_MANIFEST="$BUILD/image/system/usr/share/kodi/system/addon-manifest.xml"
     for ADDON_ID in $ADDON_ENABLE; do
       xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "$ADDON_ID" $KODI_ADDON_MANIFEST
     done
