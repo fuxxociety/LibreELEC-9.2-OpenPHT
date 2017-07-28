@@ -21,7 +21,6 @@ PKG_VERSION="6f637df"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch.git"
-PKG_URL="custom"
 PKG_DEPENDS_TARGET="toolchain alsa-lib freetype zlib retroarch-assets core-info retroarch-joypad-autoconfig common-shaders libretro-database ffmpeg tinyalsa"
 PKG_SECTION="emulation"
 PKG_SHORTDESC="Reference frontend for the libretro API."
@@ -30,12 +29,18 @@ PKG_LONGDESC="RetroArch is the reference frontend for the libretro API. Popular 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-unpack() {
-  git clone --recursive https://github.com/libretro/RetroArch $PKG_BUILD
-  cd $PKG_BUILD
+pre_build_target() {
+  git clone --recursive https://github.com/libretro/RetroArch $PKG_BUILD/$PKG_NAME-git
+  cd $PKG_BUILD/$PKG_NAME-git
   git reset --hard $PKG_VERSION
   rm -rf .git
   cd -
+  mv $PKG_BUILD/$PKG_NAME-git/* $PKG_BUILD/
+  rm -rf $PKG_BUILD/$PKG_NAME-git
+  for a in $PKG_DIR/patches/*.patch
+  do
+    patch -p1 -d $PKG_BUILD < $a
+  done
 }
 
 if [ "$OPENGLES_SUPPORT" = yes ]; then
@@ -85,7 +90,8 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-vg \
 
 pre_configure_target() {
   strip_lto # workaround for https://github.com/libretro/RetroArch/issues/1078
-  cd $PKG_BUILD
+  cd ..
+  rm -rf .$TARGET_NAME
   export PKG_CONF_PATH=$TOOLCHAIN/bin/pkg-config
   echo $PKG_VERSION > .gitversion
 }
