@@ -21,7 +21,6 @@ PKG_VERSION="5f7bcf7"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/libretro-ppsspp"
-PKG_URL="custom"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="Non-shallow fork of PPSSPP for libretro exclusively."
@@ -30,11 +29,14 @@ PKG_LONGDESC="A fast and portable PSP emulator"
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-unpack() {
-  git clone --recursive https://github.com/libretro/libretro-ppsspp $PKG_BUILD
-  cd $PKG_BUILD
+pre_build_target() {
+  git clone --recursive https://github.com/libretro/libretro-ppsspp $PKG_BUILD/$PKG_NAME-git
+  cd $PKG_BUILD/$PKG_NAME-git
   git reset --hard $PKG_VERSION
-  cd $ROOT
+  rm -rf .git
+  cd -
+  mv $PKG_BUILD/$PKG_NAME-git/* $PKG_BUILD/
+  rm -rf $PKG_BUILD/$PKG_NAME-git
 }
 
 pre_configure_target() {
