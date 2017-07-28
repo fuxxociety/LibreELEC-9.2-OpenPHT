@@ -21,17 +21,12 @@ PKG_VERSION="latest"
 PKG_ARCH="any"
 PKG_LICENSE="Freeware"
 PKG_SITE="http://www.google.com/chrome"
-PKG_URL="custom"
 PKG_DEPENDS_TARGET="toolchain gtk3 libXcomposite libXcursor libxss nss gconf scrnsaverproto atk cups"
 PKG_SECTION="apps"
 PKG_SHORTDESC="Google Chrome browser"
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
-
-unpack() {
-  mkdir -p $PKG_BUILD
-}
 
 make_target() {
   :
