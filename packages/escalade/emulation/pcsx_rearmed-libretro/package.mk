@@ -36,10 +36,8 @@ PKG_AUTORECONF="no"
 configure_target() {
   cd ../
   rm -rf .$TARGET_NAME
-}
-
-pre_build_target() {
   export GIT_VERSION=$PKG_VERSION
+  strip_gold
 }
 
 make_target() {
