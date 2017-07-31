@@ -124,6 +124,7 @@ makeinstall_target() {
   sed -i -e "s/# assets_directory =/assets_directory =\/tmp\/assets/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# menu_driver = \"rgui\"/menu_driver = \"xmb\"/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# video_shared_context = false/video_shared_context = true/" $INSTALL/etc/retroarch.cfg
+  sed -i -e "s/# menu_show_core_updater = true/# menu_show_core_updater = false/" $INSTALL/etc/retroarch.cfg
   echo 'cursor_directory = "/tmp/database/cursors"' >> $INSTALL/etc/retroarch.cfg
   echo 'recording_output_directory = "/storage/videos"' >> $INSTALL/etc/retroarch.cfg
   echo 'system_directory = "/storage/roms/bios"' >> $INSTALL/etc/retroarch.cfg
