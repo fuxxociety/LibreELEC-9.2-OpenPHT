@@ -17,11 +17,12 @@
 ################################################################################
 
 PKG_NAME="Python"
-PKG_VERSION="2.7.13"
+PKG_VERSION="3dd1ccb"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.python.org/"
-PKG_URL="http://www.python.org/ftp/python/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_URL="https://github.com/python/cpython/archive/$PKG_VERSION.tar.gz"
+PKG_SOURCE_DIR="cpython-$PKG_VERSION*"
 PKG_DEPENDS_HOST="zlib:host bzip2:host sqlite:host"
 PKG_DEPENDS_TARGET="toolchain sqlite expat zlib bzip2 openssl libffi Python:host bluez"
 PKG_SECTION="lang"
