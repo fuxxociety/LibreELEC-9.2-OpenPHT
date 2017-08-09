@@ -1,3 +1,26 @@
+From 0ec6ae4b2c69fcf27785e389391b0add474efd8c Mon Sep 17 00:00:00 2001
+From: Sean Purcell <me@seanp.xyz>
+Date: Thu, 3 Aug 2017 17:47:03 -0700
+Subject: [PATCH v5] squashfs-tools: Add zstd support
+
+This patch adds zstd support to squashfs-tools. It works with zstd
+versions >= 1.0.0. It was originally written by Sean Purcell.
+
+Signed-off-by: Sean Purcell <me@seanp.xyz>
+Signed-off-by: Nick Terrell <terrelln@fb.com>
+---
+v4 -> v5:
+- Fix patch documentation to reflect that Sean Purcell is the author
+
+ squashfs-tools/Makefile       |  21 ++++
+ squashfs-tools/compressor.c   |   8 ++
+ squashfs-tools/squashfs_fs.h  |   3 +-
+ squashfs-tools/zstd_wrapper.c | 254 ++++++++++++++++++++++++++++++++++++++++++
+ squashfs-tools/zstd_wrapper.h |  48 ++++++++
+ 5 files changed, 333 insertions(+), 1 deletion(-)
+ create mode 100644 squashfs-tools/zstd_wrapper.c
+ create mode 100644 squashfs-tools/zstd_wrapper.h
+
 diff --git a/squashfs-tools/Makefile b/squashfs-tools/Makefile
 index 52d2582..8e82e09 100644
 --- a/squashfs-tools/Makefile
@@ -5,7 +28,7 @@ index 52d2582..8e82e09 100644
 @@ -75,6 +75,19 @@ GZIP_SUPPORT = 1
  #LZMA_SUPPORT = 1
  #LZMA_DIR = ../../../../LZMA/lzma465
- 
+
 +
 +########### Building ZSTD support ############
 +#
@@ -25,7 +48,7 @@ index 52d2582..8e82e09 100644
 @@ -177,6 +190,14 @@ LIBS += -llz4
  COMPRESSORS += lz4
  endif
- 
+
 +ifeq ($(ZSTD_SUPPORT),1)
 +CFLAGS += -DZSTD_SUPPORT
 +MKSQUASHFS_OBJS += zstd_wrapper.o
@@ -44,7 +67,7 @@ index 525e316..02b5e90 100644
 @@ -65,6 +65,13 @@ static struct compressor xz_comp_ops = {
  extern struct compressor xz_comp_ops;
  #endif
- 
+
 +#ifndef ZSTD_SUPPORT
 +static struct compressor zstd_comp_ops = {
 +	ZSTD_COMPRESSION, "zstd"
@@ -52,7 +75,7 @@ index 525e316..02b5e90 100644
 +#else
 +extern struct compressor zstd_comp_ops;
 +#endif
- 
+
  static struct compressor unknown_comp_ops = {
  	0, "unknown"
 @@ -77,6 +84,7 @@ struct compressor *compressor[] = {
@@ -62,34 +85,25 @@ index 525e316..02b5e90 100644
 +	&zstd_comp_ops,
  	&unknown_comp_ops
  };
- 
+
 diff --git a/squashfs-tools/squashfs_fs.h b/squashfs-tools/squashfs_fs.h
 index 791fe12..1f2e8b0 100644
 --- a/squashfs-tools/squashfs_fs.h
 +++ b/squashfs-tools/squashfs_fs.h
-@@ -24,7 +24,7 @@
-  * squashfs_fs.h
-  */
- 
--#define SQUASHFS_CACHED_FRAGMENTS	CONFIG_SQUASHFS_FRAGMENT_CACHE_SIZE	
-+#define SQUASHFS_CACHED_FRAGMENTS	CONFIG_SQUASHFS_FRAGMENT_CACHE_SIZE
- #define SQUASHFS_MAJOR			4
- #define SQUASHFS_MINOR			0
- #define SQUASHFS_MAGIC			0x73717368
 @@ -277,6 +277,7 @@ typedef long long		squashfs_inode;
  #define LZO_COMPRESSION		3
  #define XZ_COMPRESSION		4
  #define LZ4_COMPRESSION		5
 +#define ZSTD_COMPRESSION	6
- 
+
  struct squashfs_super_block {
  	unsigned int		s_magic;
 diff --git a/squashfs-tools/zstd_wrapper.c b/squashfs-tools/zstd_wrapper.c
 new file mode 100644
-index 0000000..152353f
+index 0000000..0989f0f
 --- /dev/null
 +++ b/squashfs-tools/zstd_wrapper.c
-@@ -0,0 +1,268 @@
+@@ -0,0 +1,254 @@
 +/*
 + * Copyright (c) 2017
 + * Phillip Lougher <phillip@squashfs.org.uk>
@@ -103,10 +117,6 @@ index 0000000..152353f
 + * but WITHOUT ANY WARRANTY; without even the implied warranty of
 + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 + * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 + *
 + * zstd_wrapper.c
 + *
@@ -142,22 +152,22 @@ index 0000000..152353f
 + */
 +static int zstd_options(char *argv[], int argc)
 +{
-+	if(strcmp(argv[0], "-Xcompression-level") == 0) {
-+		if(argc < 2) {
++	if (strcmp(argv[0], "-Xcompression-level") == 0) {
++		if (argc < 2) {
 +			fprintf(stderr, "zstd: -Xcompression-level missing "
-+			        "compression level\n");
++				"compression level\n");
 +			fprintf(stderr, "zstd: -Xcompression-level it should "
-+			        "be 1 <= n <= %d\n", ZSTD_maxCLevel());
++				"be 1 <= n <= %d\n", ZSTD_maxCLevel());
 +			goto failed;
 +		}
 +
 +		compression_level = atoi(argv[1]);
-+                if (compression_level < 1 ||
-+				compression_level > ZSTD_maxCLevel()) {
++		if (compression_level < 1 ||
++		    compression_level > ZSTD_maxCLevel()) {
 +			fprintf(stderr, "zstd: -Xcompression-level invalid, it "
-+			        "should be 1 <= n <= %d\n", ZSTD_maxCLevel());
++				"should be 1 <= n <= %d\n", ZSTD_maxCLevel());
 +			goto failed;
-+                }
++		}
 +
 +		return 1;
 +	}
@@ -175,14 +185,14 @@ index 0000000..152353f
 + *
 + * This function returns a pointer to the compression options structure
 + * to be stored (and the size), or NULL if there are no compression
-+ * options
-+ *
++ * options.
 + */
 +static void *zstd_dump_options(int block_size, int *size)
 +{
 +	static struct zstd_comp_opts comp_opts;
++
 +	/* don't return anything if the options are all default */
-+	if(compression_level == ZSTD_DEFAULT_COMPRESSION_LEVEL)
++	if (compression_level == ZSTD_DEFAULT_COMPRESSION_LEVEL)
 +		return NULL;
 +
 +	comp_opts.compression_level = compression_level;
@@ -208,29 +218,28 @@ index 0000000..152353f
 + * Note, even if there are no compressor options, this function is still
 + * called with an empty compressor structure (size == 0), to explicitly
 + * set the default options, this is to ensure any user supplied
-+ * -X options on the appending mksquashfs command line are over-ridden
++ * -X options on the appending mksquashfs command line are over-ridden.
 + *
-+ * This function returns 0 on sucessful extraction of options, and
-+ *			-1 on error
++ * This function returns 0 on sucessful extraction of options, and -1 on error.
 + */
 +static int zstd_extract_options(int block_size, void *buffer, int size)
 +{
 +	struct zstd_comp_opts *comp_opts = buffer;
 +
-+	if(size == 0) {
++	if (size == 0) {
 +		/* Set default values */
 +		compression_level = ZSTD_DEFAULT_COMPRESSION_LEVEL;
 +		return 0;
 +	}
 +
 +	/* we expect a comp_opts structure of sufficient size to be present */
-+	if(size < sizeof(*comp_opts))
++	if (size < sizeof(*comp_opts))
 +		goto failed;
 +
 +	SQUASHFS_INSWAP_COMP_OPTS(comp_opts);
 +
-+	if(comp_opts->compression_level < 1
-+			|| comp_opts->compression_level > ZSTD_maxCLevel()) {
++	if (comp_opts->compression_level < 1 ||
++	    comp_opts->compression_level > ZSTD_maxCLevel()) {
 +		fprintf(stderr, "zstd: bad compression level in compression "
 +			"options structure\n");
 +		goto failed;
@@ -252,13 +261,13 @@ index 0000000..152353f
 +	struct zstd_comp_opts *comp_opts = buffer;
 +
 +	/* we expect a comp_opts structure of sufficient size to be present */
-+	if(size < sizeof(*comp_opts))
++	if (size < sizeof(*comp_opts))
 +		goto failed;
 +
 +	SQUASHFS_INSWAP_COMP_OPTS(comp_opts);
 +
-+	if(comp_opts->compression_level < 1
-+			|| comp_opts->compression_level > ZSTD_maxCLevel()) {
++	if (comp_opts->compression_level < 1 ||
++	    comp_opts->compression_level > ZSTD_maxCLevel()) {
 +		fprintf(stderr, "zstd: bad compression level in compression "
 +			"options structure\n");
 +		goto failed;
@@ -277,14 +286,13 @@ index 0000000..152353f
 + * This function is called by mksquashfs to initialise the
 + * compressor, before compress() is called.
 + *
-+ * This function returns 0 on success, and
-+ *			-1 on error
++ * This function returns 0 on success, and -1 on error.
 + */
 +static int zstd_init(void **strm, int block_size, int datablock)
 +{
 +	ZSTD_CCtx *cctx = ZSTD_createCCtx();
 +
-+	if(!cctx) {
++	if (!cctx) {
 +		fprintf(stderr, "zstd: failed to allocate compression "
 +			"context!\n");
 +		return -1;
@@ -295,40 +303,32 @@ index 0000000..152353f
 +}
 +
 +static int zstd_compress(void *strm, void *dest, void *src, int size,
-+	int block_size, int *error)
++			 int block_size, int *error)
 +{
-+	const size_t res = ZSTD_compressCCtx((ZSTD_CCtx*)strm, dest,
-+			block_size, src, size, compression_level);
++	const size_t res = ZSTD_compressCCtx((ZSTD_CCtx*)strm, dest, block_size,
++					     src, size, compression_level);
 +
-+	if(ZSTD_isError(res)) {
-+		const int errcode = ZSTD_getErrorCode(res);
-+		if(errcode == ZSTD_error_dstSize_tooSmall ||
-+				/* FIXME:
-+				 * ZSTD_compress 1.1.4 sometimes returns
-+				 * GENERIC instead of dstSize_tooSmall,
-+				 * this condition can be removed once the fix
-+				 * is in a released version of zstd */
-+				errcode == ZSTD_error_GENERIC) {
-+			/* Special code for not enough buffer space */
-+			return 0;
-+		} else {
-+			/* Otherwise return failure, with compressor specific
-+			 * error code in *error
-+			 */
-+			*error = (int)errcode;
-+			return -1;
-+		}
++	if (ZSTD_isError(res)) {
++		/* FIXME:
++		 * zstd does not expose stable error codes. The error enum may
++		 * change between versions. Until upstream zstd stablizes the
++		 * error codes, we have no way of knowing why the error occurs.
++		 * zstd shouldn't fail to compress any input unless there isn't
++		 * enough output space. We assume that is the cause and return
++		 * the special error code for not enough output space.
++		 */
++		return 0;
 +	}
 +
 +	return (int)res;
 +}
 +
 +static int zstd_uncompress(void *dest, void *src, int size, int outsize,
-+	int *error)
++			   int *error)
 +{
 +	const size_t res = ZSTD_decompress(dest, outsize, src, size);
 +
-+	if(ZSTD_isError(res)) {
++	if (ZSTD_isError(res)) {
 +		fprintf(stderr, "\t%d %d\n", outsize, size);
 +
 +		*error = (int)ZSTD_getErrorCode(res);
@@ -338,7 +338,7 @@ index 0000000..152353f
 +	return (int)res;
 +}
 +
-+static void zstd_usage()
++static void zstd_usage(void)
 +{
 +	fprintf(stderr, "\t  -Xcompression-level <compression-level>\n");
 +	fprintf(stderr, "\t\t<compression-level> should be 1 .. %d (default "
@@ -360,10 +360,10 @@ index 0000000..152353f
 +};
 diff --git a/squashfs-tools/zstd_wrapper.h b/squashfs-tools/zstd_wrapper.h
 new file mode 100644
-index 0000000..9792ff4
+index 0000000..4fbef0a
 --- /dev/null
 +++ b/squashfs-tools/zstd_wrapper.h
-@@ -0,0 +1,52 @@
+@@ -0,0 +1,48 @@
 +#ifndef ZSTD_WRAPPER_H
 +#define ZSTD_WRAPPER_H
 +/*
@@ -381,10 +381,6 @@ index 0000000..9792ff4
 + * but WITHOUT ANY WARRANTY; without even the implied warranty of
 + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 + * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 + *
 + * zstd_wrapper.h
 + *
@@ -416,3 +412,5 @@ index 0000000..9792ff4
 +	int compression_level;
 +};
 +#endif
+--
+2.9.3
