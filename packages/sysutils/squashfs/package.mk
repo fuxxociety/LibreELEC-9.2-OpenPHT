@@ -34,7 +34,7 @@ PKG_AUTORECONF="no"
 make_host() {
   make -C squashfs-tools mksquashfs \
        XZ_SUPPORT=1 LZO_SUPPORT=1 LZ4_SUPPORT=1 ZSTD_SUPPORT=1 \
-       INCLUDEDIR="-I. -I$$TOOLCHAIN/include"
+       INCLUDEDIR="-I. -I$TOOLCHAIN/include"
 }
 
 makeinstall_host() {
