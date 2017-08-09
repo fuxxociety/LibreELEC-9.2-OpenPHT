@@ -17,12 +17,12 @@
 ################################################################################
 
 PKG_NAME="lz4"
-PKG_VERSION="r131"
+PKG_VERSION="7bb64ff"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"
 PKG_SITE="http://www.lz4.org/"
-PKG_URL="https://github.com/Cyan4973/lz4/archive/$PKG_VERSION.tar.gz"
+PKG_URL="https://github.com/lz4/lz4/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_HOST=""
 PKG_PRIORITY="optional"
 PKG_SECTION="compress"
@@ -33,13 +33,11 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 make_host() {
-  make all
+  make lib
 }
 
 makeinstall_host() {
   mkdir -p $TOOLCHAIN/bin
-    cp -f programs/lz4 $TOOLCHAIN/bin
-    cp -f programs/lz4c $TOOLCHAIN/bin
   mkdir -p $TOOLCHAIN/include
     cp -f lib/lz4.h $TOOLCHAIN/include
     cp -f lib/lz4hc.h $TOOLCHAIN/include
