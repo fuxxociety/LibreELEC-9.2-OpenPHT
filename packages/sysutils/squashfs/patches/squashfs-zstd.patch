@@ -1,4 +1,4 @@
-From 0ec6ae4b2c69fcf27785e389391b0add474efd8c Mon Sep 17 00:00:00 2001
+From cc08b43a31fed1289c2027d5090999da569457f1 Mon Sep 17 00:00:00 2001
 From: Sean Purcell <me@seanp.xyz>
 Date: Thu, 3 Aug 2017 17:47:03 -0700
 Subject: [PATCH v5] squashfs-tools: Add zstd support
@@ -11,13 +11,15 @@ Signed-off-by: Nick Terrell <terrelln@fb.com>
 ---
 v4 -> v5:
 - Fix patch documentation to reflect that Sean Purcell is the author
+- Don't strip trailing whitespace of unreleated code
+- Make zstd_display_options() static
 
  squashfs-tools/Makefile       |  21 ++++
  squashfs-tools/compressor.c   |   8 ++
- squashfs-tools/squashfs_fs.h  |   3 +-
+ squashfs-tools/squashfs_fs.h  |   1 +
  squashfs-tools/zstd_wrapper.c | 254 ++++++++++++++++++++++++++++++++++++++++++
  squashfs-tools/zstd_wrapper.h |  48 ++++++++
- 5 files changed, 333 insertions(+), 1 deletion(-)
+ 5 files changed, 332 insertions(+)
  create mode 100644 squashfs-tools/zstd_wrapper.c
  create mode 100644 squashfs-tools/zstd_wrapper.h
 
@@ -87,7 +89,7 @@ index 525e316..02b5e90 100644
  };
 
 diff --git a/squashfs-tools/squashfs_fs.h b/squashfs-tools/squashfs_fs.h
-index 791fe12..1f2e8b0 100644
+index 791fe12..afca918 100644
 --- a/squashfs-tools/squashfs_fs.h
 +++ b/squashfs-tools/squashfs_fs.h
 @@ -277,6 +277,7 @@ typedef long long		squashfs_inode;
@@ -100,7 +102,7 @@ index 791fe12..1f2e8b0 100644
  	unsigned int		s_magic;
 diff --git a/squashfs-tools/zstd_wrapper.c b/squashfs-tools/zstd_wrapper.c
 new file mode 100644
-index 0000000..0989f0f
+index 0000000..dcab75a
 --- /dev/null
 +++ b/squashfs-tools/zstd_wrapper.c
 @@ -0,0 +1,254 @@
@@ -256,7 +258,7 @@ index 0000000..0989f0f
 +	return -1;
 +}
 +
-+void zstd_display_options(void *buffer, int size)
++static void zstd_display_options(void *buffer, int size)
 +{
 +	struct zstd_comp_opts *comp_opts = buffer;
 +
