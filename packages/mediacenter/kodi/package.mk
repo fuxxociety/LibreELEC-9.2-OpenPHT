@@ -257,7 +257,6 @@ pre_configure_target() {
 # kodi should never be built with lto
   strip_lto
 
-  export LIBS="$LIBS -lz -lterminfo"
   # disable optimization for arm to fix segmentation fault (http://forum.odroid.com/viewtopic.php?f=62&t=20345)
     if [ "$ARCH" = "arm" ]; then
       export CXXFLAGS="`echo $CXXFLAGS | sed -e 's|-O2|-Os|'`"
