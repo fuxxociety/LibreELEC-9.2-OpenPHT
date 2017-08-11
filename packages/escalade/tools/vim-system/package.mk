@@ -51,7 +51,6 @@ PKG_CONFIGURE_OPTS_TARGET="vim_cv_toupper_broken=no \
 pre_configure_target() {
   cd ..
   rm -rf .$TARGET_NAME
-  export LIBS="-lterminfo"
 }
 
 post_makeinstall_target() {
