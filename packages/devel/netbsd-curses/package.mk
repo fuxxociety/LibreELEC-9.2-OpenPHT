@@ -20,17 +20,15 @@ PKG_NAME="netbsd-curses"
 PKG_VERSION="07a65f0"
 PKG_ARCH="any"
 PKG_SITE="https://github.com/sabotage-linux/netbsd-curses"
-PKG_URL="https://github.com/sabotage-linux/netbsd-curses/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="toolchain ncurses"
 PKG_SECTION="devel"
 PKG_SHORTDESC="netbsd-libcurses portable edition"
 PKG_LONGDESC="netbsd-libcurses portable edition"
 
 make_target() {
-  make HOSTCC="$HOST_CC" PREFIX=/usr all-dynamic
+  :
 }
 
 makeinstall_target() {
-  make PREFIX=$SYSROOT_PREFIX/usr install-dynamic
-  make PREFIX=$INSTALL/usr install-dynamic
+  :
 }
