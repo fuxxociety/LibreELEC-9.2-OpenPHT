@@ -242,11 +242,11 @@ diff --git a/mm/page_alloc.c b/mm/page_alloc.c
 index 2302f250d6b1ba150e3c2e4e17cfb6c99574ab5b..f434dbb4aaa8845318e2d40153339b0805a69cc8 100644
 --- a/mm/page_alloc.c
 +++ b/mm/page_alloc.c
-@@ -7567,8 +7567,6 @@ int alloc_contig_range(unsigned long start, unsigned long end,
+@@ -7567,8 +7567,6 @@
  
  	/* Make sure the range is really isolated. */
  	if (test_pages_isolated(outer_start, end, false)) {
--		pr_info("%s: [%lx, %lx) PFNs busy\n",
+-		pr_info_ratelimited("%s: [%lx, %lx) PFNs busy\n",
 -			__func__, outer_start, end);
  		ret = -EBUSY;
  		goto done;
