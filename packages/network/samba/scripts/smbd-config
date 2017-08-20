@@ -27,7 +27,12 @@ fi
 
 # handle external drives
 if [ "$SAMBA_AUTOSHARE" == "true" ] ; then
-  echo -e "[Media]\n  path = /var/media\n  available = yes\n  browsable = yes\n  public = yes\n  writable = yes\n" >> $SMB_CONF
+  for dir in /media/* ; do
+    if [ -d "$dir" ] ; then
+      name=$(basename "$dir")
+      echo -e "[$name]\n  path = $dir\n  available = yes\n  browsable = yes\n  public = yes\n  writable = yes\n" >> $SMB_CONF
+    fi
+  done
 fi
 
 # only letters & numbers permitted for username & password
