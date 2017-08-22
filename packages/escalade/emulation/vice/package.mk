@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="vice"
-PKG_VERSION="33392"
+PKG_VERSION="33556"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="http://vice-emu.sourceforge.net/"
@@ -41,9 +41,13 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_prog_sdl2_config=$SYSROOT_PREFIX/usr/bin/sdl2-c
 			   --without-pulse"
 
 pre_build_target() {
-  svn checkout -r $PKG_VERSION https://svn.code.sf.net/p/vice-emu/code/trunk/vice $PKG_BUILD/$PKG_NAME-svn
+  svn export -r $PKG_VERSION https://svn.code.sf.net/p/vice-emu/code/trunk/vice $PKG_BUILD/$PKG_NAME-svn
   mv $PKG_BUILD/$PKG_NAME-svn/* $PKG_BUILD/
   rm -rf $PKG_BUILD/$PKG_NAME-svn
+  for a in $PKG_DIR/patches/*.patch
+  do
+    patch -p1 -d $PKG_BUILD < $a
+  done
 }
 
 pre_configure_target() {
