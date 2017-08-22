@@ -28,9 +28,8 @@ PKG_SHORTDESC="MakeMKV converts the video clips from proprietary (and usually en
 PKG_LONGDESC="MakeMKV can instantly stream decrypted video without intermediate conversion to wide range of players, so you may watch Blu-ray and DVD discs with your favorite player on your favorite OS or on your favorite device."
 
 PKG_IS_ADDON="yes"
+PKG_ADDON_NAME="MakeMKV"
 PKG_ADDON_TYPE="xbmc.python.script"
-PKG_ADDON_PROVIDES=""
-PKG_ADDON_REPOVERSION="8.0"
 
 PKG_AUTORECONF="no"
 
@@ -70,5 +69,5 @@ addon() {
   cp $PKG_BUILD/out/libmakemkv.so.[0-9] $ADDON_BUILD/$PKG_ADDON_ID/lib
   cp $PKG_BUILD/out/libdriveio.so.[0-9] $ADDON_BUILD/$PKG_ADDON_ID/lib
   cp $PKG_BUILD/out/libmmbd.so.[0-9] $ADDON_BUILD/$PKG_ADDON_ID/lib
-  cp -PL $(get_build_dir openssl)/.install_pkg/usr/lib/libcrypto.so.1.1 $ADDON_BUILD/$PKG_ADDON_ID/lib
+  cp -PL $(get_build_dir openssl)/.install_pkg/usr/lib/libcrypto.so.?.? $ADDON_BUILD/$PKG_ADDON_ID/lib
 }
