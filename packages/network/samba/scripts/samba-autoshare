@@ -23,5 +23,6 @@ if [ -f /storage/.cache/services/samba.conf ]; then
   if [ "$SAMBA_AUTOSHARE" == "true" ] ; then
     /usr/lib/samba/samba-config
     /usr/lib/samba/smbd-config
+    pkill -HUP smbd
   fi
 fi
