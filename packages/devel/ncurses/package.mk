@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="ncurses"
-PKG_VERSION="6.0-20170729"
+PKG_VERSION="6.0-20170827"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
