@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="boost"
-PKG_VERSION="1_63_0"
+PKG_VERSION="1_65_0"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.boost.org/"
