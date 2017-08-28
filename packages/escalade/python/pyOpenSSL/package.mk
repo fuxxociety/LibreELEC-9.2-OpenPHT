@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="pyOpenSSL"
-PKG_VERSION="16.2.0"
+PKG_VERSION="17.2.0"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
 PKG_SITE="https://pypi.python.org/pypi/pyOpenSSL"
