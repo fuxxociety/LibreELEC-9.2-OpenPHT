@@ -1,0 +1,51 @@
+diff -uNr SDL-mirror-157f916a110ce9beb9af778ac6042114d8910662/src/audio/SDL_audiocvt.c SDL-mirror-0216e916d310ccb6111562d1f664d4c1357a78b1/src/audio/SDL_audiocvt.c
+--- SDL-mirror-157f916a110ce9beb9af778ac6042114d8910662/src/audio/SDL_audiocvt.c	2017-07-31 16:22:18.000000000 +0000
++++ SDL-mirror-0216e916d310ccb6111562d1f664d4c1357a78b1/src/audio/SDL_audiocvt.c	2017-08-18 01:35:46.000000000 +0000
+@@ -22,7 +22,6 @@
+ 
+ /* Functions for audio drivers to perform runtime conversion of audio format */
+ 
+-#include "SDL.h"
+ #include "SDL_audio.h"
+ #include "SDL_audio_c.h"
+ 
+@@ -556,7 +555,7 @@
+         }
+ 
+         if (!filter) {
+-            return SDL_SetError("No conversion from source format to float available");
++            return SDL_SetError("No conversion available for these formats");
+         }
+ 
+         if (SDL_AddAudioCVTFilter(cvt, filter) < 0) {
+@@ -595,7 +594,7 @@
+         }
+ 
+         if (!filter) {
+-            return SDL_SetError("No conversion from float to destination format available");
++            return SDL_SetError("No conversion available for these formats");
+         }
+ 
+         if (SDL_AddAudioCVTFilter(cvt, filter) < 0) {
+@@ -744,8 +743,8 @@
+ 
+ 
+ /* Creates a set of audio filters to convert from one format to another.
+-   Returns 0 if no conversion is needed, 1 if the audio filter is set up,
+-   or -1 if an error like invalid parameter, unsupported format, etc. occurred.
++   Returns -1 if the format conversion is not supported, 0 if there's
++   no conversion needed, or 1 if the audio filter is set up.
+ */
+ 
+ int
+@@ -758,11 +757,6 @@
+         return SDL_InvalidParamError("cvt");
+     }
+ 
+-    /* Conversions from and to float require the audio subsystem to be initialized */
+-    if (!SDL_WasInit(SDL_INIT_AUDIO)) {
+-        return SDL_SetError("Audio subsystem has not been initialized");
+-    }
+-
+     /* Make sure we zero out the audio conversion before error checking */
+     SDL_zerop(cvt);
