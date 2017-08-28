@@ -1,7 +1,7 @@
 # Made by github.com/escalade
 
 PKG_NAME="gtk3"
-PKG_VERSION="3.22.18"
+PKG_VERSION="3.22.19"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.gtk.org/"
