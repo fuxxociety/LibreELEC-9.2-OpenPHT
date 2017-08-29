@@ -34,6 +34,7 @@ OEM_APPS_COMMON=" \
   dstat-system \
   htop-system \
   nmon-system \
+  openssl-compat \
   plexmediaserver-script \
   rsync \
   SABnzbd \
