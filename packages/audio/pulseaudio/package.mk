@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="pulseaudio"
-PKG_VERSION="10.0"
+PKG_VERSION="11.0"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://pulseaudio.org/"
