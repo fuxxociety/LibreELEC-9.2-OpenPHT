@@ -4,15 +4,18 @@
 
 kodi_freeze() {
   kodi-send --action="RunScript(/usr/bin/audio-suspend.py)"
+  usleep 500000
   if [ ! "$1" = "muteonly" ]; then
-    usleep 500000
-    killall -SIGSTOP kodi.bin
+    systemctl stop kodi &
   fi
 }
 
 kodi_unfreeze() {
-  [ ! "$1" = "muteonly" ] && killall -SIGCONT kodi.bin
-  kodi-send --action="RunScript(/usr/bin/audio-resume.py)"
+  if [ ! "$1" = "muteonly" ]; then
+    kodi-send --action="RunScript(/usr/bin/audio-resume.py)"
+  else
+    systemctl start kodi
+  fi
 }
 
 case $1 in
@@ -20,11 +23,7 @@ case $1 in
     if [ ! -f /tmp/.kodifreeze ]; then
       pidof kodi.bin > /dev/null && KODI=1
       if [ "$KODI" = "1" ]; then
-	if uname -m | grep x86_64 > /dev/null ; then
-          kodi_freeze $2
-	else
-	  systemctl stop kodi
-	fi
+        kodi_freeze $2
         touch /tmp/.kodifreeze
       else
         echo "Kodi isn't running, nothing to do."
@@ -35,11 +34,7 @@ case $1 in
     ;;
   unfreeze)
     if [ -f /tmp/.kodifreeze ]; then
-      if uname -m | grep x86_64 > /dev/null ; then
-        kodi_unfreeze $2
-      else
-        systemctl start kodi
-      fi
+      kodi_unfreeze $2
       rm /tmp/.kodifreeze
     else
       echo "Kodi isn't frozen, nothing to do."
