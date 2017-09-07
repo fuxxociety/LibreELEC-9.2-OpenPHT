@@ -685,7 +685,11 @@
           disk="$target/$OVERLAY_DIR,$options"
         fi
       fi
-      mount_part "$disk" "/storage" "rw,noatime"
+      if [ -f /flash/mountopts.cfg ]; then
+        mount_part "$disk" "/storage" "`cat /flash/mountopts.cfg`"
+      else
+        mount_part "$disk" "/storage" "rw,noatime"
+      fi
       # get the disk. /storage on 2nd partition
       PART=$(/bin/busybox grep "/storage " /proc/mounts | /bin/busybox cut -d" " -f1 | /bin/busybox grep '2$')
       # if requested, do a backup first
