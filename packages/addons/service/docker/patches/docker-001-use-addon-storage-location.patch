@@ -62,23 +62,21 @@ diff -Naur a/integration-cli/docker_cli_authz_unix_test.go b/integration-cli/doc
 diff -Naur a/integration-cli/docker_cli_daemon_test.go b/integration-cli/docker_cli_daemon_test.go
 --- a/integration-cli/docker_cli_daemon_test.go	2016-12-16 02:10:49.000000000 -0800
 +++ b/integration-cli/docker_cli_daemon_test.go	2017-01-01 23:25:17.939207024 -0800
-@@ -541,13 +541,13 @@
+@@ -520,11 +520,11 @@
  
  func (s *DockerDaemonSuite) TestDaemonKeyGeneration(c *check.C) {
  	// TODO: skip or update for Windows daemon
 -	os.Remove("/etc/docker/key.json")
 +	os.Remove("/storage/.kodi/userdata/addon_data/service.system.docker/config/key.json")
- 	if err := s.d.Start(); err != nil {
- 		c.Fatalf("Could not start daemon: %v", err)
- 	}
- 	s.d.Stop()
+ 	s.d.Start(c)
+ 	s.d.Stop(c)
  
 -	k, err := libtrust.LoadKeyFile("/etc/docker/key.json")
 +	k, err := libtrust.LoadKeyFile("/storage/.kodi/userdata/addon_data/service.system.docker/config/key.json")
  	if err != nil {
  		c.Fatalf("Error opening key file")
  	}
-@@ -560,7 +560,7 @@
+@@ -537,7 +537,7 @@
  
  func (s *DockerDaemonSuite) TestDaemonKeyMigration(c *check.C) {
  	// TODO: skip or update for Windows daemon
@@ -87,26 +85,17 @@ diff -Naur a/integration-cli/docker_cli_daemon_test.go b/integration-cli/docker_
  	k1, err := libtrust.GenerateECP256PrivateKey()
  	if err != nil {
  		c.Fatalf("Error generating private key: %s", err)
-@@ -577,7 +577,7 @@
- 	}
- 	s.d.Stop()
+@@ -552,7 +552,7 @@
+ 	s.d.Start(c)
+ 	s.d.Stop(c)
  
 -	k2, err := libtrust.LoadKeyFile("/etc/docker/key.json")
 +	k2, err := libtrust.LoadKeyFile("/storage/.kodi/userdata/addon_data/service.system.docker/config/key.json")
  	if err != nil {
  		c.Fatalf("Error opening key file")
  	}
-@@ -1300,7 +1300,7 @@
- 		Y   string `json:"y"`
- 	}
- 
--	os.Remove("/etc/docker/key.json")
-+	os.Remove("/storage/.kodi/userdata/addon_data/service.system.docker/config/key.json")
- 	if err := s.d.Start(); err != nil {
- 		c.Fatalf("Failed to start daemon: %v", err)
- 	}
-@@ -1310,7 +1310,7 @@
- 	}
+@@ -1204,7 +1204,7 @@
+ 	s.d.Stop(c)
  
  	config := &Config{}
 -	bytes, err := ioutil.ReadFile("/etc/docker/key.json")
@@ -114,7 +103,7 @@ diff -Naur a/integration-cli/docker_cli_daemon_test.go b/integration-cli/docker_
  	if err != nil {
  		c.Fatalf("Error reading key.json file: %s", err)
  	}
-@@ -1330,11 +1330,11 @@
+@@ -1224,11 +1224,11 @@
  	}
  
  	// write back
@@ -126,7 +115,7 @@ diff -Naur a/integration-cli/docker_cli_daemon_test.go b/integration-cli/docker_
 -	defer os.Remove("/etc/docker/key.json")
 +	defer os.Remove("/storage/.kodi/userdata/addon_data/service.system.docker/config/key.json")
  
- 	if err := s.d.Start(); err == nil {
+ 	if err := s.d.StartWithError(); err == nil {
  		c.Fatalf("It should not be successful to start daemon with wrong key: %v", err)
 diff -Naur a/integration-cli/docker_cli_external_graphdriver_unix_test.go b/integration-cli/docker_cli_external_graphdriver_unix_test.go
 --- a/integration-cli/docker_cli_external_graphdriver_unix_test.go	2016-12-16 02:10:49.000000000 -0800
@@ -189,14 +178,6 @@ diff -Naur a/integration-cli/docker_cli_external_volume_driver_unix_test.go b/in
 +	specPath := "/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins/down-driver.spec"
  	err := ioutil.WriteFile(specPath, []byte("tcp://127.0.0.7:9999"), 0644)
  	c.Assert(err, check.IsNil)
- 	defer os.RemoveAll(specPath)
-@@ -415,7 +415,7 @@
- 	err := s.d.StartWithBusybox()
- 	c.Assert(err, checker.IsNil)
- 
--	specPath := "/etc/docker/plugins/test-external-volume-driver-retry.spec"
-+	specPath := "/storage/.kodi/userdata/addon_data/service.system.docker/config/plugins/test-external-volume-driver-retry.spec"
- 	os.RemoveAll(specPath)
  	defer os.RemoveAll(specPath)
  
 diff -Naur a/integration-cli/docker_cli_network_unix_test.go b/integration-cli/docker_cli_network_unix_test.go
