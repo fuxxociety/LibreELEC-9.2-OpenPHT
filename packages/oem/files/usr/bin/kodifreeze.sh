@@ -11,7 +11,7 @@ kodi_freeze() {
 }
 
 kodi_unfreeze() {
-  if [ ! "$1" = "muteonly" ]; then
+  if [ "$1" = "muteonly" ]; then
     kodi-send --action="RunScript(/usr/bin/audio-resume.py)"
   else
     systemctl start kodi
