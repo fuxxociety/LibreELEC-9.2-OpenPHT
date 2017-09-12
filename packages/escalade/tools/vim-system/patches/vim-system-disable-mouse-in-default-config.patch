@@ -1,6 +1,6 @@
---- a/runtime/defaults.vim	2017-01-16 10:17:43.965968661 +0000
-+++ b/runtime/defaults.vim	2017-01-16 10:18:18.332635109 +0000
-@@ -66,9 +66,9 @@
+--- a/runtime/defaults.vim	2017-09-11 15:44:48.176302471 +0200
++++ b/runtime/defaults.vim	2017-09-11 15:44:59.582753332 +0200
+@@ -75,9 +75,9 @@
  
  " In many terminal emulators the mouse works just fine.  By enabling it you
  " can position the cursor, Visually select and scroll with the mouse.
