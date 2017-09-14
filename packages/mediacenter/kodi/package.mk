@@ -23,7 +23,7 @@ PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/xbmc/xbmc/archive/$PKG_VERSION.tar.gz"
 PKG_SOURCE_DIR="xbmc-$PKG_VERSION*"
-PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host xmlstarlet:host Python zlib systemd pciutils lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt yajl sqlite ffmpeg crossguid giflib libdvdnav libhdhomerun"
+PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host xmlstarlet:host Python zlib systemd pciutils lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt yajl sqlite ffmpeg crossguid giflib libdvdnav libhdhomerun"
 PKG_SECTION="mediacenter"
 PKG_SHORTDESC="kodi: Kodi Mediacenter"
 PKG_LONGDESC="Kodi Media Center (which was formerly named Xbox Media Center or XBMC) is a free and open source cross-platform media player and home entertainment system software with a 10-foot user interface designed for the living-room TV. Its graphical user interface allows the user to easily manage video, photos, podcasts, and music from a computer, optical disk, local network, and the internet using a remote control."
@@ -210,6 +210,11 @@ if [ ! "$KODIPLAYER_DRIVER" = default ]; then
   fi
 fi
 
+# Build TexturePacker for host only if there is no host binary
+if [ ! -f /usr/bin/TexturePacker ]; then
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET TexturePacker:host"
+fi
+
 KODI_LIBDVD="$KODI_DVDCSS \
              -DLIBDVDNAV_URL=$ROOT/$SOURCES/libdvdnav/libdvdnav-$(get_pkg_version libdvdnav).tar.gz \
              -DLIBDVDREAD_URL=$ROOT/$SOURCES/libdvdread/libdvdread-$(get_pkg_version libdvdread).tar.gz"
@@ -261,6 +266,9 @@ pre_configure_target() {
     if [ "$ARCH" = "arm" ]; then
       export CXXFLAGS="`echo $CXXFLAGS | sed -e 's|-O2|-Os|'`"
     fi
+
+  # This is needed to avoid using libraries from sysroot if we use TexturePacker from the host
+  unset LD_LIBRARY_PATH
 }
 
 post_makeinstall_target() {
