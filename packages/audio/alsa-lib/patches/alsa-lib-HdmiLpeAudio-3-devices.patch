@@ -1,0 +1,90 @@
+X-Git-Url: http://git.alsa-project.org/?p=alsa-lib.git;a=blobdiff_plain;f=src%2Fconf%2Fcards%2FHdmiLpeAudio.conf;h=9fa30da0092640f98a49011b25d9628d450f4f72;hp=dae71facac6d8a10b9056439bfe8ee9d0e362e61;hb=80bd4ce1478efdc08189c82a74da183da591c0fb;hpb=97da58213a7f56850468fc74726f255a5739cb49
+
+diff --git a/src/conf/cards/HdmiLpeAudio.conf b/src/conf/cards/HdmiLpeAudio.conf
+index dae71fa..9fa30da 100644
+--- a/src/conf/cards/HdmiLpeAudio.conf
++++ b/src/conf/cards/HdmiLpeAudio.conf
+@@ -56,6 +56,83 @@ HdmiLpeAudio.pcm.hdmi.0 {
+ 			{
+ 				interface PCM
+ 				name "IEC958 Playback Default"
++				device 0
++				lock true
++				preserve true
++				value [ $AES0 $AES1 $AES2 $AES3 ]
++			}
++		]
++	}
++}
++
++HdmiLpeAudio.pcm.hdmi.1 {
++	@args [ CARD AES0 AES1 AES2 AES3 ]
++	@args.CARD {
++		type string
++	}
++	@args.AES0 {
++		type integer
++	}
++	@args.AES1 {
++		type integer
++	}
++	@args.AES2 {
++		type integer
++	}
++	@args.AES3 {
++		type integer
++	}
++	type hooks
++	slave.pcm {
++		type hw
++		card $CARD
++		device 1
++	}
++	hooks.0 {
++		type ctl_elems
++		hook_args [
++			{
++				interface PCM
++				name "IEC958 Playback Default"
++				device 1
++				lock true
++				preserve true
++				value [ $AES0 $AES1 $AES2 $AES3 ]
++			}
++		]
++	}
++}
++
++HdmiLpeAudio.pcm.hdmi.2 {
++	@args [ CARD AES0 AES1 AES2 AES3 ]
++	@args.CARD {
++		type string
++	}
++	@args.AES0 {
++		type integer
++	}
++	@args.AES1 {
++		type integer
++	}
++	@args.AES2 {
++		type integer
++	}
++	@args.AES3 {
++		type integer
++	}
++	type hooks
++	slave.pcm {
++		type hw
++		card $CARD
++		device 2
++	}
++	hooks.0 {
++		type ctl_elems
++		hook_args [
++			{
++				interface PCM
++				name "IEC958 Playback Default"
++				device 2
+ 				lock true
+ 				preserve true
+ 				value [ $AES0 $AES1 $AES2 $AES3 ]
