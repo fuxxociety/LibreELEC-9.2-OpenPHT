@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="llvm"
-PKG_VERSION="4.0.1"
+PKG_VERSION="5.0.0"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
 PKG_SITE="http://llvm.org/"
@@ -49,7 +49,8 @@ PKG_CMAKE_OPTS_HOST="-DLLVM_INCLUDE_TOOLS=ON \
                      -DLLVM_ENABLE_WERROR=OFF \
                      -DLLVM_ENABLE_ZLIB=OFF \
                      -DLLVM_OPTIMIZED_TABLEGEN=ON \
-                     -DCMAKE_INSTALL_RPATH=$TOOLCHAIN/lib"
+                     -DCMAKE_INSTALL_RPATH=$TOOLCHAIN/lib \
+                     -DLLVM_APPEND_VC_REV=OFF"
 
 make_host() {
   make llvm-config llvm-tblgen
@@ -84,10 +85,12 @@ PKG_CMAKE_OPTS_TARGET="-DCMAKE_BUILD_TYPE=MinSizeRel \
                        -DLLVM_BUILD_LLVM_DYLIB=ON \
                        -DLLVM_LINK_LLVM_DYLIB=ON \
                        -DLLVM_OPTIMIZED_TABLEGEN=ON \
-                       -DLLVM_TABLEGEN=$TOOLCHAIN/bin/llvm-tblgen"
+                       -DLLVM_TABLEGEN=$TOOLCHAIN/bin/llvm-tblgen \
+                       -DLLVM_APPEND_VC_REV=OFF"
 
 post_makeinstall_target() {
   rm -rf $INSTALL/usr/bin
   rm -rf $INSTALL/usr/lib/LLVMHello.so
   rm -rf $INSTALL/usr/lib/libLTO.so
+  rm -rf $INSTALL/usr/share
 }
