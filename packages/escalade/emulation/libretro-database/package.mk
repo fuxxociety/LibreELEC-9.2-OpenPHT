@@ -36,6 +36,9 @@ pre_configure_target() {
   cd ../
   rm -rf .$TARGET_NAME
   rm configure Makefile
+  for mame in 2000 2010 2016; do
+    rm -rf metadat/mame*/*$mame*
+  done
 }
 
 make_target() {
