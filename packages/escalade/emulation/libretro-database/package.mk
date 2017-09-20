@@ -35,17 +35,16 @@ PKG_AUTORECONF="no"
 pre_configure_target() {
   cd ../
   rm -rf .$TARGET_NAME
-  rm configure Makefile
-  for mame in 2000 2010 2016; do
-    rm -rf metadat/mame*/*$mame*
-  done
+}
+
+configure_target() {
+  :
 }
 
 make_target() {
   :
 }
 
-makeinstall_target() {
-  mkdir -p $INSTALL/usr/share/retroarch/database
-  cp -r * $INSTALL/usr/share/retroarch/database
+post_makeinstall_target() {
+  mv $INSTALL/usr/share/libretro $INSTALL/usr/share/retroarch
 }
