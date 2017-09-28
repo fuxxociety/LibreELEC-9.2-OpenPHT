@@ -17,11 +17,11 @@
 ################################################################################
 
 PKG_NAME="SDL2"
-PKG_VERSION="0e76493"
+PKG_VERSION="2.0.6"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.libsdl.org/"
-PKG_URL="https://github.com/spurious/SDL-mirror/archive/$PKG_VERSION.tar.gz"
+PKG_URL="https://www.libsdl.org/release/SDL2-$PKG_VERSION.tar.gz"
 PKG_SOURCE_DIR="SDL-mirror-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain cmake:host yasm:host alsa-lib systemd dbus"
 PKG_SECTION="multimedia"
