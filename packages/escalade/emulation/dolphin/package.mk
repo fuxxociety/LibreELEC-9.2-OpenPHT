@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="dolphin"
-PKG_VERSION="b0f93f2"
+PKG_VERSION="faced47"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/dolphin-emu/dolphin"
