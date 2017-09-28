@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="samba"
-PKG_VERSION="4.6.7"
+PKG_VERSION="4.7.0"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3+"
 PKG_SITE="https://www.samba.org"
@@ -38,6 +38,12 @@ if [ "$AVAHI_DAEMON" = yes ]; then
   SMB_AVAHI="--enable-avahi"
 else
   SMB_AVAHI="--disable-avahi"
+fi
+
+if [ "$TARGET_ARCH" = x86_64 ]; then
+  SMB_AESNI="--accel-aes=intelaesni"
+else
+  SMB_AESNI="--accel-aes=none"
 fi
 
 PKG_CONFIGURE_OPTS="--prefix=/usr \
@@ -62,6 +68,7 @@ PKG_CONFIGURE_OPTS="--prefix=/usr \
                     --disable-rpath-install \
                     --disable-rpath-private-install \
                     $SMB_AVAHI \
+                    $SMB_AESNI \
                     --disable-cups \
                     --disable-iprint \
                     --disable-gnutls \
