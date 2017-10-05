@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="libcurl-compat"
-PKG_VERSION="7.54.1"
+PKG_VERSION="7.56.0"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="http://curl.haxx.se"
@@ -99,5 +99,5 @@ pre_configure_target() {
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib
-  cp lib/.libs/libcurl.so.4.4.0 $INSTALL/usr/lib/libcurl-compat.so
+  cp lib/.libs/libcurl.so.?.?.0 $INSTALL/usr/lib/libcurl-compat.so
 }
