@@ -31,6 +31,7 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 OEM_APPS_COMMON=" \
+  binutils \
   cryptsetup \
   dstat-system \
   htop-system \
