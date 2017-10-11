@@ -1,0 +1,209 @@
+From 51b2d768b05be9ec1610cccc2bff61040e2f1b9b Mon Sep 17 00:00:00 2001
+From: Garrett Brown <themagnificentmrb@gmail.com>
+Date: Mon, 9 Oct 2017 12:23:45 -0700
+Subject: [PATCH 1/2] Joysticks: Fix accelerometers preventing screensaver
+
+This fixes accelerometers on PS4 controllers preventing the screensaver by
+only monitoring mapped buttons and axes. By changing from IDriverHandler
+to IInputHandler, we receive input for higher-level controller features
+instead of lower-level driver events. If the driver input is not mapped
+to a controller, the IInputHandler will receive no input, meaning it
+can't interrupt a screensaver.
+---
+ xbmc/input/joysticks/JoystickMonitor.cpp        | 27 ++++++++++++++++++++-----
+ xbmc/input/joysticks/JoystickMonitor.h          | 19 ++++++++++-------
+ xbmc/peripherals/devices/PeripheralJoystick.cpp | 12 +++++++----
+ xbmc/peripherals/devices/PeripheralJoystick.h   |  4 ++--
+ 4 files changed, 44 insertions(+), 18 deletions(-)
+
+diff --git a/xbmc/input/joysticks/JoystickMonitor.cpp b/xbmc/input/joysticks/JoystickMonitor.cpp
+index ee081bea4dbd..b792a721e4de 100644
+--- a/xbmc/input/joysticks/JoystickMonitor.cpp
++++ b/xbmc/input/joysticks/JoystickMonitor.cpp
+@@ -19,12 +19,28 @@
+  */
+ 
+ #include "JoystickMonitor.h"
++#include "DefaultJoystick.h"
+ #include "Application.h"
+ #include "input/InputManager.h"
+ 
++#include <cmath>
++
+ using namespace JOYSTICK;
+ 
+-bool CJoystickMonitor::OnButtonMotion(unsigned int buttonIndex, bool bPressed)
++#define AXIS_DEADZONE  0.05f
++
++std::string CJoystickMonitor::ControllerID() const
++{
++  return DEFAULT_CONTROLLER_ID;
++}
++
++bool CJoystickMonitor::AcceptsInput()
++{
++  // Only accept input when screen saver is active
++  return g_application.IsInScreenSaver();
++}
++
++bool CJoystickMonitor::OnButtonPress(const FeatureName& feature, bool bPressed)
+ {
+   if (bPressed)
+   {
+@@ -35,9 +51,9 @@ bool CJoystickMonitor::OnButtonMotion(unsigned int buttonIndex, bool bPressed)
+   return false;
+ }
+ 
+-bool CJoystickMonitor::OnHatMotion(unsigned int hatIndex, HAT_STATE state)
++bool CJoystickMonitor::OnButtonMotion(const FeatureName& feature, float magnitude)
+ {
+-  if (state != HAT_STATE::UNPRESSED)
++  if (std::fabs(magnitude) > AXIS_DEADZONE)
+   {
+     CInputManager::GetInstance().SetMouseActive(false);
+     return ResetTimers();
+@@ -46,9 +62,10 @@ bool CJoystickMonitor::OnHatMotion(unsigned int hatIndex, HAT_STATE state)
+   return false;
+ }
+ 
+-bool CJoystickMonitor::OnAxisMotion(unsigned int axisIndex, float position, int center, unsigned int range)
++bool CJoystickMonitor::OnAnalogStickMotion(const FeatureName& feature, float x, float y, unsigned int motionTimeMs)
+ {
+-  if (position)
++  // Analog stick deadzone already processed
++  if (x != 0.0f || y != 0.0f)
+   {
+     CInputManager::GetInstance().SetMouseActive(false);
+     return ResetTimers();
+diff --git a/xbmc/input/joysticks/JoystickMonitor.h b/xbmc/input/joysticks/JoystickMonitor.h
+index 6409ea054419..0a3c122463cf 100644
+--- a/xbmc/input/joysticks/JoystickMonitor.h
++++ b/xbmc/input/joysticks/JoystickMonitor.h
+@@ -19,7 +19,7 @@
+  */
+ #pragma once
+ 
+-#include "IDriverHandler.h"
++#include "IInputHandler.h"
+ 
+ namespace JOYSTICK
+ {
+@@ -28,14 +28,19 @@ namespace JOYSTICK
+    * \brief Monitors joystick input and resets screensaver/shutdown timers
+    *        whenever motion occurs.
+    */
+-  class CJoystickMonitor : public IDriverHandler
++  class CJoystickMonitor : public IInputHandler
+   {
+   public:
+-    // implementation of IDriverHandler
+-    virtual bool OnButtonMotion(unsigned int buttonIndex, bool bPressed) override;
+-    virtual bool OnHatMotion(unsigned int hatIndex, HAT_STATE state) override;
+-    virtual bool OnAxisMotion(unsigned int axisIndex, float position, int center, unsigned int range) override;
+-    virtual void ProcessAxisMotions(void) override { }
++    // implementation of IInputHandler
++    virtual std::string ControllerID() const override;
++    virtual bool HasFeature(const FeatureName& feature) const override { return true; }
++    virtual bool AcceptsInput(void) override;
++    virtual INPUT_TYPE GetInputType(const FeatureName& feature) const override { return INPUT_TYPE::ANALOG; }
++    virtual bool OnButtonPress(const FeatureName& feature, bool bPressed) override;
++    virtual void OnButtonHold(const FeatureName& feature, unsigned int holdTimeMs) override { }
++    virtual bool OnButtonMotion(const FeatureName& feature, float magnitude) override;
++    virtual bool OnAnalogStickMotion(const FeatureName& feature, float x, float y, unsigned int motionTimeMs) override;
++    virtual bool OnAccelerometerMotion(const FeatureName& feature, float x, float y, float z) override { return false; }
+ 
+   private:
+     /*!
+diff --git a/xbmc/peripherals/devices/PeripheralJoystick.cpp b/xbmc/peripherals/devices/PeripheralJoystick.cpp
+index 062fbfd72f70..a6fc7e36837c 100644
+--- a/xbmc/peripherals/devices/PeripheralJoystick.cpp
++++ b/xbmc/peripherals/devices/PeripheralJoystick.cpp
+@@ -20,6 +20,8 @@
+ 
+ #include "PeripheralJoystick.h"
+ #include "input/joysticks/DeadzoneFilter.h"
++#include "input/joysticks/IDriverHandler.h"
++#include "input/joysticks/JoystickMonitor.h"
+ #include "input/joysticks/JoystickTranslator.h"
+ #include "peripherals/Peripherals.h"
+ #include "peripherals/addons/AddonButtonMap.h"
+@@ -48,11 +50,12 @@ CPeripheralJoystick::CPeripheralJoystick(const PeripheralScanResult& scanResult,
+ 
+ CPeripheralJoystick::~CPeripheralJoystick(void)
+ {
+-  m_deadzoneFilter.reset();
+-  m_buttonMap.reset();
+   m_defaultInputHandler.AbortRumble();
++  UnregisterJoystickInputHandler(m_joystickMonitor.get());
++  m_joystickMonitor.reset();
+   UnregisterJoystickInputHandler(&m_defaultInputHandler);
+-  UnregisterJoystickDriverHandler(&m_joystickMonitor);
++  m_deadzoneFilter.reset();
++  m_buttonMap.reset();
+ }
+ 
+ bool CPeripheralJoystick::InitialiseFeature(const PeripheralFeature feature)
+@@ -74,7 +77,8 @@ bool CPeripheralJoystick::InitialiseFeature(const PeripheralFeature feature)
+ 
+         // Give joystick monitor priority over default controller
+         RegisterJoystickInputHandler(&m_defaultInputHandler);
+-        RegisterJoystickDriverHandler(&m_joystickMonitor, false);
++        m_joystickMonitor.reset(new CJoystickMonitor);
++        RegisterJoystickInputHandler(m_joystickMonitor.get());
+       }
+     }
+     else if (feature == FEATURE_RUMBLE)
+diff --git a/xbmc/peripherals/devices/PeripheralJoystick.h b/xbmc/peripherals/devices/PeripheralJoystick.h
+index db6540edd92e..9664fa789f17 100644
+--- a/xbmc/peripherals/devices/PeripheralJoystick.h
++++ b/xbmc/peripherals/devices/PeripheralJoystick.h
+@@ -22,7 +22,6 @@
+ #include "Peripheral.h"
+ #include "input/joysticks/DefaultJoystick.h"
+ #include "input/joysticks/IDriverReceiver.h"
+-#include "input/joysticks/JoystickMonitor.h"
+ #include "input/joysticks/JoystickTypes.h"
+ #include "threads/CriticalSection.h"
+ 
+@@ -37,6 +36,7 @@ namespace JOYSTICK
+   class CDeadzoneFilter;
+   class IButtonMap;
+   class IDriverHandler;
++  class IInputHandler;
+ }
+ 
+ namespace PERIPHERALS
+@@ -119,7 +119,7 @@ namespace PERIPHERALS
+     unsigned int                        m_motorCount;
+     bool                                m_supportsPowerOff;
+     JOYSTICK::CDefaultJoystick          m_defaultInputHandler;
+-    JOYSTICK::CJoystickMonitor          m_joystickMonitor;
++    std::unique_ptr<JOYSTICK::IInputHandler> m_joystickMonitor;
+     std::unique_ptr<JOYSTICK::IButtonMap>      m_buttonMap;
+     std::unique_ptr<JOYSTICK::CDeadzoneFilter> m_deadzoneFilter;
+     std::vector<DriverHandler>          m_driverHandlers;
+
+From ff3c555571e9d2f9ad3f7a3728afcf7ed7ac8676 Mon Sep 17 00:00:00 2001
+From: Garrett Brown <themagnificentmrb@gmail.com>
+Date: Sat, 27 May 2017 19:43:46 -0700
+Subject: [PATCH 2/2] Joysticks: Fix unintended handling of analog sticks
+
+---
+ xbmc/input/joysticks/generic/FeatureHandling.cpp | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/xbmc/input/joysticks/generic/FeatureHandling.cpp b/xbmc/input/joysticks/generic/FeatureHandling.cpp
+index d4258d5df6eb..5f785d6f4f5a 100644
+--- a/xbmc/input/joysticks/generic/FeatureHandling.cpp
++++ b/xbmc/input/joysticks/generic/FeatureHandling.cpp
+@@ -51,10 +51,6 @@ bool CJoystickFeature::AcceptsInput(bool bActivation)
+   {
+     if (m_handler->AcceptsInput())
+       bAcceptsInput = true;
+-
+-    // Avoid sticking
+-    if (!bActivation)
+-      bAcceptsInput = true;
+   }
+ 
+   return bAcceptsInput;
