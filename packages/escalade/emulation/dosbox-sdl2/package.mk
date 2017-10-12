@@ -42,7 +42,7 @@ PKG_CONFIGURE_OPTS_TARGET="--prefix=/usr \
 
 pre_configure_target () {
   cd ..
-  rm -rf .$TARGET
+  rm -rf .$TARGET_NAME
 }
 
 pre_make_target() {
@@ -54,6 +54,9 @@ pre_make_target() {
 
 post_makeinstall_target() {
   cp $PKG_DIR/scripts/* $INSTALL/usr/bin/
-  mkdir -p $INSTALL/etc
-  cp $PKG_DIR/config/dosbox-SDL2.conf $INSTALL/etc/
+  mkdir -p $INSTALL/usr/config/dosbox
+  cp $PKG_DIR/config/dosbox-SDL2.conf $INSTALL/usr/config/dosbox/
+  mkdir -p $INSTALL/usr/config/dosbox/shaders
+  wget -q https://github.com/duganchen/dosbox_shaders/archive/master.zip
+  unzip -j master.zip -d $INSTALL/usr/config/dosbox/shaders
 }
