@@ -71,7 +71,6 @@ OEM_EMU_COMMON=" \
   retroarch \
   scraper \
   scummvm-libretro \
-  snes9x2010-libretro \
   transmission \
   tyrquake-libretro \
   vice-libretro \
@@ -88,6 +87,7 @@ OEM_EMU_GENERIC=" \
   parallel-n64-libretro \
   ppsspp-libretro \
   reicast-libretro \
+  snes9x-libretro \
   unclutter"
 
 OEM_EMU_RPI=" \
@@ -96,6 +96,7 @@ OEM_EMU_RPI=" \
   uae4arm \
   pcsx_rearmed-libretro \
   reicast \
+  snes9x2010-libretro \
   yabause-libretro"
 
 if [ ! "$OEM_APPS" = "no" ]; then
