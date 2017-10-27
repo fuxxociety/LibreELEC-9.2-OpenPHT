@@ -1,0 +1,10 @@
+--- a/src/cec-client/CMakeLists.txt	2017-10-27 10:50:23.596335879 +0200
++++ b/src/cec-client/CMakeLists.txt	2017-10-27 10:50:27.569594888 +0200
+@@ -44,7 +44,6 @@
+   # curses
+   if (HAVE_CURSES_API)
+     target_link_libraries(cec-client curses)
+-    target_link_libraries(cec-client tinfo)
+   endif()
+ 
+   # rt
