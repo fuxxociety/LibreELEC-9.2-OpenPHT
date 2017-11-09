@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="mesa"
-PKG_VERSION="bd903d4"
+PKG_VERSION="19b6284"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
@@ -37,9 +37,9 @@ PKG_AUTORECONF="yes"
 if [ "$LLVM_SUPPORT" = "yes" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET elfutils llvm"
   export LLVM_CONFIG="$SYSROOT_PREFIX/usr/bin/llvm-config-host"
-  MESA_GALLIUM_LLVM="--enable-gallium-llvm --enable-llvm-shared-libs"
+  MESA_GALLIUM_LLVM="--enable-llvm --enable-llvm-shared-libs"
 else
-  MESA_GALLIUM_LLVM="--disable-gallium-llvm"
+  MESA_GALLIUM_LLVM="--disable-llvm"
 fi
 
 if [ "$VDPAU_SUPPORT" = "yes" -a "$DISPLAYSERVER" = "x11" ]; then
@@ -74,8 +74,6 @@ PKG_CONFIGURE_OPTS_TARGET="CC_FOR_BUILD=$HOST_CC \
                            --enable-asm \
                            --disable-selinux \
                            --enable-opengl \
-                           --disable-gles1 \
-                           $MESA_GLES \
                            --enable-dri \
                            --enable-dri3 \
                            --enable-glx \
@@ -87,7 +85,6 @@ PKG_CONFIGURE_OPTS_TARGET="CC_FOR_BUILD=$HOST_CC \
                            --disable-nine \
                            --disable-xvmc \
                            $MESA_VDPAU \
-                           --disable-omx \
                            --disable-va \
                            --disable-opencl \
                            --enable-opencl-icd \
