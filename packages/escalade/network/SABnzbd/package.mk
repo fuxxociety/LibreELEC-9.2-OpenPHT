@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="SABnzbd"
-PKG_VERSION="2.3.0"
+PKG_VERSION="2.3.1"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://sabnzbd.org/"
