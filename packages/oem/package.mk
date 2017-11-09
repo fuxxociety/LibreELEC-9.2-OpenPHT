@@ -79,6 +79,7 @@ OEM_EMU_COMMON=" \
 OEM_EMU_GENERIC=" \
   beetle-psx-libretro \
   beetle-saturn-libretro \
+  citra-libretro \
   craft-libretro \
   desmume-libretro \
   dolphin \
