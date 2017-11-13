@@ -8,19 +8,19 @@
  #ifndef CHAR_BIT
  #define CHAR_BIT 8	/* Normally in <limits.h> */
  #endif
-@@ -257,14 +256,9 @@ again:
+@@ -252,14 +251,9 @@
  				toggle = 0;
  				break;
  			case 32:
 -				if ((scancode & RC6_6A_LCC_MASK) == RC6_6A_MCE_CC) {
--					protocol = RC_TYPE_RC6_MCE;
+-					protocol = RC_PROTO_RC6_MCE;
 -					toggle = !!(scancode & RC6_6A_MCE_TOGGLE_MASK);
 -					scancode &= ~RC6_6A_MCE_TOGGLE_MASK;
 -				} else {
--					protocol = RC_TYPE_RC6_6A_32;
+-					protocol = RC_PROTO_RC6_6A_32;
 -					toggle = 0;
 -				}
-+				protocol = RC_TYPE_RC6_MCE;
++				protocol = RC_PROTO_RC6_MCE;
 +				toggle = !!(scancode & RC6_6A_MCE_TOGGLE_MASK);
 +				scancode &= ~RC6_6A_MCE_TOGGLE_MASK;
  				break;
