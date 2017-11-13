@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="RTL8812AU"
-PKG_VERSION="887f8cc"
+PKG_VERSION="da70677"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/paspro/rtl8812au"
