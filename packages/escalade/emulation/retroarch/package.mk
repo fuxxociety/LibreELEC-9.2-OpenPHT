@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="0ff54e7"
+PKG_VERSION="94aa2cd"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch.git"
@@ -83,7 +83,6 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-vg \
                            --disable-oss \
                            $RETROARCH_GL \
                            $RETROARCH_NEON \
-                           --enable-fbo \
                            --enable-zlib \
                            --host=$TARGET_NAME \
                            --enable-freetype"
