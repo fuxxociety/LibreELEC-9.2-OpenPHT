@@ -1,15 +1,32 @@
---- a/xml/Home.xml	2016-12-02 11:32:58.361920593 +0000
-+++ b/xml/Home.xml	2016-12-02 11:33:47.611920282 +0000
-@@ -912,6 +912,12 @@
+--- a/xml/Home.xml
++++ b/xml/Home.xml
+@@ -910,6 +910,13 @@
  							<property name="id">spotify</property>
- 							<visible>!Skin.HasSetting(HomeMenuNoFavButton)</visible>
+ 							<visible>!Skin.HasSetting(HomeMenuNoSpotifyButton)</visible>
  						</item>
 +						<item>
 +							<label>Emulators</label>
 +							<onclick>XBMC.System.Exec(/usr/bin/emulator-frontend.sh)</onclick>
 +							<thumb>DefaultAddonGame.png</thumb>
 +							<property name="id">emulationstation</property>
++							<visible>!Skin.HasSetting(HomeMenuNoEmulatorsButton)</visible>
 +						</item>
  					</content>
  				</control>
  				<control type="grouplist" id="700">
+--- a/xml/SkinSettings.xml
++++ b/xml/SkinSettings.xml
+@@ -225,6 +225,12 @@
+ 					<selected>!Skin.HasSetting(HomeMenuNoSpotifyButton)</selected>
+ 					<onclick>Skin.ToggleSetting(HomeMenuNoSpotifyButton)</onclick>
+ 				</control>
++				<control type="radiobutton" id="62000">
++					<label>Emulators</label>
++					<include>DefaultSettingButton</include>
++					<selected>!Skin.HasSetting(HomeMenuNoEmulatorsButton)</selected>
++					<onclick>Skin.ToggleSetting(HomeMenuNoEmulatorsButton)</onclick>
++				</control>
+ 			</control>
+ 			<control type="image">
+ 				<description>Dialog Header image</description>
+
