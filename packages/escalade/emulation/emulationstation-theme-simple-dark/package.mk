@@ -40,6 +40,7 @@ makeinstall_target() {
   mkdir -p $INSTALL/etc/emulationstation/themes/es-theme-simple-dark
   mkdir -p $INSTALL/usr/share/kodi/addons/resource.uisounds.kodi/resources
   cp -r * $INSTALL/etc/emulationstation/themes/es-theme-simple-dark
+  cp -a $PKG_DIR/files/n3ds $INSTALL/etc/emulationstation/themes/es-theme-simple-dark/
   cp $PKG_DIR/files/scroll.wav $INSTALL/etc/emulationstation/themes/es-theme-simple-dark/art/
   cp $PKG_DIR/files/scroll.wav $INSTALL/usr/share/kodi/addons/resource.uisounds.kodi/resources/back.wav
   cp $PKG_DIR/files/scroll.wav $INSTALL/usr/share/kodi/addons/resource.uisounds.kodi/resources/click.wav
