@@ -1,7 +1,7 @@
 # Made by github.com/escalade
 #
 PKG_NAME="lvm2"
-PKG_VERSION="2.02.173"
+PKG_VERSION="2.02.176"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2 LGPL2.1"
 PKG_SITE="https://sourceware.org/lvm2"
