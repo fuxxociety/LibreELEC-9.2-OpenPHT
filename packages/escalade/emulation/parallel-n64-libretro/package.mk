@@ -36,6 +36,7 @@ pre_configure_target() {
 
 pre_build_target() {
   export GIT_VERSION=$PKG_VERSION
+  export LDFLAGS="$LDFLAGS -lpthread"
 }
 
 make_target() {
