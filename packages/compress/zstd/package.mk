@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="zstd"
-PKG_VERSION="f4340f4"
+PKG_VERSION="f3a8bd5"
 PKG_ARCH="any"
 PKG_LICENSE="BSD-3"
 PKG_SITE="http://www.zstd.net"
