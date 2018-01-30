@@ -71,6 +71,7 @@ post_patch() {
   # Add patches from Clear Linux
   if [ "$TARGET_ARCH" = "x86_64" ]; then
     for file in $PKG_DIR/clear/*.patch; do
+      echo Applying patch $file...
       patch -p1 -d $PKG_BUILD < $file
     done
   fi
