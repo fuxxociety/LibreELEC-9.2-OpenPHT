@@ -1,6 +1,6 @@
 # Made by github.com/escalade
 PKG_NAME="citra-libretro"
-PKG_VERSION="4b0ec7e"
+PKG_VERSION="c56cff5"
 PKG_REV="1"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPLv2+"

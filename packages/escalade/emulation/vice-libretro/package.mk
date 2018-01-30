@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="vice-libretro"
-PKG_VERSION="3ef72ef"
+PKG_VERSION="0a6f16b"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="http://vice-emu.sf.net"
