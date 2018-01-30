@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="ds4drv"
-PKG_VERSION="fc00652"
+PKG_VERSION="c5b6661"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="https://github.com/chrippa/ds4drv"
