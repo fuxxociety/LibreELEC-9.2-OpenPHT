@@ -17,11 +17,11 @@
 ################################################################################
 
 PKG_NAME="six"
-PKG_VERSION="1.10.0"
+PKG_VERSION="1.11.0"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://pypi.python.org/pypi/six"
-PKG_URL="http://pypi.python.org/packages/source/s/six/$PKG_NAME-$PKG_VERSION.tar.gz"
+PKG_URL="https://github.com/benjaminp/six/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain Python distutilscross:host"
 PKG_SECTION="python/devel"
 PKG_SHORTDESC="Python 2 and 3 compatibility utilities"
