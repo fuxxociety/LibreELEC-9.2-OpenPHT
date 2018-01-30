@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="transmission"
-PKG_VERSION="0378ee8"
+PKG_VERSION="81c9653"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.transmissionbt.com/"
@@ -44,10 +44,6 @@ pre_build_target() {
   cd -
   mv $PKG_BUILD/$PKG_NAME-git/* $PKG_BUILD/
   rm -rf $PKG_BUILD/$PKG_NAME-git
-  for a in $PKG_DIR/patches/*.patch
-  do
-    patch -p1 -d $PKG_BUILD < $a
-  done
 }
 
 addon() {
