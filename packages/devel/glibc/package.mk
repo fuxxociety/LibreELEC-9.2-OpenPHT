@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="glibc"
-PKG_VERSION="2.26"
+PKG_VERSION="2.27"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.gnu.org/software/libc/"
@@ -66,16 +66,6 @@ NSS_CONF_DIR="$PKG_BUILD/nss"
 GLIBC_EXCLUDE_BIN="catchsegv gencat getconf iconv iconvconfig ldconfig"
 GLIBC_EXCLUDE_BIN="$GLIBC_EXCLUDE_BIN makedb mtrace pcprofiledump"
 GLIBC_EXCLUDE_BIN="$GLIBC_EXCLUDE_BIN pldd rpcgen sln sotruss sprof xtrace"
-
-post_patch() {
-  # Add patches from Clear Linux
-  if [ "$TARGET_ARCH" = "x86_64" ]; then
-    for file in $PKG_DIR/clear/*.patch; do
-      echo Applying patch $file...
-      patch -p1 -d $PKG_BUILD < $file
-    done
-  fi
-}
 
 pre_build_target() {
   cd $PKG_BUILD
