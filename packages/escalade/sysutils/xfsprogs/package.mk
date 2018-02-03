@@ -31,13 +31,14 @@ PKG_IS_ADDON="no"
 
 PKG_AUTORECONF="no"
 
-PKG_CONFIGURE_OPTS_TARGET="--prefix=/usr \
+PKG_CONFIGURE_OPTS_TARGET="AC_HAVE_COPY_FILE_RANGE=no --prefix=/usr \
 			   --exec-prefix=/ \
 			   --enable-shared=no \
 			   --with-gnu-ld \
 			   --enable-readline=yes"
 
 pre_configure_target() {
+  $SED -i 's/^HAVE_COPY_FILE_RANGE.*/HAVE_COPY_FILE_RANGE\ =\ no/' include/builddefs.in
   make configure
 }
 
