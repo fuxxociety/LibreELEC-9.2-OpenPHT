@@ -122,6 +122,9 @@ post_makeinstall_target() {
 # xlocale.h was renamed - create symlink for compatibility
   ln -sf $SYSROOT_PREFIX/usr/include/bits/types/__locale_t.h $SYSROOT_PREFIX/usr/include/xlocale.h
 
+# symlink locale directory
+  ln -sf /storage/.config/locale $INSTALL/usr/lib/locale
+
 # we are linking against ld.so, so symlink
   ln -sf $(basename $INSTALL/usr/lib/ld-*.so) $INSTALL/usr/lib/ld.so
 
@@ -135,19 +138,6 @@ post_makeinstall_target() {
   rm -rf $INSTALL/usr/lib/*.o
   rm -rf $INSTALL/usr/lib/*.map
   rm -rf $INSTALL/var
-
-# remove locales and charmaps
-  rm -rf $INSTALL/usr/share/i18n/charmaps
-  rm -rf $INSTALL/usr/share/i18n/locales
-
-# add default locale
-if [ "$GLIBC_LOCALES" = yes ]; then
-  mkdir -p $INSTALL/usr/lib/locale
-  mkdir -p $INSTALL/etc/profile.d
-  I18NPATH=../localedata 
-  localedef -i ../localedata/locales/en_US -f ../localedata/charmaps/UTF-8 en_US.UTF-8 --prefix=$INSTALL
-  echo "export LANG=en_US.UTF-8" > $INSTALL/etc/profile.d/01-locale.conf
-fi
 
 # create default configs
   mkdir -p $INSTALL/etc
