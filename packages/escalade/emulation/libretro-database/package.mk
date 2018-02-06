@@ -45,6 +45,12 @@ make_target() {
   :
 }
 
+makeinstall_target() {
+  make install DESTDIR=$INSTALL PREFIX=/usr
+}
+
 post_makeinstall_target() {
   mv $INSTALL/usr/share/libretro $INSTALL/usr/share/retroarch
+  rm $INSTALL/usr/share/retroarch/database/rdb/MAME.rdb
+  rm $INSTALL/usr/share/retroarch/database/rdb/MAME\ 2010.rdb
 }
