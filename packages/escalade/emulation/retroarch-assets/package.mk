@@ -32,15 +32,23 @@ PKG_LONGDESC="RetroArch assets. Background and icon themes for the menu drivers.
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-configure_target() {
-  cd ..
+pre_configure_target() {
+  cd ../
   rm -rf .$TARGET_NAME
 }
+
+configure_target() {
+  :
+}
+
 make_target() {
   :
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/share/retroarch/assets
-  cp -r * $INSTALL/usr/share/retroarch/assets
+  make install DESTDIR=$INSTALL PREFIX=/usr
+}
+
+post_makeinstall_target() {
+  mv $INSTALL/usr/share/libretro $INSTALL/usr/share/retroarch
 }
