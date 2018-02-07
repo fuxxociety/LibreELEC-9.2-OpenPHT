@@ -292,7 +292,7 @@ fi # bootloader
   fsck -n $LE_TMP/part1.fat >"$SAVE_ERROR" 2>&1 || show_error
 
 # create virtual images
-  if [ "$PROJECT" = "Generic" ]; then
+  if [ "$VIRTUAL" = "yes" ]; then
     echo "image: creating open virtual appliance..."
     qemu-img convert -O vmdk -o subformat=streamOptimized "$DISK" "$DISK.vmdk"
     sed -e "s,@DISTRO@,$DISTRO,g" -e "s,@DISK@,$(basename $DISK),g" -e "s,@DISK_SIZE@,$(ls -l $DISK.vmdk | awk '{print $5}'),g" $PROJECT_DIR/$PROJECT/config/ovf.template > $DISK.ovf
