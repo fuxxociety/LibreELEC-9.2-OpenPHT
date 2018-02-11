@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="lz4"
-PKG_VERSION="7bb64ff"
+PKG_VERSION="dfed9fa"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"
