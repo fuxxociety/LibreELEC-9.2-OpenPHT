@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="mesa"
-PKG_VERSION="17c0e24"
+PKG_VERSION="1e17346"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
