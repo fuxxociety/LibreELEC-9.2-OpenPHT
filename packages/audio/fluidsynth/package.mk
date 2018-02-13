@@ -34,3 +34,9 @@ PKG_CMAKE_OPTS_TARGET="-DBUILD_SHARED_LIBS=1 \
                        -Denable-readline=1 \
                        -Denable-pulseaudio=0 \
                        -Denable-libsndfile=0"
+
+post_makeinstall_target() {
+  if [ -d $INSTALL/usr/lib64 ]; then
+    mv $INSTALL/usr/lib64 $INSTALL/usr/lib
+  fi
+}
