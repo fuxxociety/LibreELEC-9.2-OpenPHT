@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="12cf1bf"
+PKG_VERSION="71b423c"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch.git"
@@ -160,9 +160,9 @@ makeinstall_target() {
   sed -i -e "s/# thumbnails_directory =/thumbnails_directory = \/storage\/.config\/retroarch\/thumbnails/" $INSTALL/etc/retroarch.cfg
   echo "menu_show_advanced_settings = \"false\"" >> $INSTALL/etc/retroarch.cfg
   echo "menu_wallpaper_opacity = \"1.0\"" >> $INSTALL/etc/retroarch.cfg
-  echo "xmb_show_images = \"false\"" >> $INSTALL/etc/retroarch.cfg
-  echo "xmb_show_music = \"false\"" >> $INSTALL/etc/retroarch.cfg
-  echo "xmb_show_video = \"false\"" >> $INSTALL/etc/retroarch.cfg
+  echo "content_show_images = \"false\"" >> $INSTALL/etc/retroarch.cfg
+  echo "content_show_music = \"false\"" >> $INSTALL/etc/retroarch.cfg
+  echo "content_show_video = \"false\"" >> $INSTALL/etc/retroarch.cfg
 
   # Updater
   if [ "$TARGET_ARCH" == "arm" ]; then
