@@ -30,6 +30,7 @@ PKG_LONGDESC="The Xorg driver for Intel i810, i815, 830M, 845G, 852GM, 855GM, 86
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="yes"
+PKG_USE_MESON="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-backlight \
                            --disable-backlight-helper \
