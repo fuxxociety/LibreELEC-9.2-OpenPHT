@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="go"
-PKG_VERSION="1.7.5"
+PKG_VERSION="1.9.2"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"
 PKG_SITE="https://golang.org"
