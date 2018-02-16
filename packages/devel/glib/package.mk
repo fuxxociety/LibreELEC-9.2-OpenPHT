@@ -31,6 +31,7 @@ PKG_LONGDESC="GLib is a library which includes support routines for C such as li
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
+PKG_USE_MESON="no"
 
 PKG_CONFIGURE_OPTS_HOST="--enable-static --disable-shared --with-pic --with-pcre=internal"
 PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_mmap_fixed_mapped=yes \
