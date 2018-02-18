@@ -18,7 +18,7 @@
 ################################################################################
 
 PKG_NAME="libdrm"
-PKG_VERSION="2.4.89"
+PKG_VERSION="2.4.90"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://dri.freedesktop.org"
@@ -30,6 +30,7 @@ PKG_LONGDESC="The userspace interface library to kernel DRM services."
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="yes"
+PKG_USE_MESON="no"
 
 get_graphicdrivers
 
