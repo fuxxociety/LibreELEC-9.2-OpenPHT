@@ -1,6 +1,6 @@
 # Made by github.com/escalade
 PKG_NAME="citra-libretro"
-PKG_VERSION="c56cff5"
+PKG_VERSION="9b6f6a9"
 PKG_REV="1"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPLv2+"
@@ -11,6 +11,7 @@ PKG_SHORTDESC="A Nintendo 3DS Emulator"
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
+PKG_USE_NINJA="no"
 
 PKG_CMAKE_OPTS_TARGET="-DENABLE_LIBRETRO=1 \
                        -DENABLE_SDL2=0 \
@@ -30,6 +31,10 @@ pre_build_target() {
   mv $PKG_BUILD/$PKG_NAME-git/* $PKG_BUILD/
   mv $PKG_BUILD/$PKG_NAME-git/.gitmodules $PKG_BUILD/
   rm -rf $PKG_BUILD/$PKG_NAME-git
+}
+
+pre_make_target() {
+  find . -name flags.make -exec sed -i "s:isystem :I:g" \{} \;
 }
 
 makeinstall_target() {
