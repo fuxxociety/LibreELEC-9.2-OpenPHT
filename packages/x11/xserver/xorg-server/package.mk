@@ -17,19 +17,32 @@
 ################################################################################
 
 PKG_NAME="xorg-server"
-PKG_VERSION="1.19.6"
+PKG_VERSION="82f8fc5"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
-PKG_SITE="http://www.X.org"
-PKG_URL="http://xorg.freedesktop.org/archive/individual/xserver/$PKG_NAME-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS_TARGET="toolchain util-macros font-util fontsproto randrproto recordproto renderproto dri2proto dri3proto fixesproto damageproto videoproto inputproto xf86dgaproto xf86vidmodeproto xf86driproto xf86miscproto presentproto libpciaccess libX11 libXfont2 libXinerama libxshmfence libxkbfile libdrm openssl freetype pixman fontsproto systemd xorg-launch-helper"
+PKG_SITE="https://anongit.freedesktop.org/git/xorg/xserver.git"
+PKG_DEPENDS_TARGET="toolchain util-macros font-util xorgproto libpciaccess libX11 libXfont2 libXinerama libxshmfence libxkbfile libdrm openssl freetype pixman systemd xorg-launch-helper"
 PKG_NEED_UNPACK="$(get_pkg_directory xf86-video-nvidia) $(get_pkg_directory xf86-video-nvidia-legacy)"
 PKG_SECTION="x11/xserver"
 PKG_SHORTDESC="xorg-server: The Xorg X server"
 PKG_LONGDESC="Xorg is a full featured X server that was originally designed for UNIX and UNIX-like operating systems running on Intel x86 hardware."
 
 PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_AUTORECONF="no"
+PKG_USE_MESON="no"
+
+pre_build_target() {
+  git clone --single-branch $PKG_SITE $PKG_BUILD/$PKG_NAME-git
+  cd $PKG_BUILD/$PKG_NAME-git
+  git reset --hard $PKG_VERSION
+  cd -
+  mv $PKG_BUILD/$PKG_NAME-git/* $PKG_BUILD/
+  rm -rf $PKG_BUILD/$PKG_NAME-git
+  for a in $PKG_DIR/patches/*.patch
+  do
+    patch -p1 -d $PKG_BUILD < $a
+  done
+}
 
 get_graphicdrivers
 
@@ -41,7 +54,7 @@ else
 fi
 
 if [ ! "$OPENGL" = "no" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET glproto $OPENGL libepoxy glu"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $OPENGL libepoxy glu"
   XORG_MESA="--enable-glx --enable-dri --enable-glamor"
 else
   XORG_MESA="--disable-glx --disable-dri --disable-glamor"
@@ -57,7 +70,6 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-debug \
                            --disable-xselinux \
                            $XORG_COMPOSITE \
                            --enable-mitshm \
-                           --disable-xres \
                            --enable-record \
                            --enable-xv \
                            --disable-xvmc \
@@ -138,6 +150,11 @@ pre_configure_target() {
 # hack to prevent a build error
   CFLAGS=`echo $CFLAGS | sed -e "s|-O3|-O2|" -e "s|-Ofast|-O2|"`
   LDFLAGS=`echo $LDFLAGS | sed -e "s|-O3|-O2|" -e "s|-Ofast|-O2|"`
+  strip_lto
+  strip_gold
+  cd ..
+  do_autoreconf
+  cd -
 }
 
 post_makeinstall_target() {
