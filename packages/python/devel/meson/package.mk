@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="meson"
-PKG_VERSION="0.44.0"
+PKG_VERSION="0.46.0"
 PKG_ARCH="any"
 PKG_LICENSE="Apache"
 PKG_SITE="http://mesonbuild.com"
