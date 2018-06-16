@@ -52,6 +52,10 @@ if [[ "$PROJECT" =~ "RPi" ]]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET bcm2835-driver"
 fi
 
+pre_configure_target() {
+ export LDFLAGS=`$SED -i 's/[ \t]*$//' "$LDFLAGS"`
+}
+
 post_makeinstall_target() {
   $SED "s:\(['=\" ]\)/usr:\\1$SYSROOT_PREFIX/usr:g" $SYSROOT_PREFIX/usr/bin/sdl2-config
 
