@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="pulseaudio"
-PKG_VERSION="11.1"
+PKG_VERSION="11.99.1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://pulseaudio.org/"
@@ -103,7 +103,9 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-silent-rules \
 
 pre_configure_target() {
   export CFLAGS="$CFLAGS -fopenmp"
+  strip_lto
 }
+
 post_makeinstall_target() {
   rm -rf $INSTALL/usr/bin/esdcompat
   rm -rf $INSTALL/usr/include
