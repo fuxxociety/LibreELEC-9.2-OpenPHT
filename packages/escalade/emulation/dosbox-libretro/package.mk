@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="dosbox-libretro"
-PKG_VERSION="dfe0f31"
+PKG_VERSION="929be75"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/dosbox-libretro"
@@ -32,7 +32,7 @@ PKG_AUTORECONF="no"
 
 make_target() {
   strip_lto
-  make -f Makefile.libretro
+  make -f Makefile.libretro GIT_VERSION=$PKG_VERSION
 }
 
 makeinstall_target() {

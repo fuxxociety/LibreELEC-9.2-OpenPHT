@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="reicast-libretro"
-PKG_VERSION="3ea9f94"
+PKG_VERSION="13dacb0"
 PKG_ARCH="x86_64 arm"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/reicast-emulator"
@@ -40,10 +40,10 @@ make_target() {
       make platform=rpi WITH_DYNAREC=arm
       ;;
     RPi2)
-      make platform=rpi2 WITH_DYNAREC=arm
+      make platform=rpi2 WITH_DYNAREC=arm CC_PREFIX=$TOOLCHAIN/bin/armv7ve-libreelec-linux-gnueabi-
       ;;
     Generic)
-      make WITH_DYNAREC=x86_64
+      make WITH_DYNAREC=x86_64 CC_PREFIX=$TOOLCHAIN/bin/x86_64-libreelec-linux-gnu-
       ;;
   esac
 }
