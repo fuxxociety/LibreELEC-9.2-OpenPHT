@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="freetype"
-PKG_VERSION="2.9"
+PKG_VERSION="2.9.1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.freetype.org"
@@ -35,6 +35,7 @@ PKG_AUTORECONF="no"
 # target specific configure options
 PKG_CONFIGURE_OPTS_TARGET="LIBPNG_CFLAGS=-I$SYSROOT_PREFIX/usr/include \
                            LIBPNG_LDFLAGS=-L$SYSROOT_PREFIX/usr/lib \
+			   --enable-freetype-config \
                            --with-zlib"
 
 # host specific configure options
