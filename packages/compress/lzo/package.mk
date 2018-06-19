@@ -32,4 +32,13 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 PKG_CMAKE_OPTS_HOST="-DENABLE_SHARED=OFF -DENABLE_STATIC=ON"
-PKG_CMAKE_OPTS_TARGET="-DENABLE_SHARED=OFF -DENABLE_STATIC=ON"
+PKG_CMAKE_OPTS_TARGET="-DENABLE_SHARED=ON -DENABLE_STATIC=OFF"
+
+make_init() {
+ : # reuse target
+}
+
+makeinstall_init() {
+  mkdir -p $INSTALL/usr/lib
+  cp -a ../.install_pkg/usr/lib/* $INSTALL/usr/lib
+}

@@ -31,8 +31,7 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 # package specific configure options
-PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared \
-                           --disable-silent-rules \
+PKG_CONFIGURE_OPTS_TARGET="--disable-silent-rules \
                            --disable-sqlite \
                            --enable-alsa \
                            --disable-external-libs \

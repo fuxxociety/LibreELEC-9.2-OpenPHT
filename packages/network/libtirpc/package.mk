@@ -30,8 +30,7 @@ PKG_LONGDESC="Libtirpc is a port of Suns Transport-Independent RPC library to Li
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared \
-                           --disable-silent-rules \
+PKG_CONFIGURE_OPTS_TARGET="--disable-silent-rules \
                            --enable-ipv6 \
                            --disable-gssapi \
                            --with-gnu-ld"
