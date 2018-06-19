@@ -4,6 +4,9 @@ LD_OPTIM="-Wl,--as-needed"
 if [ "$LTO_SUPPORT" = yes ];then
   GCC_OPTIM_LTO="-flto=$CONCURRENCY_MAKE_LEVEL -ffat-lto-objects"
   LD_OPTIM_LTO="-fuse-linker-plugin -flto=$CONCURRENCY_MAKE_LEVEL"
+  # static libs with lto info require gcc-ar/gcc-nm/gcc-ranlib instead of
+  # default binutils versions
+  TARGET_AR_NM_RANLIB_PREFIX="gcc-"
 fi
 
 if [ "$GOLD_SUPPORT" = yes ];then
