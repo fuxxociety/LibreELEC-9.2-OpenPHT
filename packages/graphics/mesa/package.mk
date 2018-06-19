@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="mesa"
-PKG_VERSION="1e17346"
+PKG_VERSION="dd355ee"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
@@ -31,7 +31,7 @@ PKG_AUTORECONF="yes"
 PKG_USE_MESON="no"
 
 if [ "$DISPLAYSERVER" = "x11" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET glproto dri2proto presentproto libXext libXdamage libXfixes libXxf86vm libxcb libX11 dri3proto libxshmfence"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libXext libXdamage libXfixes libXxf86vm libxcb libX11 libxshmfence"
   export DRI_DRIVER_INSTALL_DIR=$XORG_PATH_DRI
   export DRI_DRIVER_SEARCH_DIR=$XORG_PATH_DRI
   export X11_INCLUDES=
@@ -83,6 +83,7 @@ PKG_CONFIGURE_OPTS_TARGET="CC_FOR_BUILD=$HOST_CC \
                            --enable-texture-float \
                            --enable-asm \
                            --disable-selinux \
+			   --disable-libunwind \
                            --enable-opengl \
                            $MESA_GLES \
                            $MESA_DRI \
