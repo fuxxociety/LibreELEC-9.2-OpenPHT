@@ -1,0 +1,10 @@
+--- a/meson.build	2018-06-19 11:33:31.609223554 +0200
++++ b/meson.build	2018-06-19 11:34:41.738527123 +0200
+@@ -401,6 +401,7 @@
+ foreach arg : ['-Wl,-z,relro',
+                '-Wl,-z,now',
+                '-pie',
++               '-fPIC',
+               ]
+ 
+         have = run_command(check_compilation_sh,
