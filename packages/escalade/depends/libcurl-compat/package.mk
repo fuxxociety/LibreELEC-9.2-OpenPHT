@@ -72,8 +72,8 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_lib_rtmp_RTMP_Init=yes \
                            --without-egd-socket \
                            --enable-thread \
                            --with-random=/dev/urandom \
-                           --without-gnutls \
-                           --with-ssl \
+			   --with-gnutls=$SYSROOT_PREFIX/usr \
+                           --without-ssl \
                            --without-polarssl \
                            --without-nss \
                            --with-ca-bundle=/etc/ssl/cert.pem \
@@ -97,7 +97,10 @@ pre_configure_target() {
   export LIBS="-lrt -lm"
 }
 
-makeinstall_target() {
-  mkdir -p $INSTALL/usr/lib
-  cp lib/.libs/libcurl.so.?.?.0 $INSTALL/usr/lib/libcurl-compat.so
+post_makeinstall_target() {
+  mv $INSTALL/usr/lib/libcurl{,-gnutls}.so.4.5.0
+  rm $INSTALL/usr/lib/libcurl.*
+  for version in 3 4 4.0.0 4.1.0 4.2.0 4.3.0 4.4.0; do
+    ln -s libcurl-gnutls.so.4.5.0 $INSTALL/usr/lib/libcurl-gnutls.so.${version}
+  done
 }
