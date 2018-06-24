@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="openal-soft"
-PKG_VERSION="1.18.1"
+PKG_VERSION="1.18.2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.openal.org/"
@@ -35,7 +35,6 @@ PKG_CMAKE_OPTS_TARGET="-DALSOFT_EXAMPLES=off \
 		       -DALSOFT_UTILS=off \
 		       -DALSOFT_BACKEND_OSS=off \
 		       -DALSOFT_BACKEND_WAVE=off \
-		       -DALSOFT_BACKEND_PORTAUDIO=off \
 		       -DALSOFT_BACKEND_PULSEAUDIO=off"
 
 post_makeinstall_target() {
