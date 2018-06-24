@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="systemd"
-PKG_VERSION="238"
+PKG_VERSION="239"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.freedesktop.org/wiki/Software/systemd"
@@ -108,6 +108,7 @@ PKG_MESON_OPTS_TARGET="--libdir=/usr/lib \
 
 pre_configure_target() {
   export LC_ALL=en_US.UTF-8
+  export LDFLAGS="$LDFLAGS -fPIC"
 }
 
 post_makeinstall_target() {
