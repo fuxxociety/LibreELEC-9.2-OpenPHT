@@ -26,7 +26,7 @@ install_spotify() {
 run_spotify() {
   kodifreeze.sh freeze
   systemctl stop pulseaudio
-  LD_PRELOAD=libcurl-compat.so $SPOTIFY_HOME/spotify "$@"
+  $SPOTIFY_HOME/spotify "$@"
   systemctl start pulseaudio
   kodifreeze.sh unfreeze
 }
