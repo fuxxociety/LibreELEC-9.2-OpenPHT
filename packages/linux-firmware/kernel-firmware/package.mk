@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="kernel-firmware"
-PKG_VERSION="7d2c913"
+PKG_VERSION="d114732"
 PKG_ARCH="any"
 PKG_LICENSE="other"
 PKG_SITE="https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/"
