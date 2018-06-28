@@ -74,6 +74,7 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 if [ "$TARGET_ARCH" = "x86_64" ]; then
+  PKG_DEPENDS_HOST="$PKG_DEPENDS_HOST elfutils:host"
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET intel-ucode:host kernel-firmware"
 fi
 
