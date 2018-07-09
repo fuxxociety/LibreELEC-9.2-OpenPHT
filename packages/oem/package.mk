@@ -132,3 +132,7 @@ makeinstall_target() {
   mkdir -p $INSTALL
   cp -PR $PKG_DIR/files/* $INSTALL
 }
+
+post_install() {
+  enable_service binfmt.service
+}
