@@ -17,11 +17,12 @@
 ################################################################################
 
 PKG_NAME="desmume-libretro"
-PKG_VERSION="73531d7"
+PKG_VERSION="9fb1e8c"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/desmume"
 PKG_URL="https://github.com/libretro/desmume/archive/$PKG_VERSION.tar.gz"
+PKG_SOURCE_DIR="desmume-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="emulation"
 PKG_SHORTDESC="libretro wrapper for desmume NDS emulator."
@@ -30,24 +31,15 @@ PKG_LONGDESC="libretro wrapper for desmume NDS emulator."
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-pre_build_target() {
-  export GIT_VERSION=$PKG_VERSION
-  export LIBS=-lpthread
-}
-
-post_unpack() {
-  mv $BUILD/desmume* $BUILD/$PKG_NAME-$PKG_VERSION
-}
-
 make_target() {
   if [ "$ARCH" == "arm" ]; then
-    make -C desmume -f Makefile.libretro platform=armv # DESMUME_JIT_ARM=1
+    make -C desmume/src/frontend/libretro platform=armv GIT_VERSION=$PKG_VERSION
   else
-    make -C desmume -f Makefile.libretro
+    make -C desmume/src/frontend/libretro GIT_VERSION=$PKG_VERSION
   fi
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp desmume/desmume_libretro.so $INSTALL/usr/lib/libretro/
+  cp desmume/src/frontend/libretro/desmume_libretro.so $INSTALL/usr/lib/libretro/
 }
