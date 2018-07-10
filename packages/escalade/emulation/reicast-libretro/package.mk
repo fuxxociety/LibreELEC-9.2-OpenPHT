@@ -17,11 +17,12 @@
 ################################################################################
 
 PKG_NAME="reicast-libretro"
-PKG_VERSION="befddf2"
+PKG_VERSION="c3712fa"
 PKG_ARCH="x86_64 arm"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/reicast-emulator"
 PKG_URL="https://github.com/libretro/reicast-emulator/archive/$PKG_VERSION.tar.gz"
+PKG_SOURCE_DIR="reicast-emulator-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="libretro"
 PKG_SHORTDESC="Reicast is a multiplatform Sega Dreamcast emulator"
@@ -30,11 +31,8 @@ PKG_LONGDESC="Reicast is a multiplatform Sega Dreamcast emulator"
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-post_unpack() {
-  mv $BUILD/reicast-emulator-$PKG_VERSION* $BUILD/$PKG_NAME-$PKG_VERSION
-}
-
 make_target() {
+  mkdir -p out
   case $PROJECT in
     RPi)
       make platform=rpi WITH_DYNAREC=arm
@@ -43,12 +41,16 @@ make_target() {
       make platform=rpi2 WITH_DYNAREC=arm CC_PREFIX=$TOOLCHAIN/bin/armv7ve-libreelec-linux-gnueabi-
       ;;
     Generic)
-      make WITH_DYNAREC=x86_64 CC_PREFIX=$TOOLCHAIN/bin/x86_64-libreelec-linux-gnu-
+      make WITH_DYNAREC=x86_64 CC_PREFIX=$TOOLCHAIN/bin/x86_64-libreelec-linux-gnu- HAVE_GL3=0
+      cp *.so out
+      make clean
+      make WITH_DYNAREC=x86_64 CC_PREFIX=$TOOLCHAIN/bin/x86_64-libreelec-linux-gnu- HAVE_OIT=1
+      cp *.so out
       ;;
   esac
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp reicast_libretro.so $INSTALL/usr/lib/libretro/
+  cp out/reicast*.so $INSTALL/usr/lib/libretro/
 }
