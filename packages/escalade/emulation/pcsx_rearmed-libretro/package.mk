@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="pcsx_rearmed-libretro"
-PKG_VERSION="358a876"
+PKG_VERSION="229fe6f"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/pcsx_rearmed"
@@ -36,20 +36,18 @@ PKG_AUTORECONF="no"
 configure_target() {
   cd ../
   rm -rf .$TARGET_NAME
-  export GIT_VERSION=$PKG_VERSION
-  strip_gold
 }
 
 make_target() {
   case $PROJECT in
     RPi)
-      make -f Makefile.libretro platform=armv
+      make -f Makefile.libretro platform=armv GIT_VERSION=$PKG_VERSION
       ;;
     RPi2)
-      make -f Makefile.libretro platform=rpi2
+      make -f Makefile.libretro platform=rpi2 GIT_VERSION=$PKG_VERSION
       ;;
     *)
-      make -f Makefile.libretro
+      make -f Makefile.libretro GIT_VERSION=$PKG_VERSION
       ;;
   esac
 }
