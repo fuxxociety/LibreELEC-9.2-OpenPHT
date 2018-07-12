@@ -17,11 +17,11 @@
 ################################################################################
 
 PKG_NAME="intel-vaapi-driver"
-PKG_VERSION="2.1.0"
+PKG_VERSION="2.2.0"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://01.org/linuxmedia"
-PKG_URL="https://github.com/01org/intel-vaapi-driver/releases/download/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.bz2"
+PKG_URL="https://github.com/intel/intel-vaapi-driver/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libva libdrm"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="intel-vaapi-driver: VA-API user mode driver for Intel GEN Graphics family"
@@ -29,5 +29,7 @@ PKG_LONGDESC="intel-vaapi-driver: VA-API user mode driver for Intel GEN Graphics
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="yes"
+PKG_USE_MESON="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-silent-rules"
+PKG_MESON_OPTS_TARGET="-Dwith_wayland=no"
