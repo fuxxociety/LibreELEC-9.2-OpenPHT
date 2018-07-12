@@ -17,11 +17,11 @@
 ################################################################################
 
 PKG_NAME="libva"
-PKG_VERSION="2.1.0"
+PKG_VERSION="2.2.0"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://01.org/linuxmedia"
-PKG_URL="https://github.com/01org/libva/releases/download/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.bz2"
+PKG_URL="https://github.com/intel/libva/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libX11 libXext libXfixes libdrm mesa glu"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="Libva is an implementation for VA-API (VIdeo Acceleration API)."
