@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="mame-libretro"
-PKG_VERSION="eb83bd9"
+PKG_VERSION="c816514"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
 PKG_SITE="https://github.com/libretro/mame"
@@ -33,29 +33,22 @@ PKG_LONGDESC="MAME - Multiple Arcade Machine Emulator"
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-pre_make_target() {
-  strip_lto
-}
-
 make_target() {
-  case $PROJECT in
-    RPi)
-      make platform=armv6-hardfloat-arm1176jzf-s
-      ;;
-    RPi2)
-      make platform=armv7-neon-hardfloat-cortex-a7
-      ;;
-    imx6)
-      make platform=armv7-neon-hardfloat-cortex-a9
-      ;;
-    WeTek_Play)
-      make platform=armv7-neon-hardfloat-cortex-a9
-      ;;
-    Generic)
-      unset ARCH
-      make OSD="retro" verbose=1 RETRO=1 NOWERROR=1 OS="linux" TARGETOS="linux" CONFIG="libretro" NO_USE_MIDI="1" PTR64=1 TARGET=mame CC=$CC CXX=$CXX LD=$LD -j5
-      ;;
-  esac
+  strip_lto
+  strip_gold
+  PTR64="0"
+  NOASM="0"
+
+  if [ "$ARCH" == "arm" ]; then
+    NOASM="1"
+  elif [ "$ARCH" == "x86_64" ]; then
+    PTR64="1"
+  fi
+
+  make REGENIE=1 VERBOSE=1 NOWERROR=1 PYTHON_EXECUTABLE=python2 CONFIG=libretro \
+       LIBRETRO_OS="unix" ARCH="" PROJECT="" LIBRETRO_CPU="$ARCH" DISTRO="debian-stable" \
+       CC="$CC" CXX="$CXX" LD="$LD" CROSS_BUILD="" PTR64="$PTR64" TARGET="mame" \
+       SUBTARGET="arcade" PLATFORM="$ARCH" RETRO=1 OSD="retro" GIT_VERSION=$PKG_VERSION
 }
 
 makeinstall_target() {

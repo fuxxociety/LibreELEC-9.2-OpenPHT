@@ -36,6 +36,7 @@ PKG_AUTORECONF="no"
 configure_target() {
   cd ../
   rm -rf .$TARGET_NAME
+  strip_gold
 }
 
 make_target() {

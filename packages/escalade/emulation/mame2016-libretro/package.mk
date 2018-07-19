@@ -29,35 +29,22 @@ PKG_SHORTDESC="MAME (0.174-ish) for libretro"
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-pre_make_target() {
-  export OVERRIDE_CC=$CC
-  export OVERRIDE_CXX=$CXX
-  export OVERRIDE_LD=$LD
+make_target() {
   strip_lto
   strip_gold
-}
+  PTR64="0"
+  NOASM="0"
 
-make_target() {
-  case $PROJECT in
-    RPi)
-      make -f Makefile.libretro platform=armv6-hardfloat-arm1176jzf-s
-      ;;
-    RPi2)
-      make -f Makefile.libretro platform=armv7-neon-hardfloat-cortex-a7
-      ;;
-    imx6)
-      make -f Makefile.libretro platform=armv7-neon-hardfloat-cortex-a9
-      ;;
-    WeTek_Play)
-      make -f Makefile.libretro platform=armv7-neon-hardfloat-cortex-a9
-      ;;
-    Odroid_C2|WeTek_Hub|WeTek_Play_2)
-      make -f Makefile.libretro platform=aarch64
-      ;;
-    Generic)
-      make -f Makefile.libretro
-      ;;
-  esac
+  if [ "$ARCH" == "arm" ]; then
+    NOASM="1"
+  elif [ "$ARCH" == "x86_64" ]; then
+    PTR64="1"
+  fi
+
+  make REGENIE=1 VERBOSE=1 NOWERROR=1 PYTHON_EXECUTABLE=python2 CONFIG=libretro \
+       LIBRETRO_OS="unix" ARCH="" PROJECT="" LIBRETRO_CPU="$ARCH" DISTRO="debian-stable" \
+       CC="$CC" CXX="$CXX" LD="$LD" CROSS_BUILD="" PTR64="$PTR64" TARGET="mame" \
+       SUBTARGET="arcade" PLATFORM="$ARCH" RETRO=1 OSD="retro" GIT_VERSION=$PKG_VERSION
 }
 
 makeinstall_target() {
