@@ -1,0 +1,123 @@
+From 5bef854ca0dc46402fa4ae3b20f0b6cc103d8cc3 Mon Sep 17 00:00:00 2001
+From: Andrey Ovcharov <sudormrfhalt@gmail.com>
+Date: Thu, 26 Apr 2018 19:01:56 +0700
+Subject: [PATCH] 4.16.* fixes
+
+---
+ exfat_core.c  | 22 ++++++++++++++++++----
+ exfat_super.c |  9 +++++++++
+ 2 files changed, 27 insertions(+), 4 deletions(-)
+
+diff --git a/exfat_core.c b/exfat_core.c
+index 143b721..2dde531 100644
+--- a/exfat_core.c
++++ b/exfat_core.c
+@@ -929,6 +929,9 @@ s32 ffsMoveFile(struct inode *old_parent_inode, FILE_ID_T *fid, struct inode *ne
+ 	}
+ 
+ 	/* check the validity of directory name in the given new pathname */
++	if (strlen(new_path) >= MAX_NAME_LENGTH)
++		return FFS_NAMETOOLONG;
++
+ 	ret = resolve_path(new_parent_inode, new_path, &newdir, &uni_name);
+ 	if (ret)
+ 		return ret;
+@@ -2107,6 +2110,9 @@ s32 exfat_count_used_clusters(struct super_block *sb)
+ 		}
+ 	}
+ 
++	if ((p_fs->num_clusters - 2) < (s32)count)
++		count = p_fs->num_clusters - 2;
++
+ 	return count;
+ } /* end of exfat_count_used_clusters */
+ 
+@@ -5057,8 +5063,10 @@ s32 sector_read(struct super_block *sb, sector_t sec, struct buffer_head **bh, s
+ 
+ 	if (!p_fs->dev_ejected) {
+ 		ret = bdev_read(sb, sec, bh, 1, read);
+-		if (ret != FFS_SUCCESS)
++		if (ret != FFS_SUCCESS) {
++			fs_error(sb);
+ 			p_fs->dev_ejected = TRUE;
++		}
+ 	}
+ 
+ 	return ret;
+@@ -5083,8 +5091,10 @@ s32 sector_write(struct super_block *sb, sector_t sec, struct buffer_head *bh, s
+ 
+ 	if (!p_fs->dev_ejected) {
+ 		ret = bdev_write(sb, sec, bh, 1, sync);
+-		if (ret != FFS_SUCCESS)
++		if (ret != FFS_SUCCESS) {
++			fs_error(sb);
+ 			p_fs->dev_ejected = TRUE;
++		}
+ 	}
+ 
+ 	return ret;
+@@ -5104,8 +5114,10 @@ s32 multi_sector_read(struct super_block *sb, sector_t sec, struct buffer_head *
+ 
+ 	if (!p_fs->dev_ejected) {
+ 		ret = bdev_read(sb, sec, bh, num_secs, read);
+-		if (ret != FFS_SUCCESS)
++		if (ret != FFS_SUCCESS) {
++			fs_error(sb);
+ 			p_fs->dev_ejected = TRUE;
++		}
+ 	}
+ 
+ 	return ret;
+@@ -5130,8 +5142,10 @@ s32 multi_sector_write(struct super_block *sb, sector_t sec, struct buffer_head
+ 
+ 	if (!p_fs->dev_ejected) {
+ 		ret = bdev_write(sb, sec, bh, num_secs, sync);
+-		if (ret != FFS_SUCCESS)
++		if (ret != FFS_SUCCESS) {
++			fs_error(sb);
+ 			p_fs->dev_ejected = TRUE;
++		}
+ 	}
+ 
+ 	return ret;
+diff --git a/exfat_super.c b/exfat_super.c
+index 312de36..ac1a83f 100644
+--- a/exfat_super.c
++++ b/exfat_super.c
+@@ -2137,6 +2137,10 @@ static int exfat_statfs(struct dentry *dentry, struct kstatfs *buf)
+ static int exfat_remount(struct super_block *sb, int *flags, char *data)
+ {
+ 	*flags |= MS_NODIRATIME;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,16,00)
++	sync_filesystem(sb);
++#endif
++
+ 	return 0;
+ }
+ 
+@@ -2150,6 +2154,7 @@ static int exfat_show_options(struct seq_file *m, struct vfsmount *mnt)
+ 	struct exfat_sb_info *sbi = EXFAT_SB(mnt->mnt_sb);
+ #endif
+ 	struct exfat_mount_options *opts = &sbi->options;
++	FS_INFO_T *p_fs = &(sbi->fs_info);
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+ 	if (__kuid_val(opts->fs_uid))
+ 		seq_printf(m, ",uid=%u", __kuid_val(opts->fs_uid));
+@@ -2180,6 +2185,9 @@ static int exfat_show_options(struct seq_file *m, struct vfsmount *mnt)
+ 	if (opts->discard)
+ 		seq_printf(m, ",discard");
+ #endif
++	if (p_fs->dev_ejected)
++		seq_puts(m, ",ejected");
++
+ 	return 0;
+ }
+ 
+@@ -2702,6 +2710,7 @@ module_exit(exit_exfat);
+ 
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("exFAT Filesystem Driver");
++MODULE_VERSION(EXFAT_VERSION);
+ #ifdef MODULE_ALIAS_FS
+ #if defined(CONFIG_MACH_LGE) || defined(CONFIG_HTC_BATT_CORE)
+ MODULE_ALIAS_FS("texfat");

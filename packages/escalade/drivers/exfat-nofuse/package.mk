@@ -1,7 +1,7 @@
 # Made by github.com/escalade
 
 PKG_NAME="exfat-nofuse"
-PKG_VERSION="de4c760"
+PKG_VERSION="01c30ad"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/dorimanx/exfat-nofuse"
@@ -15,7 +15,7 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 make_target() {
-  make KDIR=$(kernel_path)
+  kernel_make KDIR=$(kernel_path) EXTRA_CFLAGS="-Wno-error=incompatible-pointer-types"
 }
 
 makeinstall_target() {
