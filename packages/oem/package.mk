@@ -36,7 +36,6 @@ OEM_APPS_COMMON=" \
   dstat-system \
   htop-system \
   nmon-system \
-  openssl-compat \
   plexmediaserver-script \
   rsync \
   SABnzbd \
@@ -67,6 +66,7 @@ OEM_EMU_COMMON=" \
   nxengine-libretro \
   quicknes-libretro \
   prboom-libretro \
+  reicast-libretro \
   residualvm \
   retroarch \
   scraper \
@@ -87,16 +87,14 @@ OEM_EMU_GENERIC=" \
   fs-uae \
   parallel-n64-libretro \
   ppsspp-libretro \
-  reicast-libretro \
   snes9x-libretro \
   unclutter"
 
 OEM_EMU_RPI=" \
+  amiberry \
   gpsp-libretro \
-  mame2003-libretro \
-  uae4arm \
+  mame2003-plus-libretro \
   pcsx_rearmed-libretro \
-  reicast \
   snes9x2010-libretro \
   yabause-libretro"
 
