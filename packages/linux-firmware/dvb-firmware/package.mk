@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="dvb-firmware"
-PKG_VERSION="1.2.1"
+PKG_VERSION="1.2.2"
 PKG_ARCH="any"
 PKG_LICENSE="Free-to-use"
 PKG_SITE="https://github.com/LibreELEC/dvb-firmware"
