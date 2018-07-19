@@ -1,7 +1,7 @@
 # Made by github.com/escalade
 #
 PKG_NAME="mame2003-plus-libretro"
-PKG_VERSION="e145183"
+PKG_VERSION="68219f2"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
 PKG_SITE="https://github.com/libretro/mame2003-plus-libretro"
@@ -13,15 +13,11 @@ PKG_SHORTDESC="MAME - Multiple Arcade Machine Emulator"
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-configure_target() {
-  export LD=$CC
-}
-
 make_target() {
-  make GIT_VERSION=$PKG_VERSION
+  make ARCH="" CC="$CC" LD="$CC" GIT_VERSION=$PKG_VERSION
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp *.so $INSTALL/usr/lib/libretro/
+  cp *.so $INSTALL/usr/lib/libretro/mame2003_libretro.so
 }
