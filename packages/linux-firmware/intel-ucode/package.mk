@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="intel-ucode"
-PKG_VERSION="20180312"
+PKG_VERSION="20180703"
 PKG_ARCH="x86_64"
 PKG_LICENSE="other"
 PKG_SITE="https://downloadcenter.intel.com/search?keyword=linux+microcode"
