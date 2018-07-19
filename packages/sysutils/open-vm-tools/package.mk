@@ -18,7 +18,7 @@
 ################################################################################
 
 PKG_NAME="open-vm-tools"
-PKG_VERSION="stable-10.1.5"
+PKG_VERSION="stable-10.3.0"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
 PKG_SITE="http://open-vm-tools.sourceforge.net"
@@ -55,6 +55,8 @@ post_unpack() {
 
 pre_configure_target() {
   export LIBS="-ldnet"
+  strip_lto
+  strip_gold
 }
 
 post_makeinstall_target() {
