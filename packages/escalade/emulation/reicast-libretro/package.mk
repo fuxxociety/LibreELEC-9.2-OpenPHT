@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="reicast-libretro"
-PKG_VERSION="cd2bdf2"
+PKG_VERSION="da25128"
 PKG_ARCH="x86_64 arm"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/reicast-emulator"
@@ -35,16 +35,18 @@ make_target() {
   mkdir -p out
   case $PROJECT in
     RPi)
-      make platform=rpi WITH_DYNAREC=arm
+      make GIT_VERSION=$PKG_VERSION WITH_DYNAREC=$ARCH FORCE_GLES=1 platform=rpi
+      mv *.so out
       ;;
     RPi2)
-      make platform=rpi2 WITH_DYNAREC=arm CC_PREFIX=$TOOLCHAIN/bin/armv7ve-libreelec-linux-gnueabi-
+      make GIT_VERSION=$PKG_VERSION WITH_DYNAREC=$ARCH FORCE_GLES=1 platform=rpi2
+      mv *.so out
       ;;
     Generic)
-      make WITH_DYNAREC=x86_64 CC_PREFIX=$TOOLCHAIN/bin/x86_64-libreelec-linux-gnu- GIT_VERSION=$PKG_VERSION
+      make AS=${AS} CC_AS=${AS} GIT_VERSION=$PKG_VERSION
       mv *.so out
       make clean
-      make WITH_DYNAREC=x86_64 CC_PREFIX=$TOOLCHAIN/bin/x86_64-libreelec-linux-gnu- HAVE_OIT=1 HAVE_CORE=1 GIT_VERSION=$PKG_VERSION
+      make AS=${AS} CC_AS=${AS} HAVE_OIT=1 GIT_VERSION=$PKG_VERSION WITH_DYNAREC=$ARCH
       mv *.so out
       ;;
   esac
