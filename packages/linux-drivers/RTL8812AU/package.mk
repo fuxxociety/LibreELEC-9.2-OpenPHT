@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="RTL8812AU"
-PKG_VERSION="da70677"
+PKG_VERSION="af07b27"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/paspro/rtl8812au"
@@ -36,10 +36,8 @@ pre_make_target() {
 }
 
 make_target() {
-  make V=1 \
-       ARCH=$TARGET_KERNEL_ARCH \
+  kernel_make V=1 \
        KSRC=$(kernel_path) \
-       CROSS_COMPILE=$TARGET_PREFIX \
        CONFIG_POWER_SAVING=n
 }
 

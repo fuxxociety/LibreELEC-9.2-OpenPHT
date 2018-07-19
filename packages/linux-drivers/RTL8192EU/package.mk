@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="RTL8192EU"
-PKG_VERSION="addef14"
+PKG_VERSION="77bb7c3"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/Mange/rtl8192eu-linux-driver"
@@ -37,10 +37,8 @@ pre_make_target() {
 }
 
 make_target() {
-  make V=1 \
-       ARCH=$TARGET_KERNEL_ARCH \
+  kernel_make V=1 \
        KSRC=$(kernel_path) \
-       CROSS_COMPILE=$TARGET_PREFIX \
        CONFIG_POWER_SAVING=n \
        USER_EXTRA_CFLAGS="-Wno-error=date-time"
 }

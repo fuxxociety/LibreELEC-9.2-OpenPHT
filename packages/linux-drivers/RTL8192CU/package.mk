@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="RTL8192CU"
-PKG_VERSION="8757801"
+PKG_VERSION="756f2ec"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/pvaret/rtl8192cu-fixes"
@@ -37,10 +37,8 @@ pre_make_target() {
 }
 
 make_target() {
-  make V=1 \
-       ARCH=$TARGET_KERNEL_ARCH \
+  kernel_make V=1 \
        KSRC=$(kernel_path) \
-       CROSS_COMPILE=$TARGET_PREFIX \
        CONFIG_POWER_SAVING=n
 }
 
