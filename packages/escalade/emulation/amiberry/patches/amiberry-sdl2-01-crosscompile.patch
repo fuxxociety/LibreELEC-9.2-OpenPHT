@@ -1,0 +1,121 @@
+--- a/Makefile	2018-07-18 23:35:58.192837958 +0200
++++ b/Makefile	2018-07-18 23:46:13.461822046 +0200
+@@ -7,8 +7,8 @@
+ #
+ # DispmanX Common flags for both SDL1 and SDL2 (RPI-specific)
+ #
+-DISPMANX_FLAGS = -DUSE_DISPMANX -I/opt/vc/include -I/opt/vc/include/interface/vmcs_host/linux -I/opt/vc/include/interface/vcos/pthreads 
+-DISPMANX_LDFLAGS = -lbcm_host -lvchiq_arm -L/opt/vc/lib
++DISPMANX_FLAGS = -DUSE_DISPMANX -I${SYSROOT_PREFIX}/usr/lib -I${SYSROOT_PREFIX}/include/interface/vmcs_host/linux -I${SYSROOT_PREFIX}/interface/vcos/pthreads 
++DISPMANX_LDFLAGS = -lbcm_host -lvchiq_arm -L${SYSROOT_PREFIX}/lib
+ 
+ CPPFLAGS+= -MD -MP
+ #DEBUG=1
+@@ -22,21 +22,18 @@
+ # SDL1 targets
+ #
+ ifeq ($(PLATFORM),rpi3)
+-    CPU_FLAGS += -march=armv8-a -mtune=cortex-a53 -mfpu=neon-fp-armv8
+     CFLAGS += ${DISPMANX_FLAGS} -DARMV6T2 -DUSE_ARMNEON -DARM_HAS_DIV -DUSE_SDL1
+     LDFLAGS += ${DISPMANX_LDFLAGS}
+     HAVE_NEON = 1
+     NAME  = amiberry-rpi3-sdl1
+ 	
+ else ifeq ($(PLATFORM),rpi2)
+-    CPU_FLAGS += -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4
+     CFLAGS += ${DISPMANX_FLAGS} -DARMV6T2 -DUSE_ARMNEON -DARM_HAS_DIV -DUSE_SDL1
+     LDFLAGS += ${DISPMANX_LDFLAGS}
+     HAVE_NEON = 1
+     NAME  = amiberry-rpi2-sdl1
+ 	
+ else ifeq ($(PLATFORM),rpi1)
+-    CPU_FLAGS += -march=armv6zk -mtune=arm1176jzf-s -mfpu=vfp
+     CFLAGS += ${DISPMANX_FLAGS} -DUSE_SDL1
+     LDFLAGS += ${DISPMANX_LDFLAGS}
+     NAME  = amiberry-rpi1-sdl1
+@@ -54,7 +51,6 @@
+ #
+ else ifeq ($(PLATFORM),rpi3-sdl2-dispmanx)
+ USE_SDL2 = 1
+-    CPU_FLAGS += -march=armv8-a -mtune=cortex-a53 -mfpu=neon-fp-armv8
+     CFLAGS += -DARMV6T2 -DUSE_ARMNEON -DARM_HAS_DIV -DUSE_SDL2 ${DISPMANX_FLAGS}
+     LDFLAGS += ${DISPMANX_LDFLAGS}
+     HAVE_NEON = 1
+@@ -62,7 +58,6 @@
+ 
+ else ifeq ($(PLATFORM),rpi2-sdl2-dispmanx)
+ USE_SDL2 = 1
+-    CPU_FLAGS += -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4
+     CFLAGS += -DARMV6T2 -DUSE_ARMNEON -DARM_HAS_DIV -DUSE_SDL2 ${DISPMANX_FLAGS}
+     LDFLAGS += ${DISPMANX_LDFLAGS}
+     HAVE_NEON = 1
+@@ -70,7 +65,6 @@
+ 
+ else ifeq ($(PLATFORM),rpi1-sdl2-dispmanx)
+ USE_SDL2 = 1
+-    CPU_FLAGS += -march=armv6zk -mtune=arm1176jzf-s -mfpu=vfp
+     CFLAGS += -DUSE_SDL2 ${DISPMANX_FLAGS}
+     LDFLAGS += ${DISPMANX_LDFLAGS}
+     NAME  = amiberry-rpi1-sdl2-dispmanx
+@@ -80,21 +74,18 @@
+ #	
+ else ifeq ($(PLATFORM),rpi3-sdl2)
+ USE_SDL2 = 1
+-    CPU_FLAGS += -march=armv8-a -mtune=cortex-a53 -mfpu=neon-fp-armv8
+     CFLAGS += -DARMV6T2 -DUSE_ARMNEON -DARM_HAS_DIV -DUSE_SDL2
+     HAVE_NEON = 1
+     NAME  = amiberry-rpi3-sdl2
+ 	
+ else ifeq ($(PLATFORM),rpi2-sdl2)
+ USE_SDL2 = 1
+-    CPU_FLAGS += -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4
+     CFLAGS += -DARMV6T2 -DUSE_ARMNEON -DARM_HAS_DIV -DUSE_SDL2
+     HAVE_NEON = 1
+     NAME  = amiberry-rpi2-sdl2
+ 	
+ else ifeq ($(PLATFORM),rpi1-sdl2)
+ USE_SDL2 = 1
+-    CPU_FLAGS += -march=armv6zk -mtune=arm1176jzf-s -mfpu=vfp
+     CFLAGS += -DUSE_SDL2
+     NAME  = amiberry-rpi1-sdl2
+ 
+@@ -168,8 +159,8 @@
+ ifndef USE_SDL2
+ all: $(PROG)
+ 
+-SDL_CFLAGS = `sdl-config --cflags`
+-LDFLAGS += -lSDL -lSDL_image -lSDL_ttf -lguichan_sdl -lguichan
++SDL_CFLAGS = `${SYSROOT_PREFIX}/usr/bin/sdl-config --cflags`
++LDFLAGS += -lSDL -lSDL_image -lSDL_ttf -lguichan_sdl -lguichan -L${SYSROOT_PREFIX}/usr/lib
+ endif
+ 
+ #
+@@ -178,7 +169,7 @@
+ ifdef USE_SDL2
+ all: guisan $(PROG)
+ 
+-SDL_CFLAGS = `sdl2-config --cflags --libs`
++SDL_CFLAGS = `${SYSROOT_PREFIX}/usr/bin/sdl2-config --cflags --libs`
+ CPPFLAGS += -Iguisan-dev/include
+ LDFLAGS += -lSDL2 -lSDL2_image -lSDL2_ttf -lguisan -Lguisan-dev/lib
+ endif
+@@ -187,7 +178,7 @@
+ # Common options
+ #
+ CPPFLAGS += -Isrc -Isrc/osdep -Isrc/threaddep -Isrc/include -Isrc/archivers
+-DEFS += `xml2-config --cflags`
++DEFS += `${SYSROOT_PREFIX}/usr/bin/xml2-config --cflags`
+ DEFS += -DAMIBERRY -DARMV6_ASSEMBLY
+ 
+ ifndef DEBUG
+--- a/guisan-dev/Makefile	2018-07-18 23:47:29.817481754 +0200
++++ b/guisan-dev/Makefile	2018-07-18 23:46:54.417949356 +0200
+@@ -6,7 +6,7 @@
+ SOURCE	= $(foreach dir,$(DIRS),$(wildcard $(dir)/*.cpp))
+ OBJS    = $(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(SOURCE)))
+ 
+-CPPFLAGS +=-I./include -std=gnu++14 `sdl2-config --cflags --libs`
++CPPFLAGS +=-I./include -std=gnu++14 `${SYSROOT_PREFIX}/usr/bin/sdl2-config --cflags --libs`
+   
+ .PHONY : all clean
+   
