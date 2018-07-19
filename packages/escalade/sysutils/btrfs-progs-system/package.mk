@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="btrfs-progs-system"
-PKG_VERSION="v4.16.1"
+PKG_VERSION="v4.17"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kdave/btrfs-progs"
