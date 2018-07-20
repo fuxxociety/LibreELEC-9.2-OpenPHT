@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="readline"
-PKG_VERSION="7.0"
+PKG_VERSION="8.0-alpha"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="http://www.gnu.org/software/readline/"
@@ -33,6 +33,10 @@ PKG_AUTORECONF="no"
 PKG_CONFIGURE_OPTS_TARGET="bash_cv_wcwidth_broken=no \
                            --with-curses \
                            --without-purify"
+
+pre_makeinstall_target() {
+  mkdir -p $INSTALL/usr/lib/pkgconfig
+}
 
 post_makeinstall_target() {
   rm -rf $INSTALL/usr/share/readline
