@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="vim-system"
-PKG_VERSION="8.0.1092"
+PKG_VERSION="8.1.0200"
 PKG_ARCH="any"
 PKG_LICENSE="VIM"
 PKG_SITE="http://www.vim.org/"
@@ -38,7 +38,7 @@ PKG_CONFIGURE_OPTS_TARGET="vim_cv_toupper_broken=no \
                            vim_cv_getcwd_broken=no \
                            vim_cv_stat_ignores_slash=yes \
                            vim_cv_memmove_handles_overlap=yes \
-                           vim_cv_tgent=zero \
+                           vim_cv_tgetent=zero \
                            ac_cv_sizeof_int=4 \
                            ac_cv_small_wchar_t=no \
 			   --enable-selinux=no \
