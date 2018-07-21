@@ -11,6 +11,8 @@ kodifreeze.sh freeze
 # Change refresh rate to 50Hz
 tvservice -e "CEA 31"
 
+kms_on
+
 # Copy over the default configuration
 TMP_DIR=/tmp/amiberry
 mkdir -p "$TMP_DIR"

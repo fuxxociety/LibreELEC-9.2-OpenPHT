@@ -10,6 +10,8 @@ kodifreeze.sh freeze
 # Change refresh rate to 50Hz
 xrandr -r 50
 
+kms_on
+
 # Set some common variables
 TMP_DIR=/tmp/fs-uae
 CONFIG="$TMP_DIR"/.conf.fs-uae
@@ -48,6 +50,8 @@ fi
 
 # Remove temporary dir
 rm -rf "$TMP_DIR"
+
+kms_off
 
 # Change back refresh rate
 xrandr -r 60

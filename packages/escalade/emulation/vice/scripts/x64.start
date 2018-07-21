@@ -11,6 +11,8 @@ fi
 
 kodifreeze.sh freeze
 [ -x /usr/bin/tvservice ] && tvservice -e "CEA 31" || xrandr -r 50
+kms_on
 x64 "$@" > /var/log/x64.log 2>&1
+kms_off
 [ -x /usr/bin/tvservice ] && tvservice -e "CEA 16" || xrandr -r 60
 pidof emulationstation > /dev/null 2>&1 || kodifreeze.sh unfreeze

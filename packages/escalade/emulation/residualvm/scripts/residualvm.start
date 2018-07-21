@@ -6,7 +6,9 @@ export SDL_AUDIODRIVER=alsa
 
 kodifreeze.sh freeze
 
+kms_on
 # Run ResidualVM fullscreen + any arguments
 residualvm -f "$@" > /var/log/residualvm.log 2>&1
+kms_off
 
 pidof emulationstation > /dev/null 2>&1 || kodifreeze.sh unfreeze
