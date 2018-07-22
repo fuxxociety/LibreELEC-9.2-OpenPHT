@@ -1,0 +1,16 @@
+#!/bin/sh
+
+. /storage/.config/emulationstation/emulationstation.conf
+. /etc/profile
+
+if [ ! -L /storage/.emulationstation ]; then
+  ln -s /storage/.config/emulationstation /storage/.emulationstation
+fi
+
+export SDL_AUDIODRIVER=alsa
+
+kodifreeze.sh freeze
+
+emulationstation $EMULATIONSTATION_OPTS "$@" > /var/log/emulationstation.log 2>&1
+
+kodifreeze.sh unfreeze
