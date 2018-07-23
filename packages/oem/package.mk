@@ -81,7 +81,7 @@ OEM_EMU_GENERIC=" \
   citra-libretro \
   craft-libretro \
   desmume-libretro \
-  dolphin \
+  dolphin-libretro \
   mame2014-libretro \
   fs-uae \
   parallel-n64-libretro \
