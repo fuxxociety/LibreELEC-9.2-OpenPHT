@@ -9,7 +9,7 @@
      MESSAGE("bcm_host.h found")
      set(BCMHOST found)
      set(GLSystem "OpenGL ES" CACHE STRING "The OpenGL system to be used")
-@@ -136,10 +136,10 @@
+@@ -130,10 +130,10 @@
  
  if(DEFINED BCMHOST)
      LIST(APPEND COMMON_INCLUDE_DIRS
@@ -24,12 +24,12 @@
      )
  else()
      if(${GLSystem} MATCHES "Desktop OpenGL")
-@@ -158,7 +158,7 @@
+@@ -151,7 +151,7 @@
+ #define libraries and directories
  if(DEFINED BCMHOST)
      link_directories(
-         ${Boost_LIBRARY_DIRS}
 -        "/opt/vc/lib"
-++        "${CMAKE_FIND_ROOT_PATH}/lib"
++        "${CMAKE_FIND_ROOT_PATH}/lib"
      )
- else()
-     link_directories(
+ endif()
+ 
