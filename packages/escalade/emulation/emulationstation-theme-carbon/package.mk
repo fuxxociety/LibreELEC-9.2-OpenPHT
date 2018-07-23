@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="emulationstation-theme-carbon"
-PKG_VERSION="70880ca"
+PKG_VERSION="488ce79"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/RetroPie/es-theme-carbon"
