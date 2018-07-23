@@ -36,7 +36,6 @@ pre_configure_target() {
 
 pre_build_target() {
   export GIT_VERSION=$PKG_VERSION
-  export LDFLAGS="$LDFLAGS -lpthread"
 }
 
 make_target() {
@@ -54,7 +53,7 @@ make_target() {
       make platform=armv7-neon-gles-cortex-a9
       ;;
     Generic)
-      make WITH_DYNAREC=$TARGET_ARCH HAVE_PARALLEL=0
+      make WITH_DYNAREC=$TARGET_ARCH HAVE_PARALLEL=1
       ;;
   esac
 }

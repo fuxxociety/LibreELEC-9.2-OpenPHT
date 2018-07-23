@@ -32,20 +32,11 @@ PKG_LONGDESC="Standalone port of Mednafen PSX to libretro."
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-pre_build_target() {
-  export GIT_VERSION=$PKG_VERSION
-}
-
 make_target() {
-  mkdir out
-  make
-  mv *.so out/
-  make clean
-  make HAVE_HW=1
-  mv *.so out/
+  make HAVE_HW=1 GIT_VERSION=$PKG_VERSION
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp out/* $INSTALL/usr/lib/libretro/
+  cp *.so $INSTALL/usr/lib/libretro/
 }

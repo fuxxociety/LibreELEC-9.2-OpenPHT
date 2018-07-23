@@ -1,7 +1,7 @@
 # Made by github.com/escalade
 #
 PKG_NAME="dolphin-libretro"
-PKG_VERSION="b2476b9"
+PKG_VERSION="535df63"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/dolphin"
@@ -24,5 +24,5 @@ pre_make_target() {
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  mv Binaries/*.so $INSTALL/usr/lib/libretro/
+  mv *.so $INSTALL/usr/lib/libretro/
 }
