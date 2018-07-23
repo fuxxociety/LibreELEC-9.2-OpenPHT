@@ -55,11 +55,10 @@ OEM_EMU_COMMON=" \
   beetle-wswan-libretro \
   dosbox-sdl2 \
   ds4drv \
-  emulationstation \
+  emulationstation-retropie \
   fbalpha-libretro \
   fuse-libretro \
   genesis-plus-gx-libretro \
-  emulationstation \
   mgba-libretro \
   mrboom-libretro \
   mupen64plus-libretro \
