@@ -60,7 +60,7 @@ case "$LINUX" in
     ;;
   default-rpi)
     # 4.17.8
-    PKG_VERSION="9a564ac""
+    PKG_VERSION="9a564ac"
     PKG_URL="https://github.com/raspberrypi/linux/archive/$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="default-rpi"
     ;;
