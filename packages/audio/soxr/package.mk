@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="soxr"
-PKG_VERSION="0.1.2"
+PKG_VERSION="0.1.3"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
 PKG_SITE="http://sourceforge.net/p/soxr/wiki/Home/"
@@ -35,3 +35,7 @@ PKG_CMAKE_OPTS_TARGET="-DHAVE_WORDS_BIGENDIAN_EXITCODE=1 \
                        -DBUILD_TESTS=0 \
                        -DBUILD_EXAMPLES=1 \
                        -DBUILD_SHARED_LIBS=ON"
+
+post_makeinstall_target() {
+  $SED -i s/^Version:.*/Version:\ 0\.1\.3/ $SYSROOT_PREFIX/usr/lib/pkgconfig/soxr.pc
+}
