@@ -1,0 +1,18 @@
+--- a/configure.ac	2018-08-11 16:16:56.642890117 +0200
++++ b/configure.ac	2018-08-11 16:17:01.919481051 +0200
+@@ -197,7 +197,6 @@
+ 	mkfs/Makefile
+ 	fsck/Makefile
+ 	tools/Makefile
+-	tools/sg_write_buffer/Makefile
+ ])
+ 
+ # export library version info for mkfs/libf2fs_format_la
+--- a/tools/Makefile.am	2018-08-11 16:20:28.763123396 +0200
++++ b/tools/Makefile.am	2018-08-11 16:20:37.416328454 +0200
+@@ -13,5 +13,3 @@
+ f2fscrypt_LDFLAGS = -luuid
+ dist_man_MANS = f2fscrypt.8
+ endif
+-
+-SUBDIRS = sg_write_buffer
