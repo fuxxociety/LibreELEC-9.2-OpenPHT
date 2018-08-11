@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="glew"
-PKG_VERSION="1.13.0"
+PKG_VERSION="2.1.0"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"
 PKG_SITE="http://glew.sourceforge.net/"
