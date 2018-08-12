@@ -19,11 +19,11 @@
 ################################################################################
 
 PKG_NAME="nss"
-PKG_VERSION="3.37.1"
+PKG_VERSION="3.38"
 PKG_ARCH="any"
 PKG_LICENSE="Mozilla Public License"
 PKG_SITE="http://ftp.mozilla.org/"
-PKG_URL="https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_37_RTM/src/nss-3.37-with-nspr-4.19.tar.gz"
+PKG_URL="https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_38_RTM/src/nss-3.38-with-nspr-4.19.tar.gz"
 PKG_SOURCE_DIR="nss-3.37"
 PKG_DEPENDS_TARGET="toolchain nss:host nspr zlib"
 PKG_SECTION="security"
@@ -64,6 +64,7 @@ make_target() {
      CPU_ARCH_TAG=$TARGET_ARCH \
      NSS_ENABLE_WERROR=0 \
      CC=$CC LDFLAGS="$LDFLAGS -L$SYSROOT_PREFIX/usr/lib" \
+     CCC=$CXX \
      V=1
 }
 
