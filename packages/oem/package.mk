@@ -65,7 +65,6 @@ OEM_EMU_COMMON=" \
   nxengine-libretro \
   quicknes-libretro \
   prboom-libretro \
-  reicast-libretro \
   residualvm \
   retroarch \
   scraper \
@@ -81,10 +80,11 @@ OEM_EMU_GENERIC=" \
   citra-libretro \
   craft-libretro \
   desmume-libretro \
-  dolphin-libretro \
+  dolphin \
   mame2014-libretro \
   fs-uae \
   parallel-n64-libretro \
+  reicast-libretro \
   ppsspp-libretro \
   snes9x-libretro \
   unclutter"
@@ -94,6 +94,7 @@ OEM_EMU_RPI=" \
   gpsp-libretro \
   mame2003-plus-libretro \
   pcsx_rearmed-libretro \
+  reicast \
   snes9x2010-libretro \
   yabause-libretro"
 
