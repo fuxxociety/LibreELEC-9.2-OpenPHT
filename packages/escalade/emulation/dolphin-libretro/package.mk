@@ -1,7 +1,7 @@
 # Made by github.com/escalade
 #
 PKG_NAME="dolphin-libretro"
-PKG_VERSION="535df63"
+PKG_VERSION="d61e5d3"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/dolphin"
