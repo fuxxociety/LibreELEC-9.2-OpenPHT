@@ -527,53 +527,6 @@ index 8cd7a26..3b11241 100644
 2.14.1
 
 
-From 62a0d8ca1d2ee90ce57d6f1700e011ec2ec50c92 Mon Sep 17 00:00:00 2001
-From: Sean Young <sean@mess.org>
-Date: Sun, 25 Mar 2018 11:45:40 -0400
-Subject: [PATCH 04/13] media: rc: mce_kbd decoder: low timeout values cause
- double keydowns
-
-The mce keyboard repeats pressed keys every 100ms. If the IR timeout
-is set to less than that, we send key up events before the repeat
-arrives, so we have key up/key down for each IR repeat.
-
-The keyboard ends any sequence with a 0 scancode, in which case all keys
-are cleared so there is no need to run the timeout timer: it only exists
-for the case that the final 0 was not received.
-
-Signed-off-by: Sean Young <sean@mess.org>
-Signed-off-by: Mauro Carvalho Chehab <mchehab@s-opensource.com>
----
- drivers/media/rc/ir-mce_kbd-decoder.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/media/rc/ir-mce_kbd-decoder.c b/drivers/media/rc/ir-mce_kbd-decoder.c
-index fa5ce51..03d0f7e 100644
---- a/drivers/media/rc/ir-mce_kbd-decoder.c
-+++ b/drivers/media/rc/ir-mce_kbd-decoder.c
-@@ -324,11 +324,13 @@ static int ir_mce_kbd_decode(struct rc_dev *dev, struct ir_raw_event ev)
- 			scancode = data->body & 0xffff;
- 			dev_dbg(&dev->dev, "keyboard data 0x%08x\n",
- 				data->body);
--			if (dev->timeout)
--				delay = usecs_to_jiffies(dev->timeout / 1000);
--			else
--				delay = msecs_to_jiffies(100);
--			mod_timer(&data->rx_timeout, jiffies + delay);
-+			if (scancode) {
-+				delay = nsecs_to_jiffies(dev->timeout) +
-+					msecs_to_jiffies(100);
-+				mod_timer(&data->rx_timeout, jiffies + delay);
-+			} else {
-+				del_timer(&data->rx_timeout);
-+			}
- 			/* Pass data to keyboard buffer parser */
- 			ir_mce_kbd_process_keyboard_data(dev, scancode);
- 			lsc.rc_proto = RC_PROTO_MCIR2_KBD;
--- 
-2.14.1
-
-
 From 109b96feab8cdb9660aa8f5c18fe019671c38949 Mon Sep 17 00:00:00 2001
 From: Sean Young <sean@mess.org>
 Date: Sat, 7 Apr 2018 17:41:17 -0400
