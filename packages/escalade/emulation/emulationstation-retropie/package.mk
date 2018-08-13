@@ -1,7 +1,7 @@
 # Made by github.com/escalade
 #
 PKG_NAME="emulationstation-retropie"
-PKG_VERSION="de021ca"
+PKG_VERSION="dc541e5"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/RetroPie/EmulationStation"
