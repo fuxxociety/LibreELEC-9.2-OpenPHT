@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="xorg-server"
-PKG_VERSION="82f8fc5"
+PKG_VERSION="1508ea6"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="https://anongit.freedesktop.org/git/xorg/xserver.git"
@@ -32,7 +32,7 @@ PKG_AUTORECONF="no"
 PKG_USE_MESON="no"
 
 pre_build_target() {
-  git clone --single-branch $PKG_SITE $PKG_BUILD/$PKG_NAME-git
+  git clone $PKG_SITE $PKG_BUILD/$PKG_NAME-git
   cd $PKG_BUILD/$PKG_NAME-git
   git reset --hard $PKG_VERSION
   cd -
