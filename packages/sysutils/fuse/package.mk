@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="fuse"
-PKG_VERSION="2.9.7"
+PKG_VERSION="2.9.8"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libfuse/libfuse/"
@@ -41,6 +41,7 @@ PKG_CONFIGURE_OPTS_TARGET="MOUNT_FUSE_PATH=/usr/sbin \
 pre_configure_target() {
 # fuse fails to build with GOLD linker on gcc-4.9
   strip_gold
+  strip_lto
 }
 
 post_makeinstall_target() {
