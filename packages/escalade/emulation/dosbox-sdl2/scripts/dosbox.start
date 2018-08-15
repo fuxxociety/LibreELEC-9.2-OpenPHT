@@ -10,7 +10,5 @@ if [ ! -L /storage/.dosbox ]; then
 fi
 
 kodifreeze.sh freeze
-kms_on
 dosbox "$@" > /var/log/dosbox.log 2>&1
-kms_off
 pidof emulationstation > /dev/null 2>&1 || kodifreeze.sh unfreeze
