@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="libaio"
-PKG_VERSION="0.3.110"
+PKG_VERSION="0.3.111"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://lse.sourceforge.net/io/aio.html"
@@ -31,6 +31,7 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 make_target() {
+  strip_lto
   make -C src
 }
 
