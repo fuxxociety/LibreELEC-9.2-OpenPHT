@@ -31,12 +31,12 @@ diff -Naur pango-1.38.1/Makefile.am pango-1.38.1.patch/Makefile.am
 @@ -1,6 +1,6 @@
  ## Process this file with automake to create Makefile.in.
  
--SUBDIRS= pango pango-view examples docs tools tests build
-+SUBDIRS= pango pango-view examples tools tests build
+-SUBDIRS= pango pango-view examples docs tools tests win32
++SUBDIRS= pango pango-view examples tools tests win32
  
- EXTRA_DIST = 			\
- 	autogen.sh		\
-@@ -38,7 +38,6 @@
+ meson_dist_files = \
+ 	pango/pango-features.h.meson \
+@@ -39,7 +39,6 @@
  	$(srcdir)/INSTALL \
  	$(srcdir)/omf.make \
  	$(srcdir)/xmldocs.make \

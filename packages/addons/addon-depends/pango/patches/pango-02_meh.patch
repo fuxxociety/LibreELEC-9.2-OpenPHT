@@ -4,11 +4,11 @@ diff -Naur pango-1.38.1/Makefile.am pango-1.38.1.patch/Makefile.am
 @@ -1,6 +1,6 @@
  ## Process this file with automake to create Makefile.in.
  
--SUBDIRS= pango pango-view examples tools tests build
-+SUBDIRS= pango build
+-SUBDIRS= pango pango-view examples tools tests win32
++SUBDIRS= pango
  
- EXTRA_DIST = 			\
- 	autogen.sh		\
+ meson_dist_files = \
+ 	pango/pango-features.h.meson \
 diff -Naur pango-1.38.1/pango/Makefile.am pango-1.38.1.patch/pango/Makefile.am
 --- pango-1.38.1/pango/Makefile.am	2015-09-01 00:47:11.000000000 +0200
 +++ pango-1.38.1.patch/pango/Makefile.am	2015-11-14 23:21:14.081145117 +0100
@@ -47,10 +47,10 @@ diff -Naur pango-1.38.1/pango/Makefile.am pango-1.38.1.patch/pango/Makefile.am
 diff -Naur pango-1.38.1/pango/pango-context.c pango-1.38.1.patch/pango/pango-context.c
 --- pango-1.38.1/pango/pango-context.c	2015-09-13 17:05:39.000000000 +0200
 +++ pango-1.38.1.patch/pango/pango-context.c	2015-11-14 23:22:57.512225981 +0100
-@@ -38,6 +38,7 @@
- 
+@@ -39,6 +39,7 @@
  #include "pango-engine-private.h"
  #include "pango-script-private.h"
+ #include "pango-emoji-private.h"
 +#include "pango-enum-types.h"
  
  /**
