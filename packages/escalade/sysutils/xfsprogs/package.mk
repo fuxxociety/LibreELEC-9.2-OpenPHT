@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="xfsprogs"
-PKG_VERSION="4.17.0"
+PKG_VERSION="4.20.0"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.xfs.org"
