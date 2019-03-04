@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="xorg-server"
-PKG_VERSION="1508ea6"
+PKG_VERSION="94f036d"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="https://anongit.freedesktop.org/git/xorg/xserver.git"
