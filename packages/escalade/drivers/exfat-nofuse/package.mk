@@ -1,11 +1,11 @@
 # Made by github.com/escalade
 
 PKG_NAME="exfat-nofuse"
-PKG_VERSION="01c30ad"
+PKG_VERSION="c0915bb"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
-PKG_SITE="https://github.com/dorimanx/exfat-nofuse"
-PKG_URL="https://github.com/dorimanx/exfat-nofuse/archive/$PKG_VERSION.tar.gz"
+PKG_SITE="https://github.com/barrybingo/exfat-nofuse"
+PKG_URL="https://github.com/barrybingo/exfat-nofuse/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
 PKG_SECTION="escalade"
