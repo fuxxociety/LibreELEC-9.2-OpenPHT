@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="openssl"
-PKG_VERSION="1.1.0i"
+PKG_VERSION="1.1.1b"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"
