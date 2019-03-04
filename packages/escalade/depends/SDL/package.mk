@@ -43,6 +43,8 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-video-directfb \
 			   --disable-diskaudio \
 			   --disable-dummyaudio \
 			   --disable-mintaudio \
+			   --enable-static \
+			   --disable-shared \
 			   --disable-input-tslib \
 			   --disable-rpath \
 			   --with-gnu-ld"
@@ -56,11 +58,4 @@ fi
 
 pre_configure_target() {
   export SYSROOT_PREFIX
-}
-
-post_makeinstall_target() {
-  mkdir -p $TOOLCHAIN/bin
-  $SED "s:\(['=\" ]\)/usr:\\1$SYSROOT_PREFIX/usr:g" $SYSROOT_PREFIX/usr/bin/sdl-config
-  $SED "s:echo\ \-L/usr.*:echo\ \-lSDL:g" $SYSROOT_PREFIX/usr/bin/sdl-config
-  rm -rf $INSTALL/usr/bin
 }
