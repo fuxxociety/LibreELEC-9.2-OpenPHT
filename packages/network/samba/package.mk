@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="samba"
-PKG_VERSION="4.8.4"
+PKG_VERSION="4.9.4"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3+"
 PKG_SITE="https://www.samba.org"
@@ -95,6 +95,9 @@ PKG_CONFIGURE_OPTS="--prefix=/usr \
                     --enable-auto-reconfigure \
                     --bundled-libraries='ALL,!asn1_compile,!compile_et,!zlib' \
                     --without-quotas \
+                    --with-syslog  \
+                    --without-json-audit \
+		    --without-ldb-lmdb \
                     --with-syslog  \
                     --nopyc --nopyo"
 
