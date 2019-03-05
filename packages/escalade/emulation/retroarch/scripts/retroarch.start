@@ -4,19 +4,23 @@
 
 kodifreeze.sh freeze
 
-if [ ! -z "REFRESH" ]; then
-  test -x /usr/bin/tvservice && tvservice -e "CEA 31" || xrandr -r 50
+# Switch to PAL (50Hz)
+if [ "$PAL" = "1" ]; then
+  pal_on
 fi
 
+# Switch to KMS
 kms_on
 
 # Launch RetroArch
 /usr/bin/retroarch -v "$@" > /var/log/retroarch.log 2>&1
 
+# Switch to X
 kms_off
 
-if [ ! -z "REFRESH" ]; then
-  test -x /usr/bin/tvservice && tvservice -e "CEA 16" || xrandr -r 60
+# Switch to NTSC (60Hz)
+if [ "$PAL" = "1" ]; then
+  pal_off
 fi
 
 pidof emulationstation > /dev/null 2>&1 || kodifreeze.sh unfreeze
