@@ -2,17 +2,28 @@
 
 . /etc/profile
 
+# VICE writes files to cwd - change to config directory
+cd /storage/.config/vice
+
+# Set ALSA audio driver
 export SDL_AUDIODRIVER=alsa
 
-if [ ! -f /storage/.vice/sdl-vicerc ]; then
-  mkdir -p /storage/.vice
-  cp /etc/sdl-vicerc /storage/.vice/
-fi
-
+# Freeze Kodi
 kodifreeze.sh freeze
-[ -x /usr/bin/tvservice ] && tvservice -e "CEA 31" || xrandr -r 50
+
+# Switch to PAL (50Hz)
+pal_on
+
+# Switch to KMS
 kms_on
+
 x64 "$@" > /var/log/x64.log 2>&1
+
+# Switch to X
 kms_off
-[ -x /usr/bin/tvservice ] && tvservice -e "CEA 16" || xrandr -r 60
+
+# Switch to NTSC (60Hz)
+pal_off
+
+# Unfreezing Kodi is not necessary if run from Emulationstation
 pidof emulationstation > /dev/null 2>&1 || kodifreeze.sh unfreeze
