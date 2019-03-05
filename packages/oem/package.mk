@@ -81,9 +81,10 @@ OEM_EMU_GENERIC=" \
   craft-libretro \
   desmume-libretro \
   dolphin \
-  mame2014-libretro \
+  mame2015-libretro \
   fs-uae \
   parallel-n64-libretro \
+  puae-libretro \
   reicast-libretro \
   ppsspp-libretro \
   snes9x-libretro \
