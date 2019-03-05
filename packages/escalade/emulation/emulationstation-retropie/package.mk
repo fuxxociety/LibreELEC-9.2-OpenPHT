@@ -1,12 +1,12 @@
 # Made by github.com/escalade
 #
 PKG_NAME="emulationstation-retropie"
-PKG_VERSION="dc541e5"
+PKG_VERSION="d45d339"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/RetroPie/EmulationStation"
 PKG_SOURCE_DIR="EmulationStation-$PKG_VERSION*"
-PKG_DEPENDS_TARGET="toolchain SDL2 freetype curl cmake:host freeimage emulationstation-theme-carbon vlc"
+PKG_DEPENDS_TARGET="toolchain SDL2 freetype curl cmake:host freeimage emulationstation-theme-carbon vlc rapidjson"
 PKG_SECTION="emulation"
 PKG_SHORTDESC="Emulationstation emulator frontend"
 

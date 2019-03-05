@@ -32,8 +32,9 @@ pre_build_target() {
   cd $PKG_BUILD
   wget http://buildbot.libretro.com/assets/frontend/shaders_glsl.zip
   unzip -o -d common shaders_glsl.zip
+  wget http://buildbot.libretro.com/assets/frontend/shaders_slang.zip
+  unzip -o -d slang shaders_slang.zip
   git clone --depth 1 https://github.com/RetroPie/common-shaders.git retropie
-  git clone --depth 1 https://github.com/libretro/slang-shaders.git slang
   find . -type f -exec chmod 644 {} \;
   cd -
 }

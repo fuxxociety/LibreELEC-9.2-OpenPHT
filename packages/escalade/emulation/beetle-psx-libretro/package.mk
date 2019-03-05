@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="beetle-psx-libretro"
-PKG_VERSION="2af9abd"
+PKG_VERSION="5359198"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/beetle-psx-libretro"
@@ -33,7 +33,7 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 make_target() {
-  make HAVE_HW=1 GIT_VERSION=$PKG_VERSION
+  make HAVE_OPENGL=1 HAVE_VULKAN=1 GIT_VERSION=$PKG_VERSION
 }
 
 makeinstall_target() {

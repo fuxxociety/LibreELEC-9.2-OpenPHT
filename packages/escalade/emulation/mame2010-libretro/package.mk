@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="mame2010-libretro"
-PKG_VERSION="abdabbe"
+PKG_VERSION="c87309d"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/mame2010-libretro"
@@ -33,7 +33,6 @@ pre_make_target() {
   export CFLAGS="$CFLAGS -fpermissive"
   export CXXFLAGS="$CXXFLAGS -fpermissive"
   export LD="$CXX"
-  strip_lto
 }
 
 make_target() {

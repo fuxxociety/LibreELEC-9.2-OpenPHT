@@ -1,7 +1,7 @@
 # Made by github.com/escalade
 #
 PKG_NAME="mame2003-plus-libretro"
-PKG_VERSION="edd0987"
+PKG_VERSION="f9c1c11"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
 PKG_SITE="https://github.com/libretro/mame2003-plus-libretro"

@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="mame2016-libretro"
-PKG_VERSION="45e85dd"
+PKG_VERSION="e06d731"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/mame2016-libretro"

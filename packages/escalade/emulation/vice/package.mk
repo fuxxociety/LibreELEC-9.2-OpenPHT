@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="vice"
-PKG_VERSION="3.2"
+PKG_VERSION="3.3"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="http://vice-emu.sourceforge.net/"
@@ -54,8 +54,8 @@ post_makeinstall_target() {
     mv $INSTALL/usr/lib64 $INSTALL/usr/lib
   fi
   # copy over default config
-  mkdir -p $INSTALL/etc
-  cp $PKG_DIR/config/sdl-vicerc $INSTALL/etc/
+  mkdir -p $INSTALL/usr/config/vice
+  cp $PKG_DIR/config/sdl-vicerc $INSTALL/usr/config/vice
   # remove binaries
   for bin in \
     c1541 \

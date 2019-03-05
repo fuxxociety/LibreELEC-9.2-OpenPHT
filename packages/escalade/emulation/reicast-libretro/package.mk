@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="reicast-libretro"
-PKG_VERSION="689e21a"
+PKG_VERSION="2abb342"
 PKG_ARCH="x86_64 arm"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/reicast-emulator"
@@ -44,9 +44,6 @@ make_target() {
       mv *.so out
       ;;
     Generic)
-      make AS=${AS} CC_AS=${AS} GIT_VERSION=$PKG_VERSION
-      mv *.so out
-      make clean
       make AS=${AS} CC_AS=${AS} HAVE_OIT=1 GIT_VERSION=$PKG_VERSION WITH_DYNAREC=$ARCH
       mv *.so out
       ;;

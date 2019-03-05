@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="craft-libretro"
-PKG_VERSION="a6176bd"
+PKG_VERSION="74b3a6d"
 PKG_ARCH="any"
 PKG_LICENSE="MAME"
 PKG_SITE="https://github.com/libretro/Craft"
