@@ -1,35 +1,18 @@
-################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2009-2016 Lukas Rusak (lrusak@libreelec.tv)
-#
-#  LibreELEC is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  LibreELEC is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2009-2016 Lukas Rusak (lrusak@libreelec.tv)
+# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="containerd"
-PKG_VERSION="06b9cb3"
-PKG_SHA256="4d2b6e30bcc6c4bb901d6b9f19b5ac1d4a2d9b17075a9b1f110102920d01f64a"
-PKG_ARCH="any"
+PKG_VERSION="1.2.4"
 PKG_LICENSE="APL"
 PKG_SITE="https://containerd.tools/"
-PKG_URL="https://github.com/docker/containerd/archive/${PKG_VERSION}.tar.gz"
+PKG_URL="https://github.com/containerd/containerd/archive/v$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain go:host"
-PKG_SECTION="system"
-PKG_SHORTDESC="containerd is a daemon to control runC"
-PKG_LONGDESC="containerd is a daemon to control runC, built for performance and density. containerd leverages runC's advanced features such as seccomp and user namespace support as well as checkpoint and restore for cloning and live migration of containers."
+PKG_LONGDESC="A daemon to control runC, built for performance and density."
 PKG_TOOLCHAIN="manual"
 
 pre_make_target() {
+  strip_lto
   case $TARGET_ARCH in
     x86_64)
       export GOARCH=amd64
@@ -41,9 +24,9 @@ pre_make_target() {
         arm1176jzf-s)
           export GOARM=6
           ;;
-        cortex-a7)
-         export GOARM=7
-         ;;
+        *)
+          export GOARM=7
+          ;;
       esac
       ;;
     aarch64)
@@ -55,7 +38,10 @@ pre_make_target() {
   export CGO_ENABLED=1
   export CGO_NO_EMULATION=1
   export CGO_CFLAGS=$CFLAGS
-  export LDFLAGS="-w -extldflags -static -X github.com/docker/containerd.GitCommit=${PKG_VERSION} -extld $CC"
+  export CONTAINERD_VERSION=v${PKG_VERSION}
+  export CONTAINERD_REVISION=${PKG_VERSION}
+  export CONTAINERD_PKG=github.com/containerd/containerd
+  export LDFLAGS="-w -extldflags -static -X ${CONTAINERD_PKG}/version.Version=${CONTAINERD_VERSION} -X ${CONTAINERD_PKG}/version.Revision=${CONTAINERD_REVISION} -X ${CONTAINERD_PKG}/version.Package=${CONTAINERD_PKG} -extld $CC"
   export GOLANG=$TOOLCHAIN/lib/golang/bin/go
   export GOPATH=$PKG_BUILD/.gopath
   export GOROOT=$TOOLCHAIN/lib/golang
@@ -71,6 +57,10 @@ pre_make_target() {
 
 make_target() {
   mkdir -p bin
-  $GOLANG build -v -o bin/containerd      -a -tags "static_build" -ldflags "$LDFLAGS" ./containerd
-  $GOLANG build -v -o bin/containerd-shim -a -tags "static_build" -ldflags "$LDFLAGS" ./containerd-shim
+  $GOLANG build -v -o bin/containerd      -a -tags "static_build" -ldflags "$LDFLAGS" ./cmd/containerd
+  $GOLANG build -v -o bin/containerd-shim -a -tags "static_build" -ldflags "$LDFLAGS" ./cmd/containerd-shim
+}
+
+makeinstall_target() {
+  :
 }

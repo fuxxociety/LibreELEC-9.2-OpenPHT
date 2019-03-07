@@ -1,32 +1,15 @@
-################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2009-2016 Lukas Rusak (lrusak@libreelec.tv)
-#
-#  LibreELEC is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  LibreELEC is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2009-2016 Lukas Rusak (lrusak@libreelec.tv)
+# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="runc"
-PKG_VERSION="0351df1"
-PKG_SHA256="f3c59d337e52808da93e2514ddac829dd81a2b4f19529a35301819ae2524434e"
-PKG_ARCH="any"
+PKG_VERSION="96ec2177ae841256168fcf76954f7177af9446eb"
+PKG_SHA256="96040a78008abad13b412863813011f4cbe55407e513acad1d8509f4ab9b39cd"
 PKG_LICENSE="APL"
 PKG_SITE="https://github.com/opencontainers/runc"
 PKG_URL="https://github.com/opencontainers/runc/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain go:host"
-PKG_SECTION="system"
-PKG_SHORTDESC="runc is a CLI tool for spawning and running containers according to the OCI specification"
-PKG_LONGDESC="runc is a CLI tool for spawning and running containers according to the OCI specification"
+PKG_LONGDESC="A CLI tool for spawning and running containers according to the OCI specification."
 PKG_TOOLCHAIN="manual"
 
 pre_make_target() {
@@ -41,9 +24,9 @@ pre_make_target() {
         arm1176jzf-s)
           export GOARM=6
           ;;
-        cortex-a7)
-         export GOARM=7
-         ;;
+        *)
+          export GOARM=7
+          ;;
       esac
       ;;
     aarch64)
@@ -72,5 +55,8 @@ pre_make_target() {
 make_target() {
   mkdir -p bin
   $GOLANG build -v -o bin/runc -a -tags "cgo static_build" -ldflags "$LDFLAGS" ./
-  $GOLANG build -v -o runc -a -tags "cgo static_build" -ldflags "$LDFLAGS" ./
+}
+
+makeinstall_target() {
+  :
 }

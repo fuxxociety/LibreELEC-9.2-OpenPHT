@@ -1,10 +1,9 @@
-diff -Naur go-1.9.2.orig/src/crypto/x509/root_unix.go go-1.9.2/src/crypto/x509/root_unix.go
---- go-1.9.2.orig/src/crypto/x509/root_unix.go	2017-11-03 14:58:53.655965257 +0100
-+++ go-1.9.2/src/crypto/x509/root_unix.go	2017-11-03 14:59:16.923786983 +0100
-@@ -19,6 +19,7 @@
- 	"/usr/local/share/certs",       // FreeBSD
+--- a/src/crypto/x509/root_unix.go	2019-03-06 22:22:22.026313717 +0100
++++ b/src/crypto/x509/root_unix.go	2019-03-06 22:23:17.098829301 +0100
+@@ -20,6 +20,7 @@
  	"/etc/pki/tls/certs",           // Fedora/RHEL
  	"/etc/openssl/certs",           // NetBSD
+ 	"/var/ssl/certs",               // AIX
 +	"/etc/ssl",                     // LibreELEC
  }
  
