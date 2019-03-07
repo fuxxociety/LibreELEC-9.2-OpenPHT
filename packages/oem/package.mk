@@ -56,7 +56,6 @@ OEM_EMU_COMMON=" \
   dosbox-sdl2 \
   ds4drv \
   emulationstation-retropie \
-  fbalpha-libretro \
   fuse-libretro \
   genesis-plus-gx-libretro \
   mgba-libretro \
@@ -81,7 +80,7 @@ OEM_EMU_GENERIC=" \
   craft-libretro \
   desmume-libretro \
   dolphin \
-  mame2015-libretro \
+  mame2016-libretro \
   fs-uae \
   parallel-n64-libretro \
   puae-libretro \
