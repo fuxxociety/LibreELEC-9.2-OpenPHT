@@ -59,3 +59,9 @@ fi
 pre_configure_target() {
   export SYSROOT_PREFIX
 }
+
+post_makeinstall_target() {
+  mkdir -p $TOOLCHAIN/bin
+  $SED "s:echo\ \-L/usr.*:echo\ \-lSDL:g" $SYSROOT_PREFIX/usr/bin/sdl-config
+  rm -rf $INSTALL/usr/bin
+}
