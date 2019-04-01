@@ -16,6 +16,18 @@ PKG_STAMP="$KERNEL_TARGET $KERNEL_MAKE_EXTRACMD $KERNEL_UBOOT_EXTRA_TARGET"
 PKG_PATCH_DIRS="$LINUX"
 
 case "$LINUX" in
+  linux-odroidxu3-5.0)
+    PKG_VERSION="876a55d" # 5.0.3
+    PKG_SHA256="551f229051334d89a91d0c172661925ef7ea11b91f5f299cd4ffcb872b6330de"
+    PKG_URL="https://github.com/mihailescu2m/linux/archive/$PKG_VERSION.tar.gz"
+    PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
+    ;;
+  linux-odroidxu3-4.14)
+    PKG_VERSION="4.14.111-158"
+    PKG_SHA256="69badf0f3aba2d5fd351de59809356c234228f37da0fd56c5dd2e033e9d0a742"
+    PKG_URL="https://github.com/hardkernel/linux/archive/$PKG_VERSION.tar.gz"
+    PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
+    ;;
   rockchip-4.4)
     PKG_VERSION="aa8bacf821e5c8ae6dd8cae8d64011c741659945"
     PKG_SHA256="a2760fe89a15aa7be142fd25fb08ebd357c5d855c41f1612cf47c6e89de39bb3"
