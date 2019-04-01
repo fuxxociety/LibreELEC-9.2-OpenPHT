@@ -1,0 +1,80 @@
+diff --git a/arch/arm/boot/dts/exynos5422-cpus.dtsi b/arch/arm/boot/dts/exynos5422-cpus.dtsi
+index aea3893fed24..9bbba9809b4f 100644
+--- a/arch/arm/boot/dts/exynos5422-cpus.dtsi
++++ b/arch/arm/boot/dts/exynos5422-cpus.dtsi
+@@ -26,7 +26,7 @@
+ 			compatible = "arm,cortex-a7";
+ 			reg = <0x100>;
+ 			clocks = <&clock CLK_KFC_CLK>;
+-			clock-frequency = <1400000000>;
++			clock-frequency = <1500000000>;
+ 			cci-control-port = <&cci_control0>;
+ 			operating-points-v2 = <&cluster_a7_opp_table>;
+ 			#cooling-cells = <2>; /* min followed by max */
+@@ -38,7 +38,7 @@
+ 			compatible = "arm,cortex-a7";
+ 			reg = <0x101>;
+ 			clocks = <&clock CLK_KFC_CLK>;
+-			clock-frequency = <1400000000>;
++			clock-frequency = <1500000000>;
+ 			cci-control-port = <&cci_control0>;
+ 			operating-points-v2 = <&cluster_a7_opp_table>;
+ 			#cooling-cells = <2>; /* min followed by max */
+@@ -50,7 +50,7 @@
+ 			compatible = "arm,cortex-a7";
+ 			reg = <0x102>;
+ 			clocks = <&clock CLK_KFC_CLK>;
+-			clock-frequency = <1400000000>;
++			clock-frequency = <1500000000>;
+ 			cci-control-port = <&cci_control0>;
+ 			operating-points-v2 = <&cluster_a7_opp_table>;
+ 			#cooling-cells = <2>; /* min followed by max */
+@@ -62,7 +62,7 @@
+ 			compatible = "arm,cortex-a7";
+ 			reg = <0x103>;
+ 			clocks = <&clock CLK_KFC_CLK>;
+-			clock-frequency = <1400000000>;
++			clock-frequency = <1500000000>;
+ 			cci-control-port = <&cci_control0>;
+ 			operating-points-v2 = <&cluster_a7_opp_table>;
+ 			#cooling-cells = <2>; /* min followed by max */
+diff --git a/arch/arm/boot/dts/exynos5422-odroidxu3-lite.dts b/arch/arm/boot/dts/exynos5422-odroidxu3-lite.dts
+index 8082e3ce4228..fe755d058c13 100644
+--- a/arch/arm/boot/dts/exynos5422-odroidxu3-lite.dts
++++ b/arch/arm/boot/dts/exynos5422-odroidxu3-lite.dts
+@@ -24,6 +24,7 @@
+ };
+ 
+ &cluster_a7_opp_table {
++	/delete-node/opp-1500000000;
+ 	/delete-node/opp-1400000000;
+ };
+ 
+diff --git a/arch/arm/boot/dts/exynos5800.dtsi b/arch/arm/boot/dts/exynos5800.dtsi
+index bc20debe4f97..8e0d66345e91 100644
+--- a/arch/arm/boot/dts/exynos5800.dtsi
++++ b/arch/arm/boot/dts/exynos5800.dtsi
+@@ -95,6 +95,11 @@
+ };
+ 
+ &cluster_a7_opp_table {
++	opp-1500000000 {
++		opp-hz = /bits/ 64 <1500000000>;
++		opp-microvolt = <1312500>;
++		clock-latency-ns = <140000>;
++	};
+ 	opp-1400000000 {
+ 		opp-hz = /bits/ 64 <1400000000>;
+ 		opp-microvolt = <1250000>;
+diff --git a/drivers/clk/samsung/clk-exynos5420.c b/drivers/clk/samsung/clk-exynos5420.c
+index 9684721a078c..278ea3c04991 100644
+--- a/drivers/clk/samsung/clk-exynos5420.c
++++ b/drivers/clk/samsung/clk-exynos5420.c
+@@ -1391,6 +1391,7 @@ static const struct exynos_cpuclk_cfg_data exynos5800_eglclk_d[] __initconst = {
+ 		((((kpll) << 24) | ((pclk) << 20) | ((aclk) << 4)))
+ 
+ static const struct exynos_cpuclk_cfg_data exynos5420_kfcclk_d[] __initconst = {
++	{ 1500000, E5420_KFC_DIV(3, 5, 3), },
+ 	{ 1400000, E5420_KFC_DIV(3, 5, 3), }, /* for Exynos5800 */
+ 	{ 1300000, E5420_KFC_DIV(3, 5, 2), },
+ 	{ 1200000, E5420_KFC_DIV(3, 5, 2), },
