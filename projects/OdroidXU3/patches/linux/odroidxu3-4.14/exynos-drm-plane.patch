@@ -1,0 +1,19 @@
+--- a/drivers/gpu/drm/exynos/exynos_mixer.c	2019-04-06 01:29:24.471568045 +0200
++++ b/drivers/gpu/drm/exynos/exynos_mixer.c	2019-04-06 01:29:48.837916150 +0200
+@@ -134,14 +134,14 @@
+ 				EXYNOS_DRM_PLANE_CAP_ZPOS,
+ 	}, {
+ 		.zpos = 1,
+-		.type = DRM_PLANE_TYPE_CURSOR,
++		.type = DRM_PLANE_TYPE_OVERLAY,
+ 		.pixel_formats = mixer_formats,
+ 		.num_pixel_formats = ARRAY_SIZE(mixer_formats),
+ 		.capabilities = EXYNOS_DRM_PLANE_CAP_DOUBLE |
+ 				EXYNOS_DRM_PLANE_CAP_ZPOS,
+ 	}, {
+ 		.zpos = 2,
+-		.type = DRM_PLANE_TYPE_OVERLAY,
++		.type = DRM_PLANE_TYPE_CURSOR,
+ 		.pixel_formats = vp_formats,
+ 		.num_pixel_formats = ARRAY_SIZE(vp_formats),
+ 		.capabilities = EXYNOS_DRM_PLANE_CAP_SCALE |

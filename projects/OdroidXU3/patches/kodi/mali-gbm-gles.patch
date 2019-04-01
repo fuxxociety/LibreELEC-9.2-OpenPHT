@@ -1,0 +1,133 @@
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+index a7e4b86396..c824763544 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecFFmpeg.cpp
+@@ -40,6 +40,18 @@ extern "C" {
+ #define RINT lrint
+ #endif
+ 
++/* define what FFMPEG codecs to use */
++/* leave empty string for autodetect */
++#define MPEG2TS_FFMPEG_CODEC "mpeg2_v4l2m2m"
++#define H263_FFMPEG_CODEC    "h263_v4l2m2m"
++#define H264_FFMPEG_CODEC    "h264_v4l2m2m"
++#define MPEG4_FFMPEG_CODEC   "mpeg4_v4l2m2m"
++#define MPEG1_FFMPEG_CODEC   "mpeg1_v4l2m2m"
++#define MPEG2_FFMPEG_CODEC   "mpeg2_v4l2m2m"
++#define VC1_FFMPEG_CODEC     "vc1_v4l2m2m"
++#define VP8_FFMPEG_CODEC     "vp8_v4l2m2m"
++#define VP9_FFMPEG_CODEC     "vp9_v4l2m2m"
++
+ enum DecoderState
+ {
+   STATE_NONE,
+@@ -324,7 +336,7 @@ bool CDVDVideoCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
+   m_hints = hints;
+   m_options = options;
+ 
+-  AVCodec* pCodec;
++  AVCodec* pCodec = nullptr;
+ 
+   m_iOrientation = hints.orientation;
+ 
+@@ -334,7 +346,42 @@ bool CDVDVideoCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
+   m_processInfo.SetSwDeinterlacingMethods();
+   m_processInfo.SetVideoInterlaced(false);
+ 
+-  pCodec = avcodec_find_decoder(hints.codec);
++  switch(hints.codec)
++  {
++    case AV_CODEC_ID_MPEG4:
++      pCodec = avcodec_find_decoder_by_name(MPEG4_FFMPEG_CODEC);
++      break;
++    case AV_CODEC_ID_MPEG2TS:
++      pCodec = avcodec_find_decoder_by_name(MPEG2TS_FFMPEG_CODEC);
++      break;
++    case AV_CODEC_ID_H263:
++      pCodec = avcodec_find_decoder_by_name(H263_FFMPEG_CODEC);
++      break;
++    case AV_CODEC_ID_H264:
++      pCodec = avcodec_find_decoder_by_name(H264_FFMPEG_CODEC);
++      break;
++    case AV_CODEC_ID_MPEG1VIDEO:
++      pCodec = avcodec_find_decoder_by_name(MPEG1_FFMPEG_CODEC);
++      break;
++    case AV_CODEC_ID_MPEG2VIDEO:
++      pCodec = avcodec_find_decoder_by_name(MPEG2_FFMPEG_CODEC);
++      break;
++    case AV_CODEC_ID_VC1:
++      pCodec = avcodec_find_decoder_by_name(VC1_FFMPEG_CODEC);
++      break;
++    case AV_CODEC_ID_VP8:
++      pCodec = avcodec_find_decoder_by_name(VP8_FFMPEG_CODEC);
++      break;
++    case AV_CODEC_ID_VP9:
++      pCodec = avcodec_find_decoder_by_name(VP9_FFMPEG_CODEC);
++      break;
++    default:
++      pCodec = avcodec_find_decoder(hints.codec);
++      break;
++  }
++
++  if (pCodec == NULL)
++    pCodec = avcodec_find_decoder(hints.codec);
+ 
+   if(pCodec == NULL)
+   {
+diff --git a/xbmc/windowing/Resolution.cpp b/xbmc/windowing/Resolution.cpp
+index d17caf0f6a..6bfa15db5e 100644
+--- a/xbmc/windowing/Resolution.cpp
++++ b/xbmc/windowing/Resolution.cpp
+@@ -54,6 +54,8 @@ float RESOLUTION_INFO::DisplayRatio() const
+ 
+ RESOLUTION CResolutionUtils::ChooseBestResolution(float fps, int width, int height, bool is3D)
+ {
++  fps = static_cast<float>(std::round(fps));
++
+   RESOLUTION res = CServiceBroker::GetWinSystem()->GetGfxContext().GetVideoResolution();
+   float weight;
+ 
+diff --git a/xbmc/windowing/gbm/DRMUtils.cpp b/xbmc/windowing/gbm/DRMUtils.cpp
+index 215f696e17..a99330c70e 100644
+--- a/xbmc/windowing/gbm/DRMUtils.cpp
++++ b/xbmc/windowing/gbm/DRMUtils.cpp
+@@ -352,7 +352,7 @@ drmModePlanePtr CDRMUtils::FindPlane(drmModePlaneResPtr resources, int crtc_inde
+           {
+             case KODI_VIDEO_PLANE:
+             {
+-              if (SupportsFormat(plane, DRM_FORMAT_NV12))
++              if (SupportsFormat(plane, DRM_FORMAT_NV12) || SupportsFormat(plane, DRM_FORMAT_XRGB8888))
+               {
+                 CLog::Log(LOGDEBUG, "CDRMUtils::%s - found video plane %u", __FUNCTION__, plane->plane_id);
+                 drmModeFreeProperty(p);
+@@ -529,7 +529,7 @@ bool CDRMUtils::OpenDrm(bool needConnector)
+ 
+   for (auto module : modules)
+   {
+-    m_fd.attach(drmOpenWithType(module, nullptr, DRM_NODE_PRIMARY));
++    m_fd.attach(open("/dev/dri/card0", O_RDWR | O_CLOEXEC));
+     if (m_fd)
+     {
+       if(!GetResources())
+@@ -556,7 +556,7 @@ bool CDRMUtils::OpenDrm(bool needConnector)
+ 
+       CLog::Log(LOGDEBUG, "CDRMUtils::%s - opened device: %s using module: %s", __FUNCTION__, drmGetDeviceNameFromFd2(m_fd), module);
+ 
+-      m_renderFd.attach(drmOpenWithType(module, nullptr, DRM_NODE_RENDER));
++      m_renderFd.attach(open("/dev/dri/renderD128", O_RDWR | O_CLOEXEC));
+       if (m_renderFd)
+       {
+         CLog::Log(LOGDEBUG, "CDRMUtils::%s - opened render node: %s using module: %s", __FUNCTION__, drmGetDeviceNameFromFd2(m_renderFd), module);
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+index c24cb919ae..9cd6bde8ed 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLESContext.cpp
+@@ -29,7 +29,7 @@
+ using namespace KODI::WINDOWING::GBM;
+ 
+ CWinSystemGbmGLESContext::CWinSystemGbmGLESContext()
+-: CWinSystemGbmEGLContext(EGL_PLATFORM_GBM_MESA, "EGL_MESA_platform_gbm")
++: CWinSystemGbmEGLContext(EGL_PLATFORM_GBM_MESA, "EGL_KHR_platform_gbm")
+ {}
+ 
+ std::unique_ptr<CWinSystemBase> CWinSystemBase::CreateWinSystem()
