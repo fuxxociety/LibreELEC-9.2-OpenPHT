@@ -44,8 +44,8 @@ case "$LINUX" in
     PKG_BUILD_PERF="no"
     ;;
   *)
-    PKG_VERSION="5.1-rc3"
-    PKG_SHA256="56d0ab59330c5461df266ff2ab18eee4760541b2a68146d1751c90e6328085d9"
+    PKG_VERSION="5.1-rc4"
+    PKG_SHA256="26eb18ba8259db26654fd54c83c14849ff7285bc20daeb1079243b39164019b3"
     PKG_URL="https://git.kernel.org/torvalds/t/$PKG_NAME-$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="default"
     PKG_BUILD_PERF="no"
