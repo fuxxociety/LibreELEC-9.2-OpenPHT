@@ -20,6 +20,11 @@ make_target() {
   make CXX=$CXX CC=$CC 7z 7za
 }
 
+makeinstall_target() {
+  mkdir -p $INSTALL/usr/bin
+    cp bin/7za $INSTALL/usr/bin
+}
+
 makeinstall_host() {
   mkdir -p $TOOLCHAIN/bin
     cp bin/7za $TOOLCHAIN/bin
