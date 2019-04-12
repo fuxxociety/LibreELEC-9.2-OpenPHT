@@ -29,6 +29,7 @@ make_target() {
      -f makefile lib
 }
 
-post_make_target() {
-  rm -f libunrar.so
+makeinstall_target() {
+  mkdir -p $INSTALL/usr/bin
+  cp unrar $INSTALL/usr/bin
 }
