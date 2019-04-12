@@ -23,7 +23,3 @@ post_configure_target() {
   # discard native system includes
   sed -i "s%-I/usr/include%%g" Makefile
 }
-
-makeinstall_target() {
-  :
-}
