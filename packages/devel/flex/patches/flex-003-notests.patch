@@ -1,0 +1,10 @@
+--- a/Makefile.am	2019-03-21 13:50:45.630052983 +0100
++++ b/Makefile.am	2019-03-21 13:50:54.276593845 +0100
+@@ -52,7 +52,6 @@
+ 	src \
+ 	examples \
+ 	po \
+-	tests \
+ 	tools
+ 
+ # Create the ChangeLog, but only if we're inside a git working directory
