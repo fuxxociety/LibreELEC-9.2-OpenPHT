@@ -2,10 +2,80 @@
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 
 PKG_NAME="oem"
-PKG_VERSION=""
+PKG_VERSION="1.0"
 PKG_LICENSE="various"
 PKG_SITE="http://www.libreelec.tv"
-PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain $PROJECT"
-PKG_SECTION="virtual"
+PKG_DEPENDS_TARGET="toolchain btrfs-progs-oem f2fs-tools vim-system retroarch mame2003-plus-libretro snes9x-libretro snes9x2010-libretro reicast-libretro mupen64plus-libretro quicknes-libretro mgba-libretro fbalpha-libretro dosbox-svn-libretro scummvm-libretro vice-libretro puae-libretro desmume-libretro ppsspp-libretro dolphin-libretro ppsspp joyutils sdl-jstest emulationstation dosbox-sdl2 scraper rsync unrar p7zip transmission SABnzbd htop-oem cgroup-tools tcpdump file mediainfo alsa-plugins strace screen headless-agent plymouth-lite ttyd-oem"
+PKG_SECTION="oem"
 PKG_LONGDESC="OEM: Metapackage for various OEM packages"
+PKG_TOOLCHAIN="manual"
+
+case "$PROJECT" in
+  OdroidXU3)
+    PKG_DEPENDS_TARGET+=" pcsx_rearmed-libretro amiberry mame2016-libretro yabasanshiro-libretro docker-oem"
+    ;;
+  RPi)
+    PKG_DEPENDS_TARGET+=" pcsx_rearmed-libretro amiberry omxplayer"
+    ;;
+  Generic)
+    PKG_DEPENDS_TARGET+=" beetle-psx-libretro fs-uae mame2016-libretro pcsx2 unclutter-xfixes docker-oem"
+    ;;
+esac
+
+make_target() {
+  :
+}
+
+makeinstall_target() {
+  mkdir -p $INSTALL
+  mkdir -p $INSTALL/usr/bin
+  mkdir -p $INSTALL/usr/config
+
+  # The frontend service will start $FRONTEND.service
+  echo -e "# The name of the systemd unit that will start a graphical frontend \nFRONTEND=$FRONTEND" > $INSTALL/usr/config/frontend.conf
+
+  # Copy oem files to image
+  if [ -d "$PKG_DIR/filesystem" ]; then
+    cp -PR $PKG_DIR/filesystem/* $INSTALL
+  fi
+
+  # Needed by the RPi
+  if [ "$PROJECT" = "RPi" ]; then
+    sed -i "s/module-udev-detect/module-udev-detect tsched=0/" $INSTALL/usr/config/pulse-daemon.conf.d/system.pa
+  fi
+
+  # Customize Kodi
+  if [ "$MEDIACENTER" = "kodi" ]; then
+    cp -PR $PKG_DIR/kodi/filesystem/* $INSTALL
+  fi
+
+  # Install UTF-8 locale (needed by SABnzbd)
+  if [ ! "$PROJECT" = "Generic" ]; then
+    mkdir -p $INSTALL/usr/share/i18n/charmaps
+    cp -P $(get_build_dir glibc)/.$TARGET_NAME/locale/localedef $INSTALL/usr/bin/
+    cp -PR $(get_build_dir glibc)/localedata/charmaps/UTF-8 $INSTALL/usr/share/i18n/charmaps
+    gzip $INSTALL/usr/share/i18n/charmaps/UTF-8
+  fi
+}
+
+post_install() {
+  # Activate oem systemd services
+  for service in $PKG_DIR/filesystem/usr/lib/systemd/system/*.service; do
+    if [ -f "$service" ]; then
+      enable_service $(basename $service)
+    fi
+  done
+  if [ "$MEDIACENTER" = "kodi" ]; then
+    # Don't start Kodi automatically
+    rm $INSTALL/usr/lib/systemd/system/kodi.target.wants/kodi.service
+    rm $INSTALL/usr/lib/systemd/system/kodi.service.wants/kodi-autostart.service
+    sed -i '/Install/,+1 d' $INSTALL/usr/lib/systemd/system/kodi.target
+  else
+    # These services will start the shutdown scripts normally asocciated with Kodi
+    enable_service oem-halt.service
+    enable_service oem-poweroff.service
+    enable_service oem-reboot.service
+  fi
+  # We use our own autostart service
+  enable_service oem-autostart.service
+}

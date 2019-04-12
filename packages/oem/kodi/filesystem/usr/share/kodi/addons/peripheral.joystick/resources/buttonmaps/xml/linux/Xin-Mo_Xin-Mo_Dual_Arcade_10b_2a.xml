@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<buttonmap>
+    <device name="Xin-Mo Xin-Mo Dual Arcade" provider="linux" buttoncount="10" axiscount="2">
+        <controller id="game.controller.snes">
+            <feature name="a" button="3" />
+            <feature name="b" button="1" />
+            <feature name="down" axis="-0" />
+            <feature name="left" axis="-1" />
+            <feature name="leftbumper" button="4" />
+            <feature name="right" axis="+1" />
+            <feature name="rightbumper" button="5" />
+            <feature name="select" button="9" />
+            <feature name="start" button="8" />
+            <feature name="up" axis="+0" />
+            <feature name="x" button="0" />
+            <feature name="y" button="2" />
+        </controller>
+    </device>
+</buttonmap>
