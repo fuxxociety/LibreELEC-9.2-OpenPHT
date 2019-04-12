@@ -18,9 +18,14 @@ case "$PROJECT" in
     PKG_DEPENDS_TARGET+=" pcsx_rearmed-libretro amiberry omxplayer"
     ;;
   Generic)
-    PKG_DEPENDS_TARGET+=" beetle-psx-libretro fs-uae mame2016-libretro pcsx2 unclutter-xfixes docker-oem"
+    PKG_DEPENDS_TARGET+=" beetle-psx-libretro fs-uae mame2016-libretro pcsx2 unclutter-xfixes docker-oem citra-libretro"
     ;;
 esac
+
+if [ "$MEDIACENTER" = "kodi" ]; then
+  IMAGE_ADDONS="inputstream.adaptive"
+  PKG_DEPENDS_TARGET+=" $IMAGE_ADDONS"
+fi
 
 make_target() {
   :
@@ -30,9 +35,6 @@ makeinstall_target() {
   mkdir -p $INSTALL
   mkdir -p $INSTALL/usr/bin
   mkdir -p $INSTALL/usr/config
-
-  # The frontend service will start $FRONTEND.service
-  echo -e "# The name of the systemd unit that will start a graphical frontend \nFRONTEND=$FRONTEND" > $INSTALL/usr/config/frontend.conf
 
   # Copy oem files to image
   if [ -d "$PKG_DIR/filesystem" ]; then
@@ -70,6 +72,13 @@ post_install() {
     rm $INSTALL/usr/lib/systemd/system/kodi.target.wants/kodi.service
     rm $INSTALL/usr/lib/systemd/system/kodi.service.wants/kodi-autostart.service
     sed -i '/Install/,+1 d' $INSTALL/usr/lib/systemd/system/kodi.target
+    # Add custom addons to the image addon manifest
+    if [ -n "$IMAGE_ADDONS" ]; then
+      KODI_ADDON_MANIFEST="$BUILD/image/system/usr/share/kodi/system/addon-manifest.xml"
+      for ADDON_ID in $IMAGE_ADDONS; do
+        xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "$ADDON_ID" $KODI_ADDON_MANIFEST
+      done
+    fi
   else
     # These services will start the shutdown scripts normally asocciated with Kodi
     enable_service oem-halt.service
@@ -78,4 +87,7 @@ post_install() {
   fi
   # We use our own autostart service
   enable_service oem-autostart.service
+
+  # The frontend service will start $FRONTEND.service
+  echo -e "# The name of the systemd unit that will start a graphical frontend \nFRONTEND=$FRONTEND" > $INSTALL/usr/config/frontend.conf
 }

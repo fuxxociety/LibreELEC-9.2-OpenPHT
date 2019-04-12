@@ -30,6 +30,7 @@ TARGET_ARCH="${ARCH}"
 
 # include helper functions
 . config/functions
+. packages/oem/functions
 
 # read DISTRO version information
 . "${DISTRO_DIR}/${DISTRO}/version" || die "\nERROR: No distro version present\n"
