@@ -1,0 +1,11 @@
+[Unit]
+Description=Bluetooth headless pairing agent
+Requires=bluetooth.service
+ConditionPathExists=!/storage/.cache/services/bt-discoverable.disabled
+
+[Service]
+ExecStart=/usr/bin/headless-agent
+ExecStartPost=/usr/bin/bt-discoverable.sh
+
+[Install]
+WantedBy=bluetooth.target

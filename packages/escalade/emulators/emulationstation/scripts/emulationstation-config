@@ -1,0 +1,8 @@
+#!/bin/sh
+
+test -f /storage/.emulationstation/.configured && exit 0
+test -x /storage/.emulationstation || mkdir /storage/.emulationstation
+test -x /storage/.emulationstation/themes || (mkdir /storage/.emulationstation/themes ; ln -s /usr/share/emulationstation/themes/* /storage/.emulationstation/themes/)
+test -L /storage/.emulationstation/resources || ln -s /usr/share/emulationstation/resources /storage/.emulationstation/
+false | cp -iRp /usr/share/emulationstation/config/* /storage/.emulationstation/ &>/dev/null
+touch /storage/.emulationstation/.configured

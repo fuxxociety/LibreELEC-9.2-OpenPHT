@@ -1,0 +1,15 @@
+--- a/desmume/src/frontend/libretro/Makefile.libretro	2019-04-06 12:13:49.291314124 +0200
++++ b/desmume/src/frontend/libretro/Makefile.libretro	2019-04-06 12:14:17.687615533 +0200
+@@ -48,10 +48,8 @@
+    TARGET := $(TARGET_NAME)_libretro.so
+    fpic := -fPIC
+    SHARED := -shared -Wl,--no-undefined -Wl,--version-script=$(CORE_DIR)/frontend/libretro/link.T
+-   LIBS := -lpthread -lGL -lpcap
+-   CXXFLAGS += -DHAVE_OPENGL -std=gnu++11
+-   DESMUME_OPENGL = 1
+-	DESMUME_OPENGL_CORE = 1
++   LIBS := -lpthread
++   CXXFLAGS += -std=gnu++11
+ 
+    ifneq (,$(findstring clang,$(platform)))
+       CC = clang

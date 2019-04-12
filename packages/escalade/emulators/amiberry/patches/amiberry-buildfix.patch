@@ -1,0 +1,13 @@
+--- a/Makefile	2019-04-11 13:52:21.990118038 +0200
++++ a/Makefile	2019-04-11 13:55:25.161068431 +0200
+@@ -199,8 +199,8 @@
+ #
+ ifdef USE_SDL2
+ all: guisan $(PROG)
+-export SDL_CFLAGS := $(shell sdl2-config --cflags)
+-export SDL_LDFLAGS := $(shell sdl2-config --libs)
++export SDL_CFLAGS := $(shell $(SYSROOT_PREFIX)/usr/bin/sdl2-config --cflags)
++export SDL_LDFLAGS := $(shell $(SYSROOT_PREFIX)/usr/bin/sdl2-config --libs)
+ 
+ CPPFLAGS += $(SDL_CFLAGS) -Iguisan-dev/include
+ LDFLAGS += $(SDL_LDFLAGS) -lSDL2_image -lSDL2_ttf -lguisan -Lguisan-dev/lib

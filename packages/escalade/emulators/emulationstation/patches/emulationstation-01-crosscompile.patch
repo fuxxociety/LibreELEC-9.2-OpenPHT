@@ -1,0 +1,63 @@
+--- a/CMakeLists.txt	2016-03-24 12:15:07.452580559 +0100
++++ b/CMakeLists.txt	2016-03-24 12:16:37.614101378 +0100
+@@ -20,7 +20,7 @@
+     set(GLSystem "Desktop OpenGL" CACHE STRING "The OpenGL system to be used")
+ #-------------------------------------------------------------------------------
+ #check if we're running on Raspberry Pi
+-elseif(EXISTS "/opt/vc/include/bcm_host.h")
++elseif(EXISTS "${CMAKE_FIND_ROOT_PATH}/usr/include/bcm_host.h")
+     MESSAGE("bcm_host.h found")
+     set(BCMHOST found)
+     set(GLSystem "OpenGL ES" CACHE STRING "The OpenGL system to be used")
+@@ -32,11 +32,11 @@
+     set(GLSystem "OpenGL ES" CACHE STRING "The OpenGL system to be used")
+ #-------------------------------------------------------------------------------
+ #check if we're running on olinuxino / odroid / etc
+-elseif(EXISTS "/usr/lib/libMali.so" OR
+-    EXISTS "/usr/lib/arm-linux-gnueabihf/libMali.so" OR
+-    EXISTS "/usr/lib/aarch64-linux-gnu/libMali.so" OR
+-    EXISTS "/usr/lib/arm-linux-gnueabihf/mali-egl/libmali.so" OR
+-    EXISTS "/usr/lib/arm-linux-gnueabihf/libmali.so")
++elseif(EXISTS "${CMAKE_FIND_ROOT_PATH}/usr/lib/libMali.so" OR
++    EXISTS "${CMAKE_FIND_ROOT_PATH}/usr/lib/arm-linux-gnueabihf/libMali.so" OR
++    EXISTS "${CMAKE_FIND_ROOT_PATH}/usr/lib/aarch64-linux-gnu/libMali.so" OR
++    EXISTS "${CMAKE_FIND_ROOT_PATH}/usr/lib/arm-linux-gnueabihf/mali-egl/libmali.so" OR
++    EXISTS "${CMAKE_FIND_ROOT_PATH}/usr/lib/arm-linux-gnueabihf/libmali.so")
+     MESSAGE("libMali.so found")
+     set(GLSystem "OpenGL ES" CACHE STRING "The OpenGL system to be used")
+ else()
+@@ -142,10 +142,10 @@
+ 
+ if(DEFINED BCMHOST)
+     LIST(APPEND COMMON_INCLUDE_DIRS
+-        "/opt/vc/include"
+-        "/opt/vc/include/interface/vcos"
+-        "/opt/vc/include/interface/vmcs_host/linux"
+-        "/opt/vc/include/interface/vcos/pthreads"
++        "${CMAKE_FIND_ROOT_PATH}/usr/include"
++        "${CMAKE_FIND_ROOT_PATH}/usr/include/interface/vcos"
++        "${CMAKE_FIND_ROOT_PATH}/usr/include/interface/vmcs_host/linux"
++        "${CMAKE_FIND_ROOT_PATH}/usr/include/interface/vcos/pthreads"
+     )
+ #add include directory for Vero4K
+ elseif(DEFINED VERO4K)
+@@ -168,7 +168,7 @@
+ #define libraries and directories
+ if(DEFINED BCMHOST)
+     link_directories(
+-        "/opt/vc/lib"
++        "${CMAKE_FIND_ROOT_PATH}/usr/lib"
+     )
+ elseif(DEFINED VERO4K)
+     link_directories(
+--- a/es-core/src/components/VideoPlayerComponent.cpp	2019-04-21 20:41:59.516684961 +0000
++++ b/es-core/src/components/VideoPlayerComponent.cpp	2019-04-21 20:42:31.439602029 +0000
+@@ -207,7 +207,7 @@
+ 				argv[10] = Settings::getInstance()->getString("OMXAudioDev").c_str();
+ 
+ 				//const char* argv[] = args;
+-				const char* env[] = { "LD_LIBRARY_PATH=/opt/vc/libs:/usr/lib/omxplayer", NULL };
++				const char* env[] = { "LD_LIBRARY_PATH=/usr/lib:/usr/lib/pulseaudio", NULL };
+ 
+ 				// Redirect stdout
+ 				int fdin = open("/dev/null", O_RDONLY);

@@ -1,0 +1,11 @@
+--- a/src/input/subtitles.c	2019-04-04 23:31:28.862680225 +0200
++++ b/src/input/subtitles.c	2019-04-04 23:31:40.612523290 +0200
+@@ -85,8 +85,6 @@
+         strcpy(d, s);
+         return;
+     }
+-    else
+-        strlcpy(d, s, tmp - s + 1 );
+     while( (c = *d) != '\0' )
+     {
+         *d = tolower(c);

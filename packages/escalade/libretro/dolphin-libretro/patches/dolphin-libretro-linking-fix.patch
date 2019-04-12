@@ -1,0 +1,18 @@
+--- a/Source/Core/DolphinLibretro/CMakeLists.txt	2019-05-07 16:44:38.793139570 +0200
++++ b/Source/Core/DolphinLibretro/CMakeLists.txt	2019-05-07 16:47:57.107280978 +0200
+@@ -34,8 +34,6 @@
+ endif()
+ 
+ if(NOT MSVC AND NOT CLANG)
+-   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
+-else()
+    target_link_libraries(dolphin_libretro PRIVATE
+       core
+       uicommon
+@@ -50,4 +48,4 @@
+       ${LIBS}
+       "-static-libgcc -static-libstdc++"
+    )
+-endif()
+\ No newline at end of file
++endif()

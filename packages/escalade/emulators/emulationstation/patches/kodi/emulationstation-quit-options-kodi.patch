@@ -1,0 +1,22 @@
+--- a/es-app/src/guis/GuiMenu.cpp	2019-04-10 15:28:24.562743653 +0200
++++ b/es-app/src/guis/GuiMenu.cpp	2019-04-10 15:29:11.952110236 +0200
+@@ -484,6 +484,19 @@
+ 		row.addElement(std::make_shared<TextComponent>(window, "START RETROARCH", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
+ 		s->addRow(row);
+ 
++		row.elements.clear();
++		row.makeAcceptInputHandler([window] {
++			window->pushGui(new GuiMsgBox(window, "QUIT TO KODI?", "YES",
++				[] {
++				runSystemCommand("systemd-run /usr/bin/es-kodi.sh");
++				SDL_Event ev;
++				ev.type = SDL_QUIT;
++				SDL_PushEvent(&ev);
++			}, "NO", nullptr));
++		});
++		row.addElement(std::make_shared<TextComponent>(window, "START KODI", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
++		s->addRow(row);
++
+ 
+ 
+ 		if(Settings::getInstance()->getBool("ShowExit"))
