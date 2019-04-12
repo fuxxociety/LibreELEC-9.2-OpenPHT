@@ -14,9 +14,7 @@ PKG_TOOLCHAIN="autotools"
 PKG_BUILD_FLAGS="+pic"
 
 # package specific configure options
-PKG_CONFIGURE_OPTS_TARGET="--enable-static \
-                           --disable-shared \
-                           --disable-rpath \
+PKG_CONFIGURE_OPTS_TARGET="--disable-rpath \
                            --disable-altivec \
                            --disable-doxygen-docs \
                            --disable-thorough-tests \
@@ -31,6 +29,10 @@ if target_has_feature sse; then
 else
   PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --disable-sse"
 fi
+
+pre_configure_target() {
+  export LDFLAGS="$LDFLAGS -lgomp"
+}
 
 post_makeinstall_target() {
   rm -rf $INSTALL/usr/bin
