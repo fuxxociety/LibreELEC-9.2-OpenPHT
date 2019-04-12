@@ -1,0 +1,17 @@
+[Unit]
+Description=SABnzbd binary newsreader
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Restart=always
+RestartSec=10s
+TimeoutStartSec=0
+Environment=LANG=en_US.UTF-8
+ExecStart=python2 /opt/sabnzbd/SABnzbd.pyo \
+          -l 0 \
+          -b 0 \
+          -s 0.0.0.0 \
+          -f /storage/.config/sabnzbd
+[Install]
+WantedBy=multi-user.target

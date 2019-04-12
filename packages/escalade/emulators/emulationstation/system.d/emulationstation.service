@@ -1,0 +1,18 @@
+[Unit]
+Description=Emulationstation
+Conflicts=kodi.service retroarch.service
+After=multi-user.target xorg.service
+
+[Service]
+EnvironmentFile=-/storage/.config/emulationstation.conf
+Environment=SDL_AUDIODRIVER=pulseaudio
+Environment=HOME=/storage
+Environment=DISPLAY=:0
+Environment=LANG=en_US.UTF-8
+WorkingDirectory=/storage
+ExecStartPre=-/bin/sh -c 'mkdir -p /storage/.emulationstation ; false | cp -iRp /etc/emulationstation/* /storage/.emulationstation/ &>/dev/null'
+ExecStart=/usr/bin/emulationstation $EMULATIONSTATION_OPTS
+TimeoutStopSec=10
+Restart=always
+RestartSec=2
+StartLimitInterval=0

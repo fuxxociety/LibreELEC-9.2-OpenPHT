@@ -1,0 +1,12 @@
+[Unit]
+Description=Create example rom for ES first run
+Before=emulationstation.service
+After=multi-user.target
+ConditionPathExists=!/storage/.cache/.es-firstrun
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/es-firstrun.sh
+
+[Install]
+WantedBy=graphical.target

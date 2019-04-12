@@ -1,0 +1,14 @@
+[Unit]
+Description=Retroarch
+Conflicts=kodi.service emulationstation.service
+After=multi-user.target xorg.service
+
+[Service]
+Environment=HOME=/storage
+EnvironmentFile=-/run/oem/alsa.conf
+WorkingDirectory=/storage
+ExecStart=/usr/bin/retroarch -v
+TimeoutStopSec=10
+Restart=always
+RestartSec=2
+StartLimitInterval=0

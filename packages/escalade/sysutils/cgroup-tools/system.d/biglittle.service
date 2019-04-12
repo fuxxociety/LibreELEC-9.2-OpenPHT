@@ -1,0 +1,17 @@
+[Unit]
+Description=Setup big.LITTLE cgroups
+Before=sysinit.target
+After=local-fs.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/bin/true
+ExecStartPost=-/bin/mkdir -p /sys/fs/cgroup/cpuset/littlecores /sys/fs/cgroup/cpuset/bigcores
+ExecStartPost=-/bin/sh -c 'echo "0-3" > /sys/fs/cgroup/cpuset/littlecores/cpuset.cpus'
+ExecStartPost=-/bin/sh -c 'echo "0"> /sys/fs/cgroup/cpuset/littlecores/cpuset.mems'
+ExecStartPost=-/bin/sh -c 'echo "4-7"> /sys/fs/cgroup/cpuset/bigcores/cpuset.cpus'
+ExecStartPost=-/bin/sh -c 'echo "0"> /sys/fs/cgroup/cpuset/bigcores/cpuset.mems'
+
+[Install]
+WantedBy=sysinit.target

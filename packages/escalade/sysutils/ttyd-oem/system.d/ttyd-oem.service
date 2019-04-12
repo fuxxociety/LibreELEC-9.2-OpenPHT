@@ -1,0 +1,11 @@
+[Unit]
+Description=Browser terminal
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/ttyd -O -T xterm login root
+Restart=always
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,14 @@
+[Unit]
+Description=Cores directory
+Before=graphical.target
+After=sysinit.target
+DefaultDependencies=no
+
+[Mount]
+What=none
+Where=/tmp/cores
+Type=overlay
+Options=lowerdir=/usr/lib/libretro,upperdir=/storage/.config/retroarch/cores,workdir=/storage/.tmp/cores-workdir
+
+[Install]
+WantedBy=multi-user.target
