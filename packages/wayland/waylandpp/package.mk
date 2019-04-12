@@ -2,12 +2,13 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="waylandpp"
-PKG_VERSION="0.1.6"
-PKG_SHA256="33d3ec385704c5545fb50d2283aabf4ef26aaaf3e416b292e650fea67c430d23"
+PKG_VERSION="0.2.5"
+PKG_SHA256="5a4361f73d2bee65bfe54b954ce085c9bfc7bc4429ac2bdc97c10e3b84660907"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/NilsBrause/waylandpp"
 PKG_URL="https://github.com/NilsBrause/waylandpp/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain waylandpp:host"
+PKG_DEPENDS_HOST="toolchain pugixml:host"
 PKG_LONGDESC="Wayland C++ bindings"
 
 PKG_CMAKE_OPTS_HOST="-DBUILD_SCANNER=ON \
