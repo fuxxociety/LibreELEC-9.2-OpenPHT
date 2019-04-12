@@ -1,0 +1,5 @@
+#!/bin/sh
+
+systemctl stop kodi
+retroarch.sh
+systemctl start kodi

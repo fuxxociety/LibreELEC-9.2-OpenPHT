@@ -1,0 +1,7 @@
+oem_littlecores() {
+  sed -i "/ExecStart=/a ExecStartPost=-\/bin\/sh -c \'echo \$MAINPID > \/sys\/fs\/cgroup\/cpuset\/littlecores\/tasks\'" $INSTALL/usr/lib/systemd/system/$1
+}
+
+oem_bigcores() {
+  sed -i "/ExecStart=/a ExecStartPost=-\/bin\/sh -c \'echo \$MAINPID > \/sys\/fs\/cgroup\/cpuset\/bigcores\/tasks\'" $INSTALL/usr/lib/systemd/system/$1
+}

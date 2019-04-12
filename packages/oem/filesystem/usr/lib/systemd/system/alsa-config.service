@@ -1,0 +1,11 @@
+[Unit]
+Description=Configure ALSA
+After=pulseaudio.service
+Before=frontend.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/alsa-config.sh
+
+[Install]
+WantedBy=graphical.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=Start the default frontend
+After=multi-user.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/storage/.config/frontend.conf
+ExecStart=systemctl start $FRONTEND
+RemainAfterExit=yes
+
+[Install]
+WantedBy=graphical.target

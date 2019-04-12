@@ -1,0 +1,13 @@
+[Unit]
+Description=OEM user autostart script
+Before=graphical.target
+After=network-online.target multi-user.target
+
+[Service]
+Type=oneshot
+Environment=HOME=/storage
+ExecStart=-/bin/sh -c ". /etc/profile; exec /bin/sh /storage/.config/autostart.sh"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=graphical.target
