@@ -26,3 +26,8 @@ make_target() {
         --prefix=/usr
   make
 }
+
+makeinstall_target() {
+  mkdir -p $INSTALL/usr/bin
+    cp mediainfo $INSTALL/usr/bin/
+}
