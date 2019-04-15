@@ -10,7 +10,7 @@ PKG_SITE="http://s-lang.org/"
 PKG_URL="ftp://space.mit.edu/pub/davis/slang/v2.1/$PKG_NAME-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="A library designed to allow a developer to create robust multi-platform software."
-PKG_BUILD_FLAGS="-parallel"
+PKG_BUILD_FLAGS="-parallel -gold"
 
 PKG_CONFIGURE_OPTS_TARGET="--without-onig"
 
