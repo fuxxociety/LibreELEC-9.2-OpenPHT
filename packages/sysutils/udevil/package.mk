@@ -22,7 +22,9 @@ makeinstall_target() {
 
 post_makeinstall_target() {
   mkdir -p $INSTALL/etc/udevil
-    cp $PKG_DIR/config/udevil.conf $INSTALL/etc/udevil
+  mkdir -p $INSTALL/usr/config
+    cp $PKG_DIR/config/udevil.conf $INSTALL/usr/config/
+    ln -s /storage/.config/udevil.conf $INSTALL/etc/udevil/
 
   mkdir -p $INSTALL/usr/bin
     cp -PR src/udevil $INSTALL/usr/bin
