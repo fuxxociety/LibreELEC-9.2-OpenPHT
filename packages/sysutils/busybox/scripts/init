@@ -576,7 +576,67 @@ mount_storage() {
     if [ -f /flash/mount-storage.sh ]; then
       . /flash/mount-storage.sh
     else
-      mount_part "$disk" "/storage" "rw,noatime"
+      if [ -f /flash/mountopts.cfg ]; then
+        mount_part "$disk" "/storage" "$(cat /flash/mountopts.cfg)"
+      else
+        mount_part "$disk" "/storage" "rw,noatime"
+      fi
+      do_format() {
+        # get the disk. /storage on 2nd partition
+        PART=$(/usr/bin/busybox grep "/storage " /proc/mounts | /usr/bin/busybox cut -d" " -f1 | /usr/bin/busybox grep '2$')
+        # if requested, do a backup first
+        if [ -f /storage/.backup ]; then
+          mkdir -p /backup && /usr/bin/busybox mount -t tmpfs none /backup
+          /usr/bin/busybox tar -czf /backup/storage.tar.gz /storage
+        fi
+	# unmount and overwrite partition with new filesystem
+	/usr/bin/busybox umount /storage
+	case $1 in
+	  f2fs)
+            /usr/sbin/mkfs.f2fs -f -l STORAGE "$PART"
+	    ;;
+	  btrfs)
+            /usr/sbin/mkfs.btrfs -f -L STORAGE "$PART"
+	    ;;
+	  ext4)
+            /usr/sbin/mkfs.ext4 -F -L STORAGE "$PART"
+	    ;;
+	  xfs)
+            /usr/sbin/mkfs.xfs -f -L STORAGE "$PART"
+	    ;;
+	esac
+	# remount the partition
+	MOUNTOPTS="rw,noatime"
+	test $1 = btrfs && MOUNTOPTS="$MOUNTOPTS,compress=zstd"
+	mount_part "$PART" "/storage" "$MOUNTOPTS"
+        # restore backup
+        if [ -f /backup/storage.tar.gz ]; then
+          /usr/bin/busybox tar -C / -zxf /backup/storage.tar.gz
+          /usr/bin/busybox umount /backup
+          rm -rvf /backup /storage/.backup /storage/.please_reformat_*
+        fi
+        # update the bootloader
+        if [ -f /flash/boot.ini ]; then
+          BOOTLOADER=/flash/boot.ini
+	elif [ -f /flash/cmdline.txt ]; then
+	  BOOTLOADER=/flash/cmdline.txt
+	elif [ -f /flash/EFI/BOOT/syslinux.cfg ]; then
+          BOOTLOADER=/flash/EFI/BOOT/syslinux.cfg
+	fi
+        UUID=$(/usr/bin/busybox blkid "$PART" | cut -d \" -f 4)
+        mount -o remount,rw /flash
+        sed -i "s/disk=\S*/disk=UUID=$UUID/" $BOOTLOADER
+        mount -o remount,ro /flash
+      }
+      if [ -f /storage/.please_reformat_f2fs -a -x /usr/sbin/mkfs.f2fs ]; then
+        do_format f2fs 2>&1 | /usr/bin/busybox tee /reformat.log ; mv /reformat.log /storage/
+      elif [ -f /storage/.please_reformat_btrfs -a -x /usr/sbin/mkfs.btrfs ]; then
+        do_format btrfs 2>&1 | /usr/bin/busybox tee /reformat.log ; mv /reformat.log /storage/
+      elif [ -f /storage/.please_reformat_ext4 -a -L /usr/sbin/mkfs.ext4 ]; then
+        do_format ext4 2>&1 | /usr/bin/busybox tee /reformat.log ; mv /reformat.log /storage/
+      elif [ -f /storage/.please_reformat_xfs -a -x /usr/sbin/mkfs.xfs ]; then
+        do_format xfs 2>&1 | /usr/bin/busybox tee /reformat.log ; mv /reformat.log /storage/
+      fi
     fi
   else
     # /storage should always be writable

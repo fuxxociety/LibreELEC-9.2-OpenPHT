@@ -7,7 +7,7 @@ PKG_VERSION=""
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.openelec.tv"
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain libc:init busybox:init linux:init plymouth-lite:init util-linux:init e2fsprogs:init dosfstools:init fakeroot:host"
+PKG_DEPENDS_TARGET="toolchain libc:init busybox:init linux:init plymouth-lite:init util-linux:init e2fsprogs:init dosfstools:init fakeroot:host btrfs-progs-oem:init f2fs-tools:init xfsprogs:init"
 PKG_SECTION="virtual"
 PKG_LONGDESC="debug is a Metapackage for installing initramfs"
 
