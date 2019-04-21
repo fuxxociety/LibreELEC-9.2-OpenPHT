@@ -65,8 +65,3 @@ makeinstall_target() {
   mkdir -p ${INSTALL}/opt/vc
     ln -sf /usr/lib ${INSTALL}/opt/vc/lib
 }
-
-post_install() {
-  # unbind Framebuffer console
-  enable_service unbind-console.service
-}
