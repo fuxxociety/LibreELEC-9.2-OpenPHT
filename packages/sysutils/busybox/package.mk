@@ -178,7 +178,6 @@ post_install() {
   add_group nogroup 65534
 
   enable_service shell.service
-  enable_service show-version.service
   enable_service var.mount
   enable_service var-log-debug.service
   enable_service fs-resize.service
