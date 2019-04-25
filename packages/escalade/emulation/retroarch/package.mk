@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="retroarch"
-PKG_VERSION="eeaa34f"
+PKG_VERSION="fb6a403"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch.git"
@@ -25,9 +25,8 @@ PKG_DEPENDS_TARGET="toolchain alsa-lib freetype zlib retroarch-assets core-info 
 PKG_SECTION="emulation"
 PKG_SHORTDESC="Reference frontend for the libretro API."
 PKG_LONGDESC="RetroArch is the reference frontend for the libretro API. Popular examples of implementations for this API includes videogame system emulators and game engines, but also more generalized 3D programs. These programs are instantiated as dynamic libraries. We refer to these as libretro cores."
-
 PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="configure"
 
 pre_build_target() {
   git clone --recursive https://github.com/libretro/RetroArch $PKG_BUILD/$PKG_NAME-git

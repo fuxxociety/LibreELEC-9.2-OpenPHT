@@ -1,10 +1,10 @@
---- a/Makefile.in	2016-09-16 14:46:15.352407556 +0000
-+++ b/Makefile.in	2016-09-16 14:46:31.459074122 +0000
+--- a/Makefile.in	2019-03-07 15:22:29.662790905 +0100
++++ b/Makefile.in	2019-03-07 15:22:44.869241485 +0100
 @@ -33,7 +33,7 @@
     CC = gcc
     TARGET := $(TARGET_NAME)_libretro.so
     fpic := -fPIC
--   LDFLAGS := -lz -lpthread
+-   LDFLAGS += -lz -lpthread
 +   LDFLAGS := -lz -lpthread -lglib-2.0
     SHARED := -shared -Wl,--version-script=$(CORE_DIR)/libretro/link.T
     ifeq ($(USE_JIT), 1)

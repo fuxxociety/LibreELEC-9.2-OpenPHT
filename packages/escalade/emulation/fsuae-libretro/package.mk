@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="fsuae-libretro"
-PKG_VERSION="7990f7a"
+PKG_VERSION="6b98f85"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="http://fs-uae.net"

@@ -10,7 +10,7 @@
         #               athlon-fx amdfam10 barcelona
         # (Intel CPUs)  atom core2 nocona
         #
-        TARGET_CPU="x86-64"
+        TARGET_CPU="haswell"
         ;;
     esac
 
@@ -88,6 +88,12 @@
     ADDITIONAL_DRIVERS="$ADDITIONAL_DRIVERS bcm_sta"
 
   # Override some RetroArch playlist core assignation
-    RA_PLAYLIST_CORES="${RA_PLAYLIST_CORES//pcsx_rearmed/mednafen_psx}"
-    RA_PLAYLIST_CORES="${RA_PLAYLIST_CORES//glupen64/mupen64plus}"
-    RA_PLAYLIST_CORES="${RA_PLAYLIST_CORES//mame2003/mame2014}"
+    RA_PLAYLIST_NAMES="${RA_PLAYLIST_NAMES//MAME 2003-Plus/MAME 2016}"
+
+    RA_PLAYLIST_CORES="${RA_PLAYLIST_CORES//pcsx_rearmed/beetle_psx_hw}"
+    RA_PLAYLIST_CORES="${RA_PLAYLIST_CORES//parallel_n64/mupen64plus}"
+    RA_PLAYLIST_CORES="${RA_PLAYLIST_CORES//mame2003_plus/mame2016}"
+    RA_PLAYLIST_CORES="${RA_PLAYLIST_CORES//snes9x2010/snes9x}"
+
+    GRAPHIC_DRIVERS="i965"
+    ADDITIONAL_DRIVERS=""

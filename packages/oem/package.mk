@@ -54,6 +54,7 @@ OEM_APPS_GENERIC=" \
 OEM_EMU_COMMON=" \
   beetle-wswan-libretro \
   dosbox-sdl2 \
+  dosbox-svn-libretro \
   ds4drv \
   emulationstation-retropie \
   fuse-libretro \
