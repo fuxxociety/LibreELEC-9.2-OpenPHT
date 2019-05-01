@@ -1,0 +1,19 @@
+diff --git a/libavcodec/v4l2_m2m_enc.c b/libavcodec/v4l2_m2m_enc.c
+index e7265bd7cb3..12ddd5883c9 100644
+--- a/libavcodec/v4l2_m2m_enc.c
++++ b/libavcodec/v4l2_m2m_enc.c
+@@ -175,8 +175,13 @@ static int v4l2_prepare_encoder(V4L2m2mContext *s)
+ 
+     /* set ext ctrls */
+     v4l2_set_ext_ctrl(s, MPEG_CID(HEADER_MODE), MPEG_VIDEO(HEADER_MODE_SEPARATE), "header mode");
++    /* enable bit rate control */
++    if (avctx->bit_rate > 1) {
++        v4l2_set_ext_ctrl(s, MPEG_CID(FRAME_RC_ENABLE) , 1, "rate control");
++        av_log(avctx, AV_LOG_INFO, "h264_v4l2m2m encoder: enabling bit rate control: %llu\n", avctx->bit_rate);
++    }
+     v4l2_set_ext_ctrl(s, MPEG_CID(BITRATE) , avctx->bit_rate, "bit rate");
+-    v4l2_set_ext_ctrl(s, MPEG_CID(GOP_SIZE), avctx->gop_size,"gop size");
++    v4l2_set_ext_ctrl(s, MPEG_CID(GOP_SIZE), avctx->gop_size, "gop size");
+ 
+     av_log(avctx, AV_LOG_DEBUG,
+         "Encoder Context: id (%d), profile (%d), frame rate(%d/%d), number b-frames (%d), "
