@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="SDL2"
-PKG_VERSION="102108a"
-PKG_SHA256="0ea894cb195f706a73107e217c6a59d51356a66a7d0335cb1624bb7c60297ec4"
+PKG_VERSION="efee635"
+PKG_SHA256="76bc1e07dcc8f4acb1c97ca70c3d968a05783e66e8437e14a83955af9296e2d9"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.libsdl.org/"
 PKG_URL="https://github.com/spurious/SDL-mirror/archive/$PKG_VERSION.tar.gz"
@@ -80,11 +80,12 @@ if [ ! "$OPENGL" = "no" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $OPENGL"
 
   PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET \
-                         -DVIDEO_OPENGL=ON \
-                         -DVIDEO_OPENGLES=OFF"
-else
+                         -DVIDEO_OPENGL=ON"
+fi
+
+if [ ! "$OPENGLES_SUPPORT" = "no" ]; then
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $OPENGLES"
   PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET \
-                         -DVIDEO_OPENGL=OFF \
                          -DVIDEO_OPENGLES=ON"
 fi
 
