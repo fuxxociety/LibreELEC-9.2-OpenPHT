@@ -20,6 +20,17 @@ pre_configure_init() {
     rm -rf .$TARGET_NAME-init
 }
 
+pre_configure_target() {
+  # plymouth-lite dont support to build in subdirs
+  cd $PKG_BUILD
+  rm -rf .$TARGET_NAME
+}
+
+make_target() {
+  # re-use init
+  :
+}
+
 makeinstall_init() {
   mkdir -p $INSTALL/usr/bin
     cp ply-image $INSTALL/usr/bin
@@ -27,4 +38,9 @@ makeinstall_init() {
   mkdir -p $INSTALL/splash
     find_file_path splash/splash.conf && cp ${FOUND_PATH} $INSTALL/splash
     find_file_path "splash/splash-*.png" && cp ${FOUND_PATH} $INSTALL/splash
+}
+
+makeinstall_target() {
+  mkdir -p $INSTALL/usr/bin
+    cp ply-image $INSTALL/usr/bin
 }
