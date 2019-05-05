@@ -9,6 +9,7 @@ PKG_SITE="http://www.videolan.org/developers/x264.html"
 PKG_URL="http://repo.or.cz/x264.git/snapshot/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="x264 codec"
+PKG_BUILD_FLAGS="-lto"
 
 if [ "$TARGET_ARCH" = "x86_64" ]; then
   PKG_DEPENDS_TARGET+=" nasm:host"
