@@ -11,6 +11,7 @@ PKG_URL="https://github.com/containerd/containerd/archive/v$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain go:host"
 PKG_LONGDESC="A daemon to control runC, built for performance and density."
 PKG_TOOLCHAIN="manual"
+PKG_BUILD_FLAGS="-lto"
 
 pre_make_target() {
   case ${TARGET_ARCH} in
