@@ -11,7 +11,7 @@ PKG_SITE="https://ffmpeg.org"
 PKG_URL="https://github.com/xbmc/FFmpeg/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain zlib bzip2 openssl speex x264 flac lame libvpx opus"
 PKG_LONGDESC="FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video."
-PKG_BUILD_FLAGS="-gold"
+PKG_BUILD_FLAGS="-gold -lto"
 
 # Dependencies
 get_graphicdrivers
