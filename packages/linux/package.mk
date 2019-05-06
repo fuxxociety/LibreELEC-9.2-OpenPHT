@@ -21,12 +21,14 @@ case "$LINUX" in
     PKG_SHA256="551f229051334d89a91d0c172661925ef7ea11b91f5f299cd4ffcb872b6330de"
     PKG_URL="https://github.com/mihailescu2m/linux/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
+    PKG_BUILD_PERF="no"
     ;;
   odroidxu3-4.14)
     PKG_VERSION="4.14.111-158"
     PKG_SHA256="69badf0f3aba2d5fd351de59809356c234228f37da0fd56c5dd2e033e9d0a742"
     PKG_URL="https://github.com/hardkernel/linux/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
+    PKG_BUILD_PERF="no"
     ;;
   rockchip-4.4)
     PKG_VERSION="aa8bacf821e5c8ae6dd8cae8d64011c741659945"
@@ -39,12 +41,14 @@ case "$LINUX" in
     PKG_SHA256="c049323f7830fd525eff55a90d057416b8b6ff5bb82724ef9fcb10b9dc6cc90f"
     PKG_URL="https://github.com/raspberrypi/linux/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
+    PKG_BUILD_PERF="no"
     ;;
   *)
     PKG_VERSION="5.1"
     PKG_SHA256="d06a7be6e73f97d1350677ad3bae0ce7daecb79c2c2902aaabe806f7fa94f041"
     PKG_URL="https://www.kernel.org/pub/linux/kernel/v5.x/$PKG_NAME-$PKG_VERSION.tar.xz"
     PKG_PATCH_DIRS="default"
+    PKG_BUILD_PERF="no"
     ;;
 esac
 
