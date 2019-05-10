@@ -127,4 +127,8 @@ get_graphicdrivers() {
   GALLIUM_DRIVERS="$(echo ${GALLIUM_DRIVERS} | xargs -n1 | sort -u | xargs)"
   XORG_DRIVERS="$(echo ${XORG_DRIVERS} | xargs -n1 | sort -u | xargs)"
   DRI_DRIVERS="$(echo ${DRI_DRIVERS} | xargs -n1 | sort -u | xargs)"
+
+  if [ "$PROJECT" = "OdroidXU3" ]; then
+      V4L2_SUPPORT="yes"
+  fi
 }
