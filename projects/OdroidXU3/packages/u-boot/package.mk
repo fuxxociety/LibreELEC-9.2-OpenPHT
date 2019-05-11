@@ -14,7 +14,9 @@ PKG_SHORTDESC="u-boot: Universal Bootloader project"
 PKG_BUILD_FLAGS="-parallel"
 
 post_patch() {
-  echo -e "CONFIG_LZ4=y" >> $PKG_BUILD/configs/$UBOOT_CONFIG
+  echo -e "CONFIG_LZ4=y \
+	   CONFIG_CC_OPTIMIZE_FOR_SIZE=n \
+	   CONFIG_CC_OPTIMIZE_LIBS_FOR_SPEED=y" >> $PKG_BUILD/configs/$UBOOT_CONFIG
 }
 
 make_target() {
