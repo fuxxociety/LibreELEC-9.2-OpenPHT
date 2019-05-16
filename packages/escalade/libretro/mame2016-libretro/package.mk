@@ -27,7 +27,7 @@ make_target() {
   make REGENIE=1 VERBOSE=1 NOWERROR=1 PYTHON_EXECUTABLE=python2 CONFIG=libretro \
        LIBRETRO_OS="unix" ARCH="" PROJECT="" LIBRETRO_CPU="$ARCH" DISTRO="debian-stable" \
        CROSS_BUILD="1" OVERRIDE_CC="$CC" OVERRIDE_CXX="$CXX" OVERRIDE_LD="$LD" \
-       PTR64="$PTR64" TARGET="mame" \
+       PTR64="$PTR64" OPENMP=1 TARGET="mame" \
        SUBTARGET="arcade" PLATFORM="$ARCH" RETRO=1 OSD="retro" NOASM="$NOASM"
 }
 
