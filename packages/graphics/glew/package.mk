@@ -13,16 +13,19 @@ PKG_LONGDESC="A cross-platform C/C++ extension loading library."
 make_target() {
   make CC="$CC" LD="$CC" AR="$AR" \
        POPT="$CFLAGS" LDFLAGS.EXTRA="$LDFLAGS" \
-       GLEW_DEST="/usr" LIBDIR="/usr/lib" lib/libGLEW.a glew.pc
+       GLEW_DEST="/usr" LIBDIR="/usr/lib" glew.lib.shared glew.pc
 }
 
 makeinstall_target() {
   mkdir -p $SYSROOT_PREFIX/usr/lib
-    cp -PR lib/libGLEW.a $SYSROOT_PREFIX/usr/lib
+    cp -PR lib/* $SYSROOT_PREFIX/usr/lib
 
   mkdir -p $SYSROOT_PREFIX/usr/lib/pkgconfig
     cp -PR glew.pc $SYSROOT_PREFIX/usr/lib/pkgconfig
 
   mkdir -p $SYSROOT_PREFIX/usr/include
     cp -PR include/GL $SYSROOT_PREFIX/usr/include
+  
+  mkdir -p $INSTALL/usr/lib
+    cp -PR lib/* $INSTALL/usr/lib
 }
