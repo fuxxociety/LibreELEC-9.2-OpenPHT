@@ -37,16 +37,16 @@ case "$LINUX" in
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     ;;
   raspberrypi)
-    PKG_VERSION="234a9f828dd6952397a90eb385b7570d077b7e4f" # 5.1.3
-    PKG_SHA256="7b477ff6948f1a69a5652390280b6e1c1c870179c3d6aacce349651d93dec310"
+    PKG_VERSION="e301141913790171114ad0f49f1145f65bdb48e3" # 5.2-rc1
+    PKG_SHA256="b8daeefd99d2b4dfc6f06834ce8b5d318dc905ce4f1248593f687b03642949d8"
     PKG_URL="https://github.com/raspberrypi/linux/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     PKG_BUILD_PERF="no"
     ;;
   *)
-    PKG_VERSION="5.1.5"
-    PKG_SHA256="d79f90f5ca97befbfee4e247204b2ac4f45e7bb03d63a79184bc748cf3cf6ddb"
-    PKG_URL="https://www.kernel.org/pub/linux/kernel/v5.x/$PKG_NAME-$PKG_VERSION.tar.xz"
+    PKG_VERSION="5.2-rc1"
+    PKG_SHA256="3430f53e7f0f8c4e25d2e3ccf6b6ab17852edcbec78eef1de7f5c91859952f99"
+    PKG_URL="https://git.kernel.org/torvalds/t/$PKG_NAME-$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="default"
     PKG_BUILD_PERF="no"
     ;;
