@@ -329,6 +329,11 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "noobs" ]; then
     fi
   fi
 
+  # Cleanup target dir
+  rm $TARGET_IMG/$IMAGE_NAME.kernel
+  rm $TARGET_IMG/$IMAGE_NAME.system
+  [ "$1" = "mkimage" ] && rm $TARGET_IMG/$IMAGE_NAME.tar*
+
   # Cleanup release dir
   rm -rf $RELEASE_DIR
 
