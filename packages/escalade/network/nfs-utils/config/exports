@@ -1,0 +1,5 @@
+# use exportfs -rav to reload this file
+#
+#
+/storage/roms *(rw,all_squash,anonuid=0,anongid=0,fsid=10,no_subtree_check,insecure,crossmnt)
+/storage/media *(rw,all_squash,anonuid=0,anongid=0,fsid=10,no_subtree_check,insecure,crossmnt)
