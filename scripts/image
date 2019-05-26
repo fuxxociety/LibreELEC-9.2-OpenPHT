@@ -132,7 +132,7 @@ MTADDONBUILD=no start_multithread_build image || die "Parallel build failure - s
 echo "Successful build, creating image..." >&2
 
 # Create legacy sym links
-ln -sfn /var/media $INSTALL/media
+ln -sfn /storage/media $INSTALL/media
 ln -sfn /usr/lib $INSTALL/lib
 ln -sfn /usr/bin $INSTALL/bin
 ln -sfn /usr/sbin $INSTALL/sbin
