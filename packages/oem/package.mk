@@ -46,11 +46,6 @@ makeinstall_target() {
     sed -i "s/module-udev-detect/module-udev-detect tsched=0/" $INSTALL/usr/config/pulse-daemon.conf.d/system.pa
   fi
 
-  # Customize Kodi
-  if [ "$MEDIACENTER" = "kodi" ]; then
-    cp -PR $PKG_DIR/kodi/filesystem/* $INSTALL
-  fi
-
   # Install UTF-8 locale (needed by SABnzbd)
   if [ ! "$PROJECT" = "Generic" ]; then
     mkdir -p $INSTALL/usr/share/i18n/charmaps
@@ -68,6 +63,8 @@ post_install() {
     fi
   done
   if [ "$MEDIACENTER" = "kodi" ]; then
+    # Install custom file structure
+    cp -PR $PKG_DIR/kodi/filesystem/* $INSTALL
     # Don't start Kodi automatically
     rm $INSTALL/usr/lib/systemd/system/kodi.target.wants/kodi.service
     rm $INSTALL/usr/lib/systemd/system/kodi.service.wants/kodi-autostart.service
