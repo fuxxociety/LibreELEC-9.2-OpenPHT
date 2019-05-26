@@ -42,6 +42,5 @@ post_makeinstall_target() {
 }
 
 post_install() {
-  enable_service nfs-statedirs.service
   enable_service nfs-server.service
 }
