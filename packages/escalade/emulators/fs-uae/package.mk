@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="fs-uae"
-PKG_VERSION="7f4b992"
+PKG_VERSION="3a9251b"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/FrodeSolheim/fs-uae"
