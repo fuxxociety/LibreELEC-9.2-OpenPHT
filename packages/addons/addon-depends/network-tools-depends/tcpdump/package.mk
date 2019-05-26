@@ -9,7 +9,7 @@ PKG_URL="http://www.tcpdump.org/release/tcpdump-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libpcap libtirpc"
 PKG_LONGDESC="A program that allows you to dump the traffic on a network."
 
-PKG_CONFIGURE_OPTS_TARGET="--with-crypto=no"
+PKG_CONFIGURE_OPTS_TARGET="ac_cv_path_PCAP_CONFIG=$SYSROOT_PREFIX/usr/bin/pcap-config --with-crypto=no --with-cap-ng=no"
 
 pre_configure_target() {
   # When cross-compiling, configure can't set linux version
