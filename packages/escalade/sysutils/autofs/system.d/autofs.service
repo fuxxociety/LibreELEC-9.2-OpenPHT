@@ -1,0 +1,14 @@
+[Unit]
+Description=Automounts filesystems on demand
+After=network.target network-online.target remote-fs.target
+Wants=network-online.target rpc-statd.service rpcbind.service
+
+[Service]
+EnvironmentFile=-/storage/.config/autofs/conf.d/autofs
+ExecStart=/usr/sbin/automount $OPTIONS --systemd-service --dont-check-daemon
+ExecReload=/usr/bin/kill -HUP $MAINPID
+KillMode=process
+TimeoutSec=180
+
+[Install]
+WantedBy=multi-user.target
