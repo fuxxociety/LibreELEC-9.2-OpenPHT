@@ -13,7 +13,7 @@ PKG_SHORTDESC="libsdl: A cross-platform Graphic API"
 PKG_BUILD_FLAGS="+pic"
 PKG_TOOLCHAIN="configure"
 
-PKG_CONFIGURE_OPTS_TARGET="have_esd=no --disable-video-directfb \
+PKG_CONFIGURE_OPTS_TARGET="--disable-video-directfb \
 			   --disable-oss \
 			   --disable-alsatest \
 			   --disable-arts \
@@ -27,11 +27,11 @@ PKG_CONFIGURE_OPTS_TARGET="have_esd=no --disable-video-directfb \
 			   --disable-shared \
 			   --disable-input-tslib \
 			   --disable-rpath \
-			   --disable-x11 \
+			   --without-x \
 			   --with-gnu-ld"
 
 post_makeinstall_target() {
   mkdir -p $TOOLCHAIN/bin
-  sed "s:echo\ \-L/usr.*:echo\ \-lSDL:g" $SYSROOT_PREFIX/usr/bin/sdl-config
+  sed -i -e "s:\(['=\" ]\)/usr:\\=$SYSROOT_PREFIX/usr:g" $SYSROOT_PREFIX/usr/bin/sdl-config
   rm -rf $INSTALL/usr/bin
 }
