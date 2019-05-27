@@ -35,7 +35,7 @@ post_makeinstall_target() {
   ln -sf /storage/.config/nfsmount.conf $INSTALL/etc/
   ln -sf /storage/.config/exports $INSTALL/etc/
   ln -sf /storage/.config/idmapd.conf $INSTALL/etc/
-  cp nfs.conf $INSTALL/usr/config/
+  sed 's/# udp=n/udp=y/' nfs.conf > $INSTALL/usr/config/nfs.conf
   cp utils/mount/nfsmount.conf $INSTALL/usr/config/
   cp $PKG_DIR/config/* $INSTALL/usr/config/
   rm -rf $INSTALL/run
