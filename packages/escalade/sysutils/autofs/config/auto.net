@@ -9,7 +9,9 @@ key="$1"
 
 # add "nosymlink" here if you want to suppress symlinking local filesystems
 # add "nonstrict" to make it OK for some filesystems to not mount
-# fstype=nfs for v3 mounts
+# add "nonstrict" to make it OK for some filesystems to not mount
+# add "udp" to mount using UDP
+# use "fstype=nfs4" for v4 mounts
 opts="-fstype=nfs,hard,intr,nodev,nosuid"
 
 for P in /bin /sbin /usr/bin /usr/sbin
