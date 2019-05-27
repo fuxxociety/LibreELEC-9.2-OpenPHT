@@ -2,4 +2,4 @@
 #
 #
 /storage/roms *(rw,all_squash,anonuid=0,anongid=0,fsid=10,no_subtree_check,insecure,crossmnt)
-/storage/media *(rw,all_squash,anonuid=0,anongid=0,fsid=10,no_subtree_check,insecure,crossmnt)
+/media *(rw,all_squash,anonuid=0,anongid=0,fsid=1,no_subtree_check,insecure,crossmnt)
