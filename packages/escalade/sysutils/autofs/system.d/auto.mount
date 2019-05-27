@@ -1,0 +1,13 @@
+[Unit]
+Description=Temporary directory for mounts
+DefaultDependencies=no
+Conflicts=umount.target
+Before=local-fs.target umount.target
+
+[Mount]
+What=tmpfs
+Where=/auto
+Type=tmpfs
+
+[Install]
+WantedBy=multi-user.target

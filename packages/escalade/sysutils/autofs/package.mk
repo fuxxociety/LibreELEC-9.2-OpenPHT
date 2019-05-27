@@ -30,4 +30,6 @@ post_makeinstall_target() {
 
 post_install() {
   enable_service autofs.service
+  enable_service auto.mount
+  mkdir $INSTALL/auto
 }

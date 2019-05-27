@@ -1,1 +1,2 @@
-/media/Autofs auto.net
+/auto/nfs auto.net
+/auto/smb auto.smb
