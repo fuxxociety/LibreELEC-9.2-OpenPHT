@@ -1,0 +1,17 @@
+--- a/configure.ac	2019-05-28 17:47:47.493170574 +0200
++++ b/configure.ac	2019-05-28 17:48:04.972941984 +0200
+@@ -546,11 +546,11 @@
+ 
+ AH_TEMPLATE(C_SDL_SOUND,[Define to 1 to enable SDL_sound support])
+ AC_CHECK_HEADER(SDL_sound.h,have_SDL_sound_h=yes,)
+-AC_CHECK_LIB(SDL_sound, Sound_Init, have_SDL_sound_init=yes,,)
+-AC_CHECK_LIB(SDL_sound, Sound_Seek, have_SDL_sound_seek=yes,,)
++AC_CHECK_LIB(SDL2_sound, Sound_Init, have_SDL_sound_init=yes,,)
++AC_CHECK_LIB(SDL2_sound, Sound_Seek, have_SDL_sound_seek=yes,,)
+ if test x$have_SDL_sound_h = xyes -a x$have_SDL_sound_init = xyes ; then
+   if test x$have_SDL_sound_seek = xyes ; then
+-    LIBS="-lSDL_sound $LIBS"
++    LIBS="-lSDL2_sound $LIBS"
+     AC_DEFINE(C_SDL_SOUND,1)
+    else 
+      AC_MSG_WARN([Can't find SoundSeek in libSDL_Sound, libSDL_sound support disabled])

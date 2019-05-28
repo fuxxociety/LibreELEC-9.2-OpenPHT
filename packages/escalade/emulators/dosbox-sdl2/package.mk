@@ -7,7 +7,7 @@ PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/duganchen/dosbox"
 PKG_URL="https://github.com/duganchen/dosbox/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain alsa-lib SDL2 SDL2_net SDL_sound fluidsynth libpng munt"
+PKG_DEPENDS_TARGET="toolchain alsa-lib SDL2 SDL2_net SDL2_sound fluidsynth libpng munt zlib libpng"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="DOSBox emulator SDL2 fork by duganchen"
 PKG_TOOLCHAIN="autotools"
@@ -30,7 +30,6 @@ esac
 
 pre_configure_target() {
   cd $PKG_BUILD
-  export LDFLAGS="$LDFLAGS -ldbus-1 -lglib-2.0"
 }
 
 pre_make_target() {
@@ -43,6 +42,6 @@ post_makeinstall_target() {
   cp $PKG_DIR/scripts/* $INSTALL/usr/bin/
   cp $PKG_DIR/config/dosbox-SDL2.conf $INSTALL/usr/config/dosbox/
   wget -q https://github.com/duganchen/dosbox_shaders/archive/master.zip
-  unzip -j master.zip -d $INSTALL/usr/share/dosbox/shaders
+  unzip -qj master.zip -d $INSTALL/usr/share/dosbox/shaders
   ln -s /usr/share/dosbox/shaders $INSTALL/usr/config/dosbox/shaders
 }
