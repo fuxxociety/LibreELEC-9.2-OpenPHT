@@ -17,40 +17,29 @@ else
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $OPENGL"
 fi
 
-if [ "$SAMBA_SUPPORT" = yes ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET samba"
-fi
-
-if [ "$AVAHI_DAEMON" = yes ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET avahi nss-mdns"
-fi
-
 if [ "$PULSEAUDIO_SUPPORT" = yes ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET pulseaudio"
 else
-  RETROARCH_PULSE="--disable-pulse"
+  RETROARCH_OPTS="--disable-pulse"
 fi
 
-if [ "$OPENGLES" == "no" ]; then
-  RETROARCH_GL="--enable-kms"
-elif [ "$OPENGLES" == "bcm2835-driver" ]; then
-  RETROARCH_GL="--enable-opengles --disable-kms --disable-x11 --disable-opengl1 --disable-opengl_core"
-  CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads \
-                  -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
-elif [ "$OPENGLES" == "libmali" ]; then
-   RETROARCH_GL="--enable-opengles --enable-kms --disable-x11 --disable-opengl1 --disable-opengl_core --enable-opengles3"
-fi
-
-if [[ "$TARGET_FPU" =~ "neon" ]]; then
-  RETROARCH_NEON="--enable-neon"
-fi
+case "$PROJECT" in
+  Generic)
+    RETROARCH_OPTS+="--enable-kms --disable-opengl_core"
+    ;;
+  RPi2)
+    RETROARCH_OPTS+="--enable-opengles --disable-kms --disable-x11 --disable-opengl1 --disable-opengl_core --enable-neon"
+    CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
+    ;;
+  OdroidXU3)
+   RETROARCH_OPTS+="--enable-opengles --enable-kms --disable-x11 --disable-opengl1 --disable-opengl_core --enable-opengles3"
+   ;;
+esac
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-vg \
                            --disable-sdl \
                            --disable-qt \
-                           $RETROARCH_GL \
-                           $RETROARCH_NEON \
-                           $RETROARCH_PULSE \
+                           $RETROARCH_OPTS \
                            --enable-zlib \
                            --enable-freetype"
 
