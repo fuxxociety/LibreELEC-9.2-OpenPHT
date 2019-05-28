@@ -20,7 +20,7 @@ PKG_CONFIGURE_OPTS_TARGET="--prefix=/usr \
 
 case "$PROJECT" in
   Generic)
-    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET glew"
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET glu"
     PKG_CONFIGURE_OPTS_TARGET+=" --host=x86_64"
     ;;
   OdroidXU3|RPi)
@@ -30,6 +30,7 @@ esac
 
 pre_configure_target() {
   cd $PKG_BUILD
+  export LDFLAGS="$LDFLAGS -ldbus-1 -lglib-2.0"
 }
 
 pre_make_target() {
@@ -37,10 +38,11 @@ pre_make_target() {
 }
 
 post_makeinstall_target() {
-  cp $PKG_DIR/scripts/* $INSTALL/usr/bin/
   mkdir -p $INSTALL/usr/config/dosbox
+  mkdir -p $INSTALL/usr/share/dosbox
+  cp $PKG_DIR/scripts/* $INSTALL/usr/bin/
   cp $PKG_DIR/config/dosbox-SDL2.conf $INSTALL/usr/config/dosbox/
-  mkdir -p $INSTALL/usr/config/dosbox/shaders
   wget -q https://github.com/duganchen/dosbox_shaders/archive/master.zip
-  unzip -j master.zip -d $INSTALL/usr/config/dosbox/shaders
+  unzip -j master.zip -d $INSTALL/usr/share/dosbox/shaders
+  ln -s /usr/share/dosbox/shaders $INSTALL/usr/config/dosbox/shaders
 }
