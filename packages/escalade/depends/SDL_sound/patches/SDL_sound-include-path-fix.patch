@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt	2019-05-28 14:18:28.354565960 +0200
++++ b/CMakeLists.txt	2019-05-28 14:18:58.754167796 +0200
+@@ -171,7 +171,7 @@
+         RUNTIME DESTINATION bin
+         LIBRARY DESTINATION lib${LIB_SUFFIX}
+         ARCHIVE DESTINATION lib${LIB_SUFFIX})
+-install(FILES SDL_sound.h DESTINATION include)
++install(FILES src/SDL_sound.h DESTINATION include/SDL2)
+ 
+ find_package(Doxygen)
+ if(DOXYGEN_FOUND)
