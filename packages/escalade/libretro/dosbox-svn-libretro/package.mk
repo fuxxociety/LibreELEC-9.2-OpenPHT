@@ -2,12 +2,12 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="dosbox-svn-libretro"
-PKG_VERSION="5380ccb"
+PKG_VERSION="763445f"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/fr500/dosbox-svn"
 PKG_URL="https://github.com/fr500/dosbox-svn.git"
-PKG_DEPENDS_TARGET="toolchain SDL SDL_net"
+PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="Upstream port of DOSBox to libretro"
 GET_HANDLER_SUPPORT="git"
@@ -17,7 +17,7 @@ PKG_TOOLCHAIN="make"
 
 make_target() {
   export SYSROOT_PREFIX
-  make -C libretro GIT_VERSION=$PKG_VERSION WITH_DYNAREC=$ARCH
+  make -C libretro GIT_VERSION=$PKG_VERSION WITH_DYNAREC=$ARCH WITH_FAKE_SDL=1
 }
 
 makeinstall_target() {
