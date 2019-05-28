@@ -27,12 +27,13 @@ case "$PROJECT" in
   Generic)
     RETROARCH_OPTS+="--enable-kms --disable-opengl_core"
     ;;
-  RPi2)
+  RPi)
     RETROARCH_OPTS+="--enable-opengles --disable-kms --disable-x11 --disable-opengl1 --disable-opengl_core --enable-neon"
     CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
+    echo FOOFOO
     ;;
   OdroidXU3)
-   RETROARCH_OPTS+="--enable-opengles --enable-kms --disable-x11 --disable-opengl1 --disable-opengl_core --enable-opengles3"
+   RETROARCH_OPTS+="--enable-opengles --enable-kms --disable-x11 --disable-opengl1 --disable-opengl_core --enable-opengles3 --enable-neon"
    ;;
 esac
 
