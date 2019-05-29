@@ -26,6 +26,9 @@
 # Install glibc locales to the build (yes / no)
   GLIBC_LOCALES="yes"
 
+# Which graphical frontend to use by default (emulationstation / retroarch / kodi)
+  FRONTEND="emulationstation"
+
 # Mediacenter to use (kodi / no)
   MEDIACENTER="no"
 
@@ -227,6 +230,3 @@
 
 # IR remote keymaps supported in default config
   IR_REMOTE_KEYMAPS="rc6_mce xbox_360 xbox_one"
-
-# Which graphical frontend to use by default (emulationstation / retroarch / kodi)
-  FRONTEND="emulationstation"
