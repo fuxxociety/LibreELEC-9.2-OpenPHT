@@ -111,6 +111,8 @@
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
     FIRMWARE="misc-firmware wlan-firmware"
 
+    ADDITIONAL_DRIVERS="RTL8812AU"
+
   # Default system partition offset, in sectors, eg. 2048
     SYSTEM_PART_START=3072
 
