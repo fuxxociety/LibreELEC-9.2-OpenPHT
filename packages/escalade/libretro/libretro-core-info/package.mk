@@ -19,3 +19,4 @@ make_target() {
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
   cp ../*.info $INSTALL/usr/lib/libretro/
+}
