@@ -1,13 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
-PKG_NAME="reicast-libretro"
-PKG_VERSION="34f5ec6"
+PKG_NAME="beetle-dc-libretro"
+PKG_VERSION="78bc44a"
 PKG_ARCH="x86_64 arm"
 PKG_LICENSE="GPLv2"
-PKG_SITE="https://github.com/libretro/reicast-emulator"
-PKG_URL="https://github.com/libretro/reicast-emulator/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="reicast-emulator-$PKG_VERSION*"
+PKG_SITE="https://github.com/libretro/beetle-dc"
+PKG_URL="https://github.com/libretro/beetle-dc/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="Reicast is a multiplatform Sega Dreamcast emulator"
