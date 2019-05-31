@@ -2,8 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="libretro-core-info"
-PKG_VERSION="cd22a6a"
-PKG_REV="1"
+PKG_VERSION="eef4add"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/libretro-core-info"
@@ -20,4 +19,3 @@ make_target() {
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
   cp ../*.info $INSTALL/usr/lib/libretro/
-}
