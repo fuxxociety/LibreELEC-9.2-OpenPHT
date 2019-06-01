@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="fbneo-libretro"
-PKG_VERSION="549b646"
+PKG_VERSION="ce6073d"
 PKG_ARCH="any"
 PKG_LICENSE="Non-commercial"
 PKG_SITE="https://github.com/libretro/FBNeo"
@@ -11,7 +11,7 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="Port of FinalBurn Neo to Libretro."
 PKG_TOOLCHAIN="make"
-PKG_BUILD_FLAGS="+lto"
+PKG_BUILD_FLAGS="+lto-parallel"
 
 pre_make_target() {
   PKG_MAKE_OPTS_TARGET="-C src/burner/libretro CC=$CC CXX=$CXX GIT_VERSION=$PKG_VERSION"
