@@ -11,7 +11,12 @@ PKG_DEPENDS_TARGET="toolchain nasm:host"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="mupen64plus + RSP-HLE + GLideN64 + libretro"
 PKG_TOOLCHAIN="manual"
-PKG_BUILD_FLAGS="-lto"
+
+if [ "$ARCH" = "arm" ]; then
+  PKG_BUILD_FLAGS="+lto-parallel"
+else
+  PKG_BUILD_FLAGS="-lto"
+fi
 
 configure_target() {
   cd $PKG_BUILD

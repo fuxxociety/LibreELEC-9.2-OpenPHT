@@ -8,10 +8,16 @@ PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/libretro-uae"
 PKG_URL="https://github.com/libretro/libretro-uae/archive/$PKG_VERSION.tar.gz"
 PKG_SOURCE_DIR="libretro-uae-$PKG_VERSION*"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="toolchain capsimg"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="PUAE LIBRETRO"
-PKG_BUILD_FLAGS="-lto"
+
+if [ "$ARCH" = "arm" ]; then
+  PKG_BUILD_FLAGS="+lto-parallel"
+  PKG_PATCH_DIRS="joystick2"
+else
+  PKG_BUILD_FLAGS="-lto"
+fi
 
 make_target() {
   if [ "$ARCH" = "arm" ]; then

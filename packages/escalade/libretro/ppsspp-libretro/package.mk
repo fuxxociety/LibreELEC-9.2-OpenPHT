@@ -1,5 +1,5 @@
 PKG_NAME="ppsspp-libretro"
-PKG_VERSION="122f871"
+PKG_VERSION="420156d"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/hrydgard/ppsspp"

@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="yabasanshiro-libretro"
-PKG_VERSION="6d55ffb"
+PKG_VERSION="f702466"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/yabause"
