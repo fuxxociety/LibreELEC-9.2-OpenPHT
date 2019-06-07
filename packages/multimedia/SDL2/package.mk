@@ -3,11 +3,11 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="SDL2"
-PKG_VERSION="efee635"
-PKG_SHA256="76bc1e07dcc8f4acb1c97ca70c3d968a05783e66e8437e14a83955af9296e2d9"
+PKG_VERSION="0fa532733f3f"
+PKG_SHA256="cae12ce19f8b2b724bb36061827d9b6cf6954369aadf46c2ef03e156b57aef4d"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.libsdl.org/"
-PKG_URL="https://github.com/spurious/SDL-mirror/archive/$PKG_VERSION.tar.gz"
+PKG_URL="http://hg.libsdl.org/SDL/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain alsa-lib systemd dbus"
 PKG_LONGDESC="A cross-platform multimedia library designed to provide fast access to the graphics framebuffer and audio device. "
 PKG_BUILD_FLAGS="+pic"
