@@ -2,15 +2,17 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="fs-uae"
-PKG_VERSION="3a9251b"
+PKG_VERSION="c843fe1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/FrodeSolheim/fs-uae"
 PKG_URL="https://github.com/FrodeSolheim/fs-uae/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain SDL2 glew glu libmpeg2 libXi openal-soft-oem capsimg"
+PKG_DEPENDS_TARGET="toolchain SDL2 glew glu libmpeg2 libXi openal-soft-oem capsimg SDL2_ttf"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="FS-UAE amiga emulator."
 PKG_TOOLCHAIN="autotools"
+
+PKG_CONFIGURE_OPTS_TARGET="--without-libmpeg2"
 
 pre_configure_target() {
   export ac_cv_func_realloc_0_nonnull=yes

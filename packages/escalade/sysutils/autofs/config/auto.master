@@ -1,2 +1,2 @@
-/auto/nfs auto.net
+/auto/nfs -hosts vers=3,udp
 /auto/smb auto.smb

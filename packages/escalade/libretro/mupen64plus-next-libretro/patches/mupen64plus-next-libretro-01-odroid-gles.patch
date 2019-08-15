@@ -1,0 +1,49 @@
+--- a/GLideN64/src/Graphics/OpenGLContext/GLFunctions.cpp	2019-08-05 15:56:10.649859665 +0200
++++ b/GLideN64/src/Graphics/OpenGLContext/GLFunctions.cpp	2019-08-05 15:57:01.549193208 +0200
+@@ -207,7 +207,7 @@
+ #ifdef VC
+ 	void *gles2so = dlopen("/opt/vc/lib/libbrcmGLESv2.so", RTLD_NOW);
+ #elif defined(ODROID)
+-	void *gles2so = dlopen("/usr/lib/arm-linux-gnueabihf/libGLESv2.so", RTLD_NOW);
++	void *gles2so = dlopen("/usr/lib/libGLESv2.so", RTLD_NOW);
+ #elif defined(VERO4K)
+        void *gles2so = dlopen("/opt/vero3/lib/libGLESv2.so", RTLD_NOW);
+ #elif defined(AMLOGIC)
+--- a/Makefile	2019-08-05 16:10:27.975585325 +0200
++++ b/Makefile	2019-08-05 16:12:04.327704900 +0200
+@@ -189,9 +189,8 @@
+ # ODROIDs
+ else ifneq (,$(findstring odroid,$(platform)))
+    TARGET := $(TARGET_NAME)_libretro.so
+-   LDFLAGS += -shared -Wl,--version-script=$(LIBRETRO_DIR)/link.T -Wl,--no-undefined
++   LDFLAGS += -shared -Wl,--version-script=$(LIBRETRO_DIR)/link.T -Wl,--no-undefined -ldl
+    BOARD := $(shell cat /proc/cpuinfo | grep -i odroid | awk '{print $$3}')
+-   GLES = 1
+    GL_LIB := -lGLESv2
+    CPUFLAGS += -marm -mfloat-abi=hard -mfpu=neon
+    HAVE_NEON = 1
+@@ -199,19 +198,23 @@
+    ifneq (,$(findstring ODROIDC,$(BOARD)))
+       # ODROID-C1
+       CPUFLAGS += -mcpu=cortex-a5
++      GLES = 1
+    else ifneq (,$(findstring ODROID-XU,$(BOARD)))
+       # ODROID-XU3 & -XU3 Lite and -XU4
+       ifeq "$(shell expr `gcc -dumpversion` \>= 4.9)" "1"
+          CPUFLAGS += -march=armv7ve -mcpu=cortex-a15.cortex-a7
++         GLES3 = 1
+       else
+          CPUFLAGS += -mcpu=cortex-a9
++         GLES = 1
+       endif
+    else
+       # ODROID-U2, -U3, -X & -X2
+       CPUFLAGS += -mcpu=cortex-a9
++      GLES = 1
+    endif
+ 
+-   COREFLAGS += -DOS_LINUX
++   COREFLAGS += -DOS_LINUX -DUNDEF_GL_GLEXT_PROTOTYPES -DODROID
+    ASFLAGS = -f elf -d ELF_TYPE
+ 
+ # Amlogic S905/S905X/S912 (AMLGXBB/AMLGXL/AMLGXM) e.g. Khadas VIM1/2 / S905X2 (AMLG12A) & S922X/A311D (AMLG12B) e.g. Khadas VIM3 - 32-bit userspace

@@ -2,8 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="retroarch-joypad-autoconfig"
-PKG_VERSION="3adf2df"
-PKG_REV="1"
+PKG_VERSION="f4059c0"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/retroarch-joypad-autoconfig"

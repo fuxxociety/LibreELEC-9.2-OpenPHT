@@ -1,5 +1,5 @@
 PKG_NAME="ppsspp"
-PKG_VERSION="f7a2fc9"
+PKG_VERSION="6e78ec9"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/hrydgard/ppsspp"

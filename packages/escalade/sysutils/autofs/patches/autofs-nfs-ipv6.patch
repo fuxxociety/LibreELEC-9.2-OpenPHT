@@ -1,0 +1,17 @@
+diff --git a/modules/replicated.c b/modules/replicated.c
+index 740270e..e99e32a 100644
+--- a/modules/replicated.c
++++ b/modules/replicated.c
+@@ -497,9 +497,6 @@ static int check_address_proto(unsigned logopt,
+ 	if (ipv6_requested) {
+ 		if (host->addr_len == INET_ADDRSTRLEN)
+ 			ret = 0;
+-	} else {
+-		if (host->addr_len == INET6_ADDRSTRLEN)
+-			ret = 0;
+ 	}
+ 
+ 	if (!ret)
+-- 
+cgit 1.2-0.3.lf.el7
+

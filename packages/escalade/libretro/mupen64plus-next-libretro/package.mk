@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
-PKG_NAME="mupen64plus-libretro"
-PKG_VERSION="ab8134a"
+PKG_NAME="mupen64plus-next-libretro"
+PKG_VERSION="8cc06b1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
-PKG_SITE="https://github.com/libretro/mupen64plus-libretro"
-PKG_URL="https://github.com/libretro/mupen64plus-libretro/archive/$PKG_VERSION.tar.gz"
+PKG_SITE="https://github.com/libretro/mupen64plus-libretro-nx"
+PKG_URL="https://github.com/libretro/mupen64plus-libretro-nx/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain nasm:host"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="mupen64plus + RSP-HLE + GLideN64 + libretro"
@@ -25,15 +25,15 @@ configure_target() {
 make_target() {
   case $PROJECT in
     RPi)
-      CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads \
-                      -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
-      make platform=rpi2 FORCE_GLES=1 HAVE_NEON=1 WITH_DYNAREC=arm
+      #CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads \
+      #                -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
+      make platform=rpi2
       ;;
     Generic)
       make
       ;;
     OdroidXU3)
-      make platform=odroid BOARD=ODROID-XU3 FORCE_GLES3=1 HAVE_NEON=1 WITH_DYNAREC=arm
+      make platform=odroid BOARD=ODROID-XU4
       ;;
   esac
 }

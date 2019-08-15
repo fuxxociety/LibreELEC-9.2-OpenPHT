@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="retroarch"
-PKG_VERSION="ba3f164"
+PKG_VERSION="b4375e3"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch"
@@ -12,20 +12,21 @@ PKG_SECTION="escalade"
 PKG_SHORTDESC="Reference frontend for the libretro API."
 
 if [ "$OPENGLES_SUPPORT" = yes ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $OPENGLES"
+  PKG_DEPENDS_TARGET+=" $OPENGLES"
 else
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $OPENGL"
+  PKG_DEPENDS_TARGET+=" $OPENGL"
 fi
 
 if [ "$PULSEAUDIO_SUPPORT" = yes ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET pulseaudio"
+  PKG_DEPENDS_TARGET+=" pulseaudio"
 else
   RETROARCH_OPTS="--disable-pulse"
 fi
 
 case "$PROJECT" in
   Generic)
-    RETROARCH_OPTS+="--enable-kms --disable-opengl_core"
+    RETROARCH_OPTS+="--enable-kms"
+    PKG_DEPENDS_TARGET+=" nvidia-cg-toolkit"
     ;;
   RPi)
     RETROARCH_OPTS+="--enable-opengles --disable-kms --disable-x11 --disable-opengl1 --disable-opengl_core --enable-neon"
@@ -38,9 +39,12 @@ esac
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-vg \
                            --disable-sdl \
+                           --disable-sdl2 \
                            --disable-qt \
                            $RETROARCH_OPTS \
                            --enable-zlib \
+                           --disable-builtinflac \
+                           --disable-xinerama \
                            --enable-freetype"
 
 pre_configure_target() {
@@ -50,9 +54,9 @@ pre_configure_target() {
 }
 
 make_target() {
-  make V=1
-  make -C gfx/video_filters compiler=$CC extra_flags="$CFLAGS"
-  make -C libretro-common/audio/dsp_filters compiler=$CC extra_flags="$CFLAGS"
+  make V=1 $MAKEFLAGS
+  make -C gfx/video_filters compiler=$CC extra_flags="$CFLAGS" $MAKEFLAGS
+  make -C libretro-common/audio/dsp_filters compiler=$CC extra_flags="$CFLAGS" $MAKEFLAGS
 }
 
 makeinstall_target() {

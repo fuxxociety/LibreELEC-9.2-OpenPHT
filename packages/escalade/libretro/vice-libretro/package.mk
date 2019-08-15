@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="vice-libretro"
-PKG_VERSION="ce4524d"
+PKG_VERSION="9a2184c"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="http://vice-emu.sf.net"

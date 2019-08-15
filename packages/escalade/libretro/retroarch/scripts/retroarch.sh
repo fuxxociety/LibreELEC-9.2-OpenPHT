@@ -8,7 +8,8 @@ if [ "$M3U" = "1" ]; then
   if file --mime-type "$2" | grep -q zip$; then
     mkdir -p /tmp/.retroarch
     unzip -j -q -d /tmp/.retroarch "$2"
-    for file in /tmp/.retroarch/*; do echo $file >> /tmp/.retroarch/rom.m3u; done
+    ROM=`basename "$2" .zip`
+    for file in /tmp/.retroarch/*; do echo $file >> /tmp/.retroarch/"$ROM".m3u; done
   else
     echo "M3U=1 is set but filename is not a .zip file"
     M3U=0
@@ -25,7 +26,7 @@ fi
 
 
 if [ "$M3U" = "1" ]; then
-  $PASUSPENDER /usr/bin/retroarch -v -L $1 /tmp/.retroarch/rom.m3u > /var/log/retroarch.log 2>&1
+  $PASUSPENDER /usr/bin/retroarch -v -L $1 /tmp/.retroarch/"$ROM".m3u > /var/log/retroarch.log 2>&1
   rm -rf /tmp/.retroarch
 else
   $PASUSPENDER /usr/bin/retroarch -v -L $1 "$2" > /var/log/retroarch.log 2>&1

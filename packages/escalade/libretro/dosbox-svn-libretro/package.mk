@@ -2,11 +2,11 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="dosbox-svn-libretro"
-PKG_VERSION="141742c"
+PKG_VERSION="f81ce27"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
-PKG_SITE="https://github.com/fr500/dosbox-svn"
-PKG_URL="https://github.com/fr500/dosbox-svn.git"
+PKG_SITE="https://github.com/libretro/dosbox-svn"
+PKG_URL="https://github.com/libretro/dosbox-svn.git"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="Upstream port of DOSBox to libretro"

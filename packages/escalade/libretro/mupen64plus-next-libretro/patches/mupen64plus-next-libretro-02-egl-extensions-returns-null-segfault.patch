@@ -1,0 +1,13 @@
+diff --git a/GLideN64/src/Graphics/OpenGLContext/opengl_Utils.cpp b/GLideN64/src/Graphics/OpenGLContext/opengl_Utils.cpp
+index 0279af9..dbc09fe 100644
+--- a/GLideN64/src/Graphics/OpenGLContext/opengl_Utils.cpp
++++ b/GLideN64/src/Graphics/OpenGLContext/opengl_Utils.cpp
+@@ -54,7 +54,7 @@ bool Utils::isEGLExtensionSupported(const char * extension)
+ 	const char* extensions = eglQueryString(eglGetDisplay(EGL_DEFAULT_DISPLAY), EGL_EXTENSIONS);
+ 
+ 	const char* start = extensions;
+-	for (;;) {
++	while (start) {
+ 		where = strstr(start, extension);
+ 		if (where == nullptr)
+ 			break;

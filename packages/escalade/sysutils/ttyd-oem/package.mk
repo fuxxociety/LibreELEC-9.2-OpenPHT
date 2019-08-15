@@ -3,8 +3,8 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="ttyd-oem"
-PKG_VERSION="1.4.4"
-PKG_SHA256="b910a33ddaa474c369991ba345187a8a2f4aa420389083671ba3a6c305a491d6"
+PKG_VERSION="1.5.2"
+PKG_SHA256="b5b62ec2ce08add0173e6d1dfdd879e55f02f9490043e89f389981a62e87d376"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/tsl0922/ttyd"

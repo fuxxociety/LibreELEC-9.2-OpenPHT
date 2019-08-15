@@ -1,10 +1,12 @@
 --- a/Makefile	2016-08-13 15:58:53.302616785 +0200
 +++ b/Makefile	2016-08-13 15:59:39.916444896 +0200
-@@ -1,4 +1,4 @@
--SUBDIRS=libsepol libselinux libsemanage sepolgen checkpolicy secilc policycoreutils # policy
+@@ -1,6 +1,6 @@
+ PREFIX ?= /usr
+ OPT_SUBDIRS ?= dbus gui mcstrans python restorecond sandbox semodule-utils
+-SUBDIRS=libsepol libselinux libsemanage checkpolicy secilc policycoreutils $(OPT_SUBDIRS)
 +SUBDIRS=libsepol libselinux
  PYSUBDIRS=libselinux libsemanage
- DISTCLEANSUBIDRS=libselinux libsemanage
+ DISTCLEANSUBDIRS=libselinux libsemanage
  
 --- a/libselinux/Makefile	2016-08-13 14:35:10.029812196 +0000
 +++ b/libselinux/Makefile	2016-08-13 14:35:33.929812046 +0000

@@ -18,8 +18,11 @@ PKG_CONFIGURE_OPTS_TARGET="--without-hesiod \
 			   --with-mapdir=/storage/.config/autofs \
 			   --with-confdir=/storage/.config/autofs/conf.d"
 
+PKG_MAKE_OPTS_TARGET="DONTSTRIP=1"
+
 pre_configure_target() {
   cd $PKG_BUILD
+  unset STRIP
 }
 
 post_makeinstall_target() {
@@ -31,5 +34,6 @@ post_makeinstall_target() {
 post_install() {
   enable_service autofs.service
   enable_service auto.mount
+  echo "automount:	files" >> $INSTALL/etc/nsswitch.conf
   mkdir $INSTALL/auto
 }
