@@ -11,8 +11,6 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="sidplay-libs"
 PKG_BUILD_FLAGS="+pic"
 
-PKG_CONFIGURE_OPTS_TARGET="--disable-shared --enable-static"
-
 pre_configure_target() {
   # fails to build in subdirs
   cd $PKG_BUILD
