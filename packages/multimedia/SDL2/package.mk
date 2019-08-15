@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="SDL2"
-PKG_VERSION="0fa532733f3f"
-PKG_SHA256="cae12ce19f8b2b724bb36061827d9b6cf6954369aadf46c2ef03e156b57aef4d"
+PKG_VERSION="bc90ce38f1e2"
+PKG_SHA256="3dcfa6237facf0c6b3d8b618087659d6f1c16976f8043535191cd9b150d30499"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.libsdl.org/"
 PKG_URL="http://hg.libsdl.org/SDL/archive/$PKG_VERSION.tar.gz"
