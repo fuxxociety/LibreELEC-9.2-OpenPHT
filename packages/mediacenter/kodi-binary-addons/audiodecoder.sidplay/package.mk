@@ -19,3 +19,8 @@ PKG_IS_ADDON="yes"
 PKG_ADDON_TYPE="kodi.audiodecoder"
 
 PKG_CMAKE_OPTS_TARGET="-DSIDPLAY2_LIBRARIES=$SYSROOT_PREFIX/usr/lib"
+
+addon() {
+  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/lib
+  cp -P $(get_build_dir sidplay-libs)/builders/resid-builder/src/.libs/libresid-builder.so.0 $ADDON_BUILD/$PKG_ADDON_ID/lib/
+}
