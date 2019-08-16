@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="fbneo-libretro"
-PKG_VERSION="130ed19"
+PKG_VERSION="e0cdb6a"
 PKG_ARCH="any"
 PKG_LICENSE="Non-commercial"
 PKG_SITE="https://github.com/libretro/FBNeo"
@@ -14,7 +14,7 @@ PKG_TOOLCHAIN="make"
 PKG_BUILD_FLAGS="+lto-parallel"
 
 pre_make_target() {
-  PKG_MAKE_OPTS_TARGET="-C src/burner/libretro CC=$CC CXX=$CXX GIT_VERSION=$PKG_VERSION"
+  PKG_MAKE_OPTS_TARGET="-C src/burner/libretro CC=$CC CXX=$CXX GIT_VERSION=$PKG_VERSION EXTERNAL_ZLIB=1"
 
   if [ "$PROJECT" = "RPi" ]; then
     case $DEVICE in
@@ -25,11 +25,10 @@ pre_make_target() {
         PKG_MAKE_OPTS_TARGET+=" platform=rpi2"
         ;;
     esac
-  else
-    # NEON Support ?
-    if target_has_feature neon; then
-      PKG_MAKE_OPTS_TARGET+=" HAVE_NEON=1"
-    fi
+  fi
+
+  if [ "$PROJECT" = "OdroidXU3" ]; then
+    PKG_MAKE_OPTS_TARGET+=" platform=armv7-neon"
   fi
 }
 

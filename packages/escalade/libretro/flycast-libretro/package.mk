@@ -5,17 +5,18 @@ PKG_NAME="flycast-libretro"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/flycast"
-PKG_URL="https://github.com/libretro/flycast/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="Flycast is a multiplatform Sega Dreamcast emulator"
 PKG_TOOLCHAIN="manual"
 
 if [ "$PROJECT" = "Generic" ]; then
-  PKG_VERSION="33c2ce0" # WinCE / MMU
+  PKG_VERSION="9a5d26e" # WinCE / MMU
 else
-  PKG_VERSION="6baf827"
+  PKG_VERSION="8193d58"
 fi
+
+PKG_URL="https://github.com/libretro/flycast/archive/$PKG_VERSION.tar.gz"
 
 make_target() {
   case $PROJECT in

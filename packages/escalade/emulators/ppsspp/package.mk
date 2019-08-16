@@ -1,5 +1,5 @@
 PKG_NAME="ppsspp"
-PKG_VERSION="6e78ec9"
+PKG_VERSION="3356f94"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/hrydgard/ppsspp"
@@ -15,7 +15,7 @@ PKG_CMAKE_OPTS_TARGET="-DUSE_SYSTEM_FFMPEG=on -DUSING_EGL=off -DUSE_DISCORD=no"
 case $PROJECT in
   Generic)
     PKG_CMAKE_OPTS_TARGET+=" -DUSING_GLES2=off"
-    PKG_DEPENDS_TARGET+=" glu"
+    PKG_DEPENDS_TARGET+=" glew"
     ;;
   OdroidXU3|RPi)
     PKG_CMAKE_OPTS_TARGET+=" -DARMV7=on -DUSING_GLES2=on -DARM_NO_VULKAN=on"
