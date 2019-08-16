@@ -477,7 +477,7 @@ if [ "$TARGET" = "target" -o "$TARGET" = "init" ]; then
         -exec rm -f {} \; 2>/dev/null || :
     find $INSTALL -type d -exec rmdir -p {} \; 2>/dev/null || :
 
-    if [ ! "${BUILD_WITH_DEBUG}" = "yes" ]; then
+    if [ ! "${BUILD_WITH_DEBUG}" = "yes" -a ! -z "${STRIP}" ]; then
       $STRIP $(find $INSTALL \
         -type f -name "*.so*" \
         ! -name "ld-*.so" \
