@@ -11,8 +11,7 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="A port of Suns Transport-Independent RPC library to Linux."
 PKG_BUILD_FLAGS="+pic"
 
-PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared \
-                           --disable-silent-rules \
+PKG_CONFIGURE_OPTS_TARGET="--disable-silent-rules \
                            --enable-ipv6 \
                            --disable-gssapi \
                            --with-gnu-ld"
