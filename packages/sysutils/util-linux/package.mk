@@ -3,15 +3,15 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="util-linux"
-PKG_VERSION="2.33.2"
-PKG_SHA256="631be8eac6cf6230ba478de211941d526808dba3cd436380793334496013ce97"
+PKG_VERSION="2.34"
+PKG_SHA256="743f9d0c7252b6db246b659c1e1ce0bd45d8d4508b4dfa427bbb4a3e9b9f62b5"
 PKG_LICENSE="GPL"
-PKG_URL="http://www.kernel.org/pub/linux/utils/util-linux/v${PKG_VERSION%.*}/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_URL="http://www.kernel.org/pub/linux/utils/util-linux/v$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_HOST="gcc:host pkg-config:host"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_DEPENDS_INIT="toolchain"
 PKG_LONGDESC="A large variety of low-level system utilities that are necessary for a Linux system to function."
-PKG_TOOLCHAIN="autotools"
+PKG_TOOLCHAIN="configure"
 PKG_BUILD_FLAGS="+pic:host"
 
 UTILLINUX_CONFIG_DEFAULT="--disable-gtk-doc \
@@ -21,7 +21,6 @@ UTILLINUX_CONFIG_DEFAULT="--disable-gtk-doc \
                           --disable-all-programs \
                           --enable-chsh-only-listed \
                           --disable-bash-completion \
-                          --disable-colors-default \
                           --disable-pylibmount \
                           --disable-pg-bell \
                           --disable-use-tty-group \
@@ -31,7 +30,6 @@ UTILLINUX_CONFIG_DEFAULT="--disable-gtk-doc \
                           --without-selinux \
                           --without-audit \
                           --without-udev \
-                          --without-ncurses \
                           --without-ncursesw \
                           --without-readline \
                           --without-slang \
@@ -54,6 +52,7 @@ PKG_CONFIGURE_OPTS_TARGET="$UTILLINUX_CONFIG_DEFAULT \
                            --enable-fsck \
                            --enable-fstrim \
                            --enable-blkid \
+                           --enable-dmesg \
                            --enable-lscpu"
 
 if [ "$SWAP_SUPPORT" = "yes" ]; then

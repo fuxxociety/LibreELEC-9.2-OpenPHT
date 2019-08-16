@@ -1,0 +1,15 @@
+--- a/configure.ac	2019-07-09 12:55:45.562549624 +0200
++++ b/configure.ac	2019-07-09 12:49:53.903794016 +0200
+@@ -1776,7 +1776,11 @@
+ UL_REQUIRES_LINUX([readprofile])
+ AM_CONDITIONAL([BUILD_READPROFILE], [test "x$build_readprofile" = xyes])
+ 
+-UL_BUILD_INIT([dmesg], [check])
++UL_BUILD_INIT([dmesg])
++AC_ARG_ENABLE([dmesg],
++  AS_HELP_STRING([--disable-dmesg], [do not build dmesg]),
++  [], [UL_DEFAULT_ENABLE([dmesg], [check])]
++)
+ UL_REQUIRES_LINUX([dmesg])
+ AM_CONDITIONAL([BUILD_DMESG], [test "x$build_dmesg" = xyes])
+ 
