@@ -24,8 +24,8 @@ case "$LINUX" in
     PKG_BUILD_PERF="no"
     ;;
   odroidxu3-4.14)
-    PKG_VERSION="4.14.111-158"
-    PKG_SHA256="69badf0f3aba2d5fd351de59809356c234228f37da0fd56c5dd2e033e9d0a742"
+    PKG_VERSION="4.14.133-165"
+    PKG_SHA256="fe3a1c1d8e86d84deda75c7d0694a2403f0752066f4433c436c32f9fb9f41ee6"
     PKG_URL="https://github.com/hardkernel/linux/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     PKG_BUILD_PERF="no"
@@ -37,16 +37,16 @@ case "$LINUX" in
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     ;;
   raspberrypi)
-    PKG_VERSION="ebfe5bc" # 5.2-rc4
-    PKG_SHA256="bb16058676e164934c8ea3b3c827b63e4f7e21890d28e2b9ec8aa05d0c1a7e13"
+    PKG_VERSION="cf9b886fbdb1f7a90484d8f5f28c5327f17c8487" # 5.2.8
+    PKG_SHA256="c46905f19a20ed85c854546d1a605d4d04b373f6d3df34e9a16241fd2bb17249"
     PKG_URL="https://github.com/raspberrypi/linux/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     PKG_BUILD_PERF="no"
     ;;
   *)
-    PKG_VERSION="5.2-rc4"
-    PKG_SHA256="18aafe90304e1b7752b82f1bf257569d9a0e324d0aa5a607555ed66657ddbb48"
-    PKG_URL="https://git.kernel.org/torvalds/t/$PKG_NAME-$PKG_VERSION.tar.gz"
+    PKG_VERSION="5.3-rc4"
+    PKG_SHA256="b79938622739cf91187d59f9823a963d2e23c58b7131e4f83b95ce23c3ed90d8"
+PKG_URL="https://git.kernel.org/torvalds/t/linux-$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="default"
     PKG_BUILD_PERF="no"
     ;;
