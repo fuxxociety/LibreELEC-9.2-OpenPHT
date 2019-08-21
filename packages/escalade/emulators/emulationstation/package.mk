@@ -2,12 +2,12 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="emulationstation"
-PKG_VERSION="13819ec"
+PKG_VERSION="023e9d8"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/RetroPie/EmulationStation"
 PKG_URL="https://github.com/RetroPie/EmulationStation.git"
-PKG_DEPENDS_TARGET="toolchain SDL2 freetype curl freeimage es-theme-carbon vlc rapidjson libcec"
+PKG_DEPENDS_TARGET="toolchain SDL2 freetype curl freeimage es-theme-tronkyfran vlc rapidjson libcec"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="Emulationstation emulator frontend"
 GET_HANDLER_SUPPORT="git"

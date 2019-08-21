@@ -11,7 +11,16 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="Standalone port of Mednafen Saturn to libretro."
 
+case "$PROJECT" in
+  "Generic")
+    PKG_MAKE_OPTS_TARGET="HAVE_OPENGL=1"
+    ;;
+  "OdroidXU3")
+    PKG_MAKE_OPTS_TARGET="HAVE_OPENGL=1 platform=unix-gles"
+    ;;
+esac
+
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/libretro
-  cp mednafen_saturn_libretro.so $INSTALL/usr/lib/libretro/
+  cp *.so $INSTALL/usr/lib/libretro/
 }

@@ -11,9 +11,9 @@ PKG_SHORTDESC="Flycast is a multiplatform Sega Dreamcast emulator"
 PKG_TOOLCHAIN="manual"
 
 if [ "$PROJECT" = "Generic" ]; then
-  PKG_VERSION="9a5d26e" # WinCE / MMU
+  PKG_VERSION="c7ebabc" # WinCE / MMU
 else
-  PKG_VERSION="8193d58"
+  PKG_VERSION="39f6cee"
 fi
 
 PKG_URL="https://github.com/libretro/flycast/archive/$PKG_VERSION.tar.gz"

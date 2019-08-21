@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="mupen64plus-next-libretro"
-PKG_VERSION="8cc06b1"
+PKG_VERSION="b785150"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/mupen64plus-libretro-nx"
@@ -25,8 +25,6 @@ configure_target() {
 make_target() {
   case $PROJECT in
     RPi)
-      #CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads \
-      #                -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
       make platform=rpi2
       ;;
     Generic)
