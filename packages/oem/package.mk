@@ -18,7 +18,7 @@ case "$PROJECT" in
     PKG_DEPENDS_TARGET+=" pcsx_rearmed-libretro omxplayer"
     ;;
   Generic)
-    PKG_DEPENDS_TARGET+=" beetle-psx-libretro fs-uae mame2016-libretro pcsx2 unclutter-xfixes docker-oem citra-libretro kronos-libretro"
+    PKG_DEPENDS_TARGET+=" beetle-psx-libretro fs-uae mame2016-libretro pcsx2 unclutter-xfixes docker-oem citra-libretro beetle-saturn-libretro"
     ;;
 esac
 
