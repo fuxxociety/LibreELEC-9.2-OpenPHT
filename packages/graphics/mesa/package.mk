@@ -3,15 +3,15 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mesa"
-PKG_VERSION="19.1.4"
-PKG_SHA256="d4856509db0fb63bfbb89027fc75fed55e5203e1a1be10f768bb6e1992cefc8d"
+PKG_VERSION="19.2.0-rc1"
+PKG_SHA256="e4d93e91a8ced0b4d068a5b2f9eee978a221ad20bb1284944d2ce89b1cdb9cad"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
 PKG_URL="https://github.com/mesa3d/mesa/archive/mesa-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain expat libdrm Mako:host"
 PKG_LONGDESC="Mesa is a 3-D graphics library with an API."
 PKG_TOOLCHAIN="meson"
-PKG_BUILD_FLAGS="+lto"
+PKG_BUILD_FLAGS="-lto"
 
 get_graphicdrivers
 
@@ -22,7 +22,7 @@ PKG_MESON_OPTS_TARGET="-Ddri-drivers=${DRI_DRIVERS// /,} \
                        -Dgallium-omx=disabled \
                        -Dgallium-nine=false \
                        -Dgallium-opencl=disabled \
-                       -Dvulkan-drivers= \
+                       -Dvulkan-drivers=${VULKAN_DRIVERS// /,} \
                        -Dshader-cache=true \
                        -Dshared-glapi=true \
                        -Dopengl=true \
@@ -81,16 +81,6 @@ if [ "$OPENGLES_SUPPORT" = "yes" ]; then
 else
   PKG_MESON_OPTS_TARGET+=" -Dgles1=false -Dgles2=false"
 fi
-
-# Temporary workaround:
-# Listed libraries are static, while mesa expects shared ones. This breaks the
-# dependency tracking. The following has some ideas on how to address that.
-# https://github.com/LibreELEC/LibreELEC.tv/pull/2163
-pre_configure_target() {
-  if [ "$DISPLAYSERVER" = "x11" ]; then
-    export LIBS="-lxcb-dri3 -lxcb-dri2 -lxcb-xfixes -lxcb-present -lxcb-sync -lxshmfence -lz"
-  fi
-}
 
 post_makeinstall_target() {
   # Similar hack is needed on EGL, GLES* front. Might as well drop it and test the GLVND?
