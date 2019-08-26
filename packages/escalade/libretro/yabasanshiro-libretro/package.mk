@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="yabasanshiro-libretro"
-PKG_VERSION="0d24002"
+PKG_VERSION="9d1dea1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/yabause"
@@ -24,6 +24,6 @@ make_target() {
 
 makeinstall_target() {
   echo $INSTALL $INSTALL
-  mkdir -p $INSTALL/usr/lib/libretro
-  cp yabasanshiro_libretro.so $INSTALL/usr/lib/libretro/
+  mkdir -p $INSTALL/usr/share/retroarch/cores
+  cp yabasanshiro_libretro.so $INSTALL/usr/share/retroarch/cores/
 }

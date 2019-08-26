@@ -53,8 +53,8 @@ make_target() {
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/bin
-  mkdir -p $INSTALL/usr/lib/libretro
-  cp *.so $INSTALL/usr/lib/libretro/mame2016_libretro.so
+  mkdir -p $INSTALL/usr/share/retroarch/cores
+  cp *.so $INSTALL/usr/share/retroarch/cores/mame2016_libretro.so
   mkdir -p $INSTALL/usr/config/retroarch/savefiles/mame2016/hi
   cp metadata/hiscore.dat $INSTALL/usr/config/retroarch/savefiles/mame2016/hi
 }

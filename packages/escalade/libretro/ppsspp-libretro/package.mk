@@ -23,6 +23,6 @@ case $PROJECT in
 esac
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/lib/libretro
-  cp lib/ppsspp_libretro.so $INSTALL/usr/lib/libretro/
+  mkdir -p $INSTALL/usr/share/retroarch/cores
+  cp lib/ppsspp_libretro.so $INSTALL/usr/share/retroarch/cores/
 }

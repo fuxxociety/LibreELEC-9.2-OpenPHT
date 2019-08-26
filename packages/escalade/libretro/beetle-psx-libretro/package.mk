@@ -14,6 +14,6 @@ PKG_SHORTDESC="Standalone port of Mednafen PSX to libretro."
 PKG_MAKE_OPTS_TARGET="HAVE_OPENGL=1 HAVE_VULKAN=1 GIT_VERSION=${PKG_VERSION}"
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/lib/libretro
-  cp *.so $INSTALL/usr/lib/libretro/
+  mkdir -p $INSTALL/usr/share/retroarch/cores
+  cp *.so $INSTALL/usr/share/retroarch/cores/
 }

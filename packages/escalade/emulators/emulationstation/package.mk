@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="emulationstation"
-PKG_VERSION="023e9d8"
+PKG_VERSION="d62758c"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/RetroPie/EmulationStation"
@@ -20,6 +20,11 @@ fi
 if [ "$PROJECT" = "RPi" ]; then
   PKG_DEPENDS_TARGET+=" omxplayer"
 fi
+
+pre_configure_target() {
+  export CFLAGS=`echo $CFLAGS | sed -e "s|-O.|-O3|g"`
+  export CXXFLAGS=`echo $CFLAGS | sed -e "s|-O.|-O3|g"`
+}
 
 makeinstall_target() {  
   mkdir -p $INSTALL/usr/bin

@@ -2,8 +2,8 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="vlc"
-PKG_VERSION="3.0.7.1"
-PKG_SHA256="0655804371096772f06104b75c21cde8a76e3b6c8a2fdadc97914f082c6264f5"
+PKG_VERSION="3.0.8"
+PKG_SHA256="e0149ef4a20a19b9ecd87309c2d27787ee3f47dfd47c6639644bc1f6fd95bdf6"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.videolan.org"
 PKG_URL="http://get.videolan.org/vlc/$PKG_VERSION/vlc-$PKG_VERSION.tar.xz"

@@ -14,8 +14,8 @@ PKG_BUILD_FLAGS="+lto-parallel"
 PKG_CMAKE_OPTS_TARGET="-DLIBRETRO=1"
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/lib/libretro
-  mv *.so $INSTALL/usr/lib/libretro/
+  mkdir -p $INSTALL/usr/share/retroarch/cores
+  mv *.so $INSTALL/usr/share/retroarch/cores/
   mkdir -p $INSTALL/usr/config/retroarch/downloads/Dolphin
   cp -a ../Data/Sys $INSTALL/usr/config/retroarch/downloads/Dolphin/
 }

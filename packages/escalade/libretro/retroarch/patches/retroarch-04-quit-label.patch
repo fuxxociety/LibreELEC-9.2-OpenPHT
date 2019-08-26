@@ -1,0 +1,828 @@
+--- a/intl/msg_hash_ar.h	2019-08-22 16:22:52.000000000 +0200
++++ b/intl/msg_hash_ar.h	2019-08-22 20:42:14.763094817 +0200
+@@ -891,13 +891,8 @@
+       "Overlay next")
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+       "Pause toggle")
+-#ifdef HAVE_LAKKA
+-MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+-      "Restart RetroArch")
+-#else
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+       "Quit RetroArch")
+-#endif
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_RESET,
+       "Reset game")
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_REWIND,
+@@ -2702,13 +2697,8 @@
+       "Show network interface(s) and associated IP addresses.")
+ MSG_HASH(MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
+       "Show information specific to the device.")
+-#ifdef HAVE_LAKKA
+-MSG_HASH(MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+-      "Restart the program.")
+-#else
+ MSG_HASH(MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+       "Quit the program.")
+-#endif
+ MSG_HASH(MENU_ENUM_SUBLABEL_VIDEO_WINDOW_WIDTH,
+       "Set the custom width size for the display window. Leaving it at 0 will attempt to scale the window as large as possible.")
+ MSG_HASH(MENU_ENUM_SUBLABEL_VIDEO_WINDOW_HEIGHT,
+@@ -3382,17 +3372,10 @@
+       "Show Help")
+ MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
+       "Show/hide the 'Help' option.")
+-#ifdef HAVE_LAKKA
+-MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+-      "Show Restart RetroArch")
+-MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+-      "Show/hide the 'Restart RetroArch' option.")
+-#else
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+       "Show Quit RetroArch")
+ MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+       "Show/hide the 'Quit RetroArch' option.")
+-#endif
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_REBOOT,
+       "Show Reboot")
+ MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_REBOOT,
+diff -uNr a/intl/msg_hash_cht.h b/intl/msg_hash_cht.h
+--- a/intl/msg_hash_cht.h	2019-08-22 16:22:52.000000000 +0200
++++ b/intl/msg_hash_cht.h	2019-08-22 20:42:27.006270720 +0200
+@@ -3188,17 +3188,10 @@
+       "顯示 Help")
+ MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
+       "顯示/隱藏 the 'Help' option.")
+-#ifdef HAVE_LAKKA
+-MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+-      "顯示 Restart RetroArch")
+-MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+-      "顯示/隱藏 the 'Restart RetroArch' option.")
+-#else
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+       "顯示 Quit RetroArch")
+ MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+       "顯示/隱藏 the 'Quit RetroArch' option.")
+-#endif
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_REBOOT,
+       "顯示 Reboot")
+ MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_REBOOT,
+diff -uNr a/intl/msg_hash_eo.h b/intl/msg_hash_eo.h
+--- a/intl/msg_hash_eo.h	2019-08-22 16:22:52.000000000 +0200
++++ b/intl/msg_hash_eo.h	2019-08-22 20:44:03.678363823 +0200
+@@ -748,13 +748,8 @@
+       "Overlay next")
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+       "Pause toggle")
+-#ifdef HAVE_LAKKA
+-MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+-      "Restart RetroArch")
+-#else
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+       "Quit RetroArch")
+-#endif
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_RESET,
+       "Reset game")
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_REWIND,
+@@ -1107,13 +1102,8 @@
+       "Present")
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_PRIVACY_SETTINGS,
+       "Privacy")
+-#ifdef HAVE_LAKKA
+-MSG_HASH(MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+-      "Restart RetroArch")
+-#else
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+       "Quit RetroArch")
+-#endif
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_RDB_ENTRY_ANALOG,
+       "Analog supported")
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_RDB_ENTRY_BBFC_RATING,
+@@ -2416,13 +2406,8 @@
+       "Show network interface(s) and associated IP addresses.")
+ MSG_HASH(MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
+       "Show information specific to the device.")
+-#ifdef HAVE_LAKKA
+-MSG_HASH(MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+-      "Restart the program.")
+-#else
+ MSG_HASH(MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+       "Quit the program.")
+-#endif
+ MSG_HASH(MENU_ENUM_SUBLABEL_VIDEO_WINDOW_WIDTH,
+       "Set the custom width size for the display window. Leaving it at 0 will attempt to scale the window as large as possible.")
+ MSG_HASH(MENU_ENUM_SUBLABEL_VIDEO_WINDOW_HEIGHT,
+@@ -3076,17 +3061,10 @@
+       "Show Help")
+ MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
+       "Show/hide the 'Help' option.")
+-#ifdef HAVE_LAKKA
+-MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+-      "Show Restart RetroArch")
+-MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+-      "Show/hide the 'Restart RetroArch' option.")
+-#else
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+       "Show Quit RetroArch")
+ MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+       "Show/hide the 'Quit RetroArch' option.")
+-#endif
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_REBOOT,
+       "Show Reboot")
+ MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_REBOOT,
+diff -uNr a/intl/msg_hash_es.h b/intl/msg_hash_es.h
+--- a/intl/msg_hash_es.h	2019-08-22 16:22:52.000000000 +0200
++++ b/intl/msg_hash_es.h	2019-08-22 20:45:24.100668422 +0200
+@@ -1313,17 +1313,10 @@
+     MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+     "Pausar"
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+-    "Reiniciar RetroArch"
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+     "Cerrar RetroArch"
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_INPUT_META_RESET,
+     "Resetear juego"
+@@ -2116,17 +2109,10 @@
+     MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
+     "MIDI"
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+-    "Reiniciar RetroArch"
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+     "Cerrar RetroArch"
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_RDB_ENTRY_ANALOG,
+     "Soporte de analógico"
+@@ -4967,17 +4953,10 @@
+     MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
+     "Mostrar información especifica del dispositivo"
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+-    "Reiniciar el programa"
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+     "Salir del programa"
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_SUBLABEL_VIDEO_WINDOW_WIDTH,
+     "Establece el ancho de la ventana. Al dejarlo en 0 hará que intente ser lo mas grande posible"
+@@ -6165,16 +6144,6 @@
+     MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
+     "Mostrar/ocultar la opción de 'Ayuda'"
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+-    "Mostrar Reiniciar RetroArch"
+-    )
+-MSG_HASH(
+-    MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+-    "Mostrar/ocultar la opción de 'Reiniciar RetroArch'"
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+     "Mostrar Cerrar RetroArch"
+@@ -6183,7 +6152,6 @@
+     MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+     "Muestrar/Ocultar la opción de 'Cerrar RetroArch'"
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_MENU_SHOW_REBOOT,
+     "Mostrar reiniciar"
+diff -uNr a/intl/msg_hash_fr.h b/intl/msg_hash_fr.h
+--- a/intl/msg_hash_fr.h	2019-08-22 16:22:52.000000000 +0200
++++ b/intl/msg_hash_fr.h	2019-08-22 20:45:54.340282145 +0200
+@@ -1350,17 +1350,10 @@
+          MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+          "Mettre en pause/reprendre"
+          )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-         MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+-         "Redémarrer RetroArch"
+-         )
+-#else
+ MSG_HASH(
+          MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+          "Quitter RetroArch"
+          )
+-#endif
+ MSG_HASH(
+          MENU_ENUM_LABEL_VALUE_INPUT_META_RESET,
+          "Redémarrer le jeu"
+@@ -2189,17 +2182,10 @@
+          MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
+          "MIDI"
+          )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-         MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+-         "Redémarrer RetroArch"
+-         )
+-#else
+ MSG_HASH(
+          MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+          "Quitter RetroArch"
+          )
+-#endif
+ MSG_HASH(
+          MENU_ENUM_LABEL_VALUE_RDB_ENTRY_ANALOG,
+          "Analogique pris en charge"
+@@ -5432,17 +5418,10 @@
+          MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
+          "Affiche les informations spécifiques à l'appareil."
+          )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-         MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+-         "Redémarrer le programme."
+-         )
+-#else
+ MSG_HASH(
+          MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+          "Quitter le programme."
+          )
+-#endif
+ MSG_HASH(
+          MENU_ENUM_SUBLABEL_VIDEO_WINDOW_WIDTH,
+          "Définir une largeur personnalisée pour la fenêtre d'affichage."
+@@ -6653,16 +6632,6 @@
+          MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
+          "Afficher/masquer l'option 'Aide'."
+          )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-         MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+-         "Afficher 'Redémarrer RetroArch'"
+-         )
+-MSG_HASH(
+-         MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+-         "Afficher/masquer l'option 'Redémarrer RetroArch'."
+-         )
+-#else
+ MSG_HASH(
+          MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+          "Afficher 'Quitter RetroArch'"
+@@ -6671,7 +6640,6 @@
+          MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+          "Afficher/masquer l'option 'Quitter RetroArch'."
+          )
+-#endif
+ MSG_HASH(
+          MENU_ENUM_LABEL_VALUE_MENU_SHOW_REBOOT,
+          "Afficher 'Redémarrer'"
+diff -uNr a/intl/msg_hash_ja.h b/intl/msg_hash_ja.h
+--- a/intl/msg_hash_ja.h	2019-08-22 16:22:52.000000000 +0200
++++ b/intl/msg_hash_ja.h	2019-08-22 20:46:37.979725123 +0200
+@@ -1357,17 +1357,10 @@
+    MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+    "一時停止"
+ )
+-#ifdef HAVE_LAKKA
+ MSG_HASH(
+    MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+    "RetroArchを終了"
+ )
+-#else
+-MSG_HASH(
+-   MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+-   "RetroArchを終了"
+-)
+-#endif
+ MSG_HASH(
+    MENU_ENUM_LABEL_VALUE_INPUT_META_RESET,
+    "リセット"
+@@ -2227,12 +2220,6 @@
+    MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
+    "MIDI"
+ )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-   MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+-   "再起動"
+-)
+-#else
+ MSG_HASH(
+    MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+    "終了"
+@@ -2241,7 +2228,6 @@
+    MENU_ENUM_LABEL_VALUE_RESTART_RETROARCH,
+    "再起動"
+ )
+-#endif
+ MSG_HASH(
+    MENU_ENUM_LABEL_VALUE_RDB_ENTRY_DETAIL,
+    "データベースエントリ"
+@@ -5603,12 +5589,6 @@
+    MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
+    "デバイス固有の情報を表示します。"
+ )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-   MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+-   "RetroArchを終了します。"
+-)
+-#else
+ MSG_HASH(
+    MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+    "RetroArchを終了します。"
+@@ -5617,7 +5597,6 @@
+    MENU_ENUM_SUBLABEL_RESTART_RETROARCH,
+    "RetroArchを再起動します。"
+ )
+-#endif
+ MSG_HASH(
+    MENU_ENUM_SUBLABEL_VIDEO_WINDOW_WIDTH,
+    "ウィンドウの幅を指定します。 "
+@@ -6897,16 +6876,6 @@
+    MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
+    "[ヘルプ]オプションを表示/非表示にします。"
+ )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-   MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+-   "[終了]を表示"
+-)
+-MSG_HASH(
+-   MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+-   "[終了]オプションを表示/非表示にします。"
+-)
+-#else
+ MSG_HASH(
+    MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+    "[終了]を表示"
+@@ -6923,7 +6892,6 @@
+    MENU_ENUM_SUBLABEL_MENU_SHOW_RESTART_RETROARCH,
+    "[再起動]オプションを表示/非表示にします。"
+ )
+-#endif
+ MSG_HASH(
+    MENU_ENUM_LABEL_VALUE_MENU_SHOW_REBOOT,
+    "[再起動]を表示"
+diff -uNr a/intl/msg_hash_ko.h b/intl/msg_hash_ko.h
+--- a/intl/msg_hash_ko.h	2019-08-22 16:22:52.000000000 +0200
++++ b/intl/msg_hash_ko.h	2019-08-22 20:47:10.995970652 +0200
+@@ -1349,17 +1349,10 @@
+     MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+     "일시정지 켜기/끄기"
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+-    "RetroArch 재시작"
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+     "RetroArch 종료"
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_INPUT_META_RESET,
+     "게임 초기화"
+@@ -2216,12 +2209,6 @@
+     MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
+     "MIDI"
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+-    "RetroArch 다시 시작"
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+     "RetroArch 종료"
+@@ -2230,7 +2217,6 @@
+     MENU_ENUM_LABEL_VALUE_RESTART_RETROARCH,
+     "RetroArch 다시 시작"
+     )
+-#endif
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_RDB_ENTRY_DETAIL,
+       "데이터베이스 항목")
+ MSG_HASH(MENU_ENUM_SUBLABEL_RDB_ENTRY_DETAIL,
+@@ -5569,12 +5555,6 @@
+     MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
+     "시스템 관련 정보를 표시합니다."
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+-    "프로그램을 재시작합니다."
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+     "프로그램을 종료합니다."
+@@ -5583,7 +5563,6 @@
+     MENU_ENUM_SUBLABEL_RESTART_RETROARCH,
+     "프로그램을 재시작합니다."
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_SUBLABEL_VIDEO_WINDOW_WIDTH,
+     "표시 창의 사용자 너비 크기를 설정합니다. 값을 0으로 두면 최대 크기로 창을 설정합니다."
+@@ -6812,16 +6791,6 @@
+     MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
+     "도움말을 표시/해제합니다."
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+-    "RetroArch 재시작 표시"
+-    )
+-MSG_HASH(
+-    MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+-    "RetroArch 재시작 설정란을 표시/해제합니다."
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+     "RetroArch 나가기 표시"
+@@ -6838,7 +6807,6 @@
+     MENU_ENUM_SUBLABEL_MENU_SHOW_RESTART_RETROARCH,
+     "'RetroArch 다시 시작'옵션을 표시/해제합니다."
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_MENU_SHOW_REBOOT,
+     "재시작 표시"
+diff -uNr a/intl/msg_hash_pl.h b/intl/msg_hash_pl.h
+--- a/intl/msg_hash_pl.h	2019-08-22 16:22:52.000000000 +0200
++++ b/intl/msg_hash_pl.h	2019-08-22 20:47:37.312301797 +0200
+@@ -4053,16 +4053,6 @@
+     MENU_ENUM_LABEL_VALUE_HELP_SEND_DEBUG_INFO,
+     "Wyślij informacje o debugowaniu"
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+-    "Pokaż uruchom ponownie RetroArch"
+-    )
+-MSG_HASH(
+-    MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+-    "Pokaż/ukryj opcję „Uruchom ponownie RetroArch”."
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+     "Pokaż zamknij RetroArch"
+@@ -4079,7 +4069,6 @@
+     MENU_ENUM_SUBLABEL_MENU_SHOW_RESTART_RETROARCH,
+     "Pokaż/ukryj opcję „Uruchom ponownie RetroArch”."
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_RUNTIME_LOG_DIRECTORY,
+     "Dzienniki uruchomia"
+@@ -4168,12 +4157,6 @@
+     MENU_ENUM_SUBLABEL_MENU_SAVESTATE_RESUME,
+     "Automatyczne zamykanie menu i wznawianie bieżącej zawartości po wybraniu „Zapisz stan” lub „Wczytaj stan” z Szybkiego menu. Wyłączenie tego może poprawić wydajność stanu zapisywania na bardzo wolnych urządzeniach."
+     )
+-   #ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+-    "Uruchom ponownie program."
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+     "Zamknij program."
+@@ -4182,7 +4165,6 @@
+     MENU_ENUM_SUBLABEL_RESTART_RETROARCH,
+     "Uruchom ponownie program."
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_SUBLABEL_ONSCREEN_OVERLAY_SETTINGS,
+     "Dopasuj ramki i elementy sterujące na ekranie"
+diff -uNr a/intl/msg_hash_pt_br.h b/intl/msg_hash_pt_br.h
+--- a/intl/msg_hash_pt_br.h	2019-08-22 16:22:52.000000000 +0200
++++ b/intl/msg_hash_pt_br.h	2019-08-22 20:48:20.731748478 +0200
+@@ -1353,17 +1353,10 @@
+     MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+     "Alternar pausa"
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+-    "Reiniciar o RetroArch"
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+     "Sair do RetroArch"
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_INPUT_META_RESET,
+     "Reiniciar jogo"
+@@ -2260,12 +2253,6 @@
+     MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
+     "MIDI"
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+-    "Reiniciar o RetroArch"
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+     "Sair do RetroArch"
+@@ -2274,7 +2261,6 @@
+     MENU_ENUM_LABEL_VALUE_RESTART_RETROARCH,
+     "Reiniciar o RetroArch"
+     )
+-#endif
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_RDB_ENTRY_DETAIL,
+       "Entrada do banco de dados")
+ MSG_HASH(MENU_ENUM_SUBLABEL_RDB_ENTRY_DETAIL,
+@@ -5621,12 +5607,6 @@
+     MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
+     "Exibe informações específicas do dispositivo."
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+-    "Reinicia o programa."
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+     "Sai do programa."
+@@ -5635,7 +5615,6 @@
+     MENU_ENUM_SUBLABEL_RESTART_RETROARCH,
+     "Reinicia o programa."
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_SUBLABEL_VIDEO_WINDOW_WIDTH,
+     "Define a largura personalizada para a janela de exibição."
+@@ -6880,16 +6859,6 @@
+     MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
+     "Exibir ou ocultar a opção 'Ajuda'."
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+-    "Exibir Sair do RetroArch"
+-    )
+-MSG_HASH(
+-    MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+-    "Exibir ou ocultar a opção 'Reiniciar o RetroArch'."
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+     "Exibir Sair do RetroArch"
+@@ -6906,7 +6875,6 @@
+     MENU_ENUM_SUBLABEL_MENU_SHOW_RESTART_RETROARCH,
+     "Exibir ou ocultar a opção 'Reiniciar o RetroArch'"
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_MENU_SHOW_REBOOT,
+     "Exibir Reiniciar"
+diff -uNr a/intl/msg_hash_tr.h b/intl/msg_hash_tr.h
+--- a/intl/msg_hash_tr.h	2019-08-22 16:22:52.000000000 +0200
++++ b/intl/msg_hash_tr.h	2019-08-22 20:48:52.727990428 +0200
+@@ -1361,17 +1361,10 @@
+     MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+     "Pause açma-kapama"
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+-    "RetroArch'ı yeniden başlat"
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+     "RetroArch'dan çık"
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_INPUT_META_RESET,
+     "Oyunu sıfırla"
+@@ -2244,17 +2237,10 @@
+     MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
+     "MIDI"
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+-    "RetroArch'ı Yeniden Başlat"
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+     "RetroArch'dan Çık"
+     )
+-#endif
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_RDB_ENTRY_DETAIL,
+       "Veritabanı Girişi")
+ MSG_HASH(MENU_ENUM_SUBLABEL_RDB_ENTRY_DETAIL,
+@@ -5480,17 +5466,10 @@
+     MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
+     "Aygıta özgü bilgileri gösterir."
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+-    "Programı yeniden başlat."
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+     "Programdan çık."
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_SUBLABEL_VIDEO_WINDOW_WIDTH,
+     "Ekran penceresi için özel genişliği ayarlayın."
+@@ -6701,16 +6680,6 @@
+     MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
+     "'Yardım' seçeneğini göster/gizle."
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+-    "RetroArch'ı Yeniden Başlat'ı göster"
+-    )
+-MSG_HASH(
+-    MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+-    "'RetroArch'ı Yeniden Başlat' seçeneğini gösterin/gizleyin."
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+     "RetroArch'tan Çıkışı Göster"
+@@ -6719,7 +6688,6 @@
+     MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+     "'RetroArch'tan Çık' seçeneğini göster/gizle."
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_MENU_SHOW_REBOOT,
+     "Yeniden Başlat'ı göster"
+diff -uNr a/intl/msg_hash_us.h b/intl/msg_hash_us.h
+--- a/intl/msg_hash_us.h	2019-08-22 16:22:52.000000000 +0200
++++ b/intl/msg_hash_us.h	2019-08-22 20:49:26.134206538 +0200
+@@ -1361,17 +1361,10 @@
+     MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+     "Pause toggle"
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+-    "Restart RetroArch"
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+     "Quit RetroArch"
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_INPUT_META_RESET,
+     "Reset game"
+@@ -2272,12 +2265,6 @@
+     MENU_ENUM_LABEL_VALUE_MIDI_SETTINGS,
+     "MIDI"
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+-    "Restart RetroArch"
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
+     "Quit RetroArch"
+@@ -2286,7 +2273,6 @@
+     MENU_ENUM_LABEL_VALUE_RESTART_RETROARCH,
+     "Restart RetroArch"
+     )
+-#endif
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_RDB_ENTRY_DETAIL,
+       "Database Entry")
+ MSG_HASH(MENU_ENUM_SUBLABEL_RDB_ENTRY_DETAIL,
+@@ -5657,12 +5643,6 @@
+     MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
+     "Show information specific to the device."
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+-    "Restart the program."
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+     "Quit the program."
+@@ -5671,7 +5651,6 @@
+     MENU_ENUM_SUBLABEL_RESTART_RETROARCH,
+     "Restart the program."
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_SUBLABEL_VIDEO_WINDOW_WIDTH,
+     "Set the custom width for the display window."
+@@ -6920,16 +6899,6 @@
+     MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
+     "Show/hide the 'Help' option."
+     )
+-#ifdef HAVE_LAKKA
+-MSG_HASH(
+-    MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+-    "Show Restart RetroArch"
+-    )
+-MSG_HASH(
+-    MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+-    "Show/hide the 'Restart RetroArch' option."
+-    )
+-#else
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+     "Show Quit RetroArch"
+@@ -6946,7 +6915,6 @@
+     MENU_ENUM_SUBLABEL_MENU_SHOW_RESTART_RETROARCH,
+     "Show/hide the 'Restart RetroArch' option."
+     )
+-#endif
+ MSG_HASH(
+     MENU_ENUM_LABEL_VALUE_MENU_SHOW_REBOOT,
+     "Show Reboot"
+diff -uNr a/intl/msg_hash_vn.h b/intl/msg_hash_vn.h
+--- a/intl/msg_hash_vn.h	2019-08-22 16:22:52.000000000 +0200
++++ b/intl/msg_hash_vn.h	2019-08-22 20:49:40.050686362 +0200
+@@ -831,13 +831,8 @@
+       "Overlay next")
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_PAUSE_TOGGLE,
+       "Pause toggle")
+-#ifdef HAVE_LAKKA
+-MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+-      "Restart RetroArch")
+-#else
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
+       "Quit RetroArch")
+-#endif
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_RESET,
+       "Reset game")
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_INPUT_META_REWIND,
+@@ -2578,13 +2573,8 @@
+       "Show network interface(s) and associated IP addresses.")
+ MSG_HASH(MENU_ENUM_SUBLABEL_SYSTEM_INFORMATION,
+       "Show information specific to the device.")
+-#ifdef HAVE_LAKKA
+-MSG_HASH(MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+-      "Restart the program.")
+-#else
+ MSG_HASH(MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
+       "Quit the program.")
+-#endif
+ MSG_HASH(MENU_ENUM_SUBLABEL_VIDEO_WINDOW_WIDTH,
+       "Set the custom width size for the display window. Leaving it at 0 will attempt to scale the window as large as possible.")
+ MSG_HASH(MENU_ENUM_SUBLABEL_VIDEO_WINDOW_HEIGHT,
+@@ -3230,17 +3220,10 @@
+       "Show Help")
+ MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_HELP,
+       "Show/hide the 'Help' option.")
+-#ifdef HAVE_LAKKA
+-MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+-      "Show Restart RetroArch")
+-MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+-      "Show/hide the 'Restart RetroArch' option.")
+-#else
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_QUIT_RETROARCH,
+       "Show Quit RetroArch")
+ MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_QUIT_RETROARCH,
+       "Show/hide the 'Quit RetroArch' option.")
+-#endif
+ MSG_HASH(MENU_ENUM_LABEL_VALUE_MENU_SHOW_REBOOT,
+       "Show Reboot")
+ MSG_HASH(MENU_ENUM_SUBLABEL_MENU_SHOW_REBOOT,

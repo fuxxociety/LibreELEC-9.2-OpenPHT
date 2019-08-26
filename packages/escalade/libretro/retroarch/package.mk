@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="retroarch"
-PKG_VERSION="e536911"
+PKG_VERSION="045a4cc"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch"
@@ -10,6 +10,8 @@ PKG_URL="https://github.com/libretro/RetroArch/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain alsa-lib freetype zlib retroarch-assets retroarch-overlays libretro-core-info retroarch-joypad-autoconfig glsl-shaders ffmpeg libass openal-soft-oem libxkbcommon"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="Reference frontend for the libretro API."
+
+get_graphicdrivers
 
 if [ "$OPENGLES_SUPPORT" = yes ]; then
   PKG_DEPENDS_TARGET+=" $OPENGLES"
@@ -20,20 +22,24 @@ fi
 if [ "$PULSEAUDIO_SUPPORT" = yes ]; then
   PKG_DEPENDS_TARGET+=" pulseaudio"
 else
-  RETROARCH_OPTS="--disable-pulse"
+  RETROARCH_OPTS+=" --disable-pulse"
+fi
+
+if [ ! -z "$VULKAN_DRIVERS" ]; then
+  RETROARCH_OPTS+=" --enable-vulkan"
 fi
 
 case "$PROJECT" in
   Generic)
-    RETROARCH_OPTS+="--enable-kms"
+    RETROARCH_OPTS+=" --enable-kms"
     PKG_DEPENDS_TARGET+=" nvidia-cg-toolkit"
     ;;
   RPi)
-    RETROARCH_OPTS+="--enable-opengles --disable-kms --disable-x11 --disable-opengl1 --disable-opengl_core --enable-neon"
+    RETROARCH_OPTS+=" --enable-opengles --disable-kms --disable-x11 --disable-opengl1 --disable-opengl_core --enable-neon"
     CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
     ;;
   OdroidXU3)
-   RETROARCH_OPTS+="--enable-opengles --enable-kms --disable-x11 --disable-opengl1 --disable-opengl_core --enable-opengles3 --enable-neon"
+   RETROARCH_OPTS+=" --enable-opengles --enable-kms --disable-x11 --disable-opengl1 --disable-opengl_core --enable-opengles3 --enable-neon"
    ;;
 esac
 
@@ -51,10 +57,12 @@ pre_configure_target() {
   cd $PKG_BUILD
   echo $PKG_VERSION > .gitversion
   export PKG_CONF_PATH=$TOOLCHAIN/bin/pkg-config
+  export CFLAGS=`echo $CFLAGS | sed -e "s|-O.|-O3|g"`
+  export CXXFLAGS=`echo $CFLAGS | sed -e "s|-O.|-O3|g"`
 }
 
 make_target() {
-  make V=1 $MAKEFLAGS
+  make V=1 HAVE_LAKKA=1 $MAKEFLAGS
   make -C gfx/video_filters compiler=$CC extra_flags="$CFLAGS" $MAKEFLAGS
   make -C libretro-common/audio/dsp_filters compiler=$CC extra_flags="$CFLAGS" $MAKEFLAGS
 }
@@ -101,7 +109,14 @@ makeinstall_target() {
   echo "quick_menu_show_overlays = \"false\"" >> $INSTALL/etc/retroarch.cfg
   echo "quick_menu_show_rewind = \"false\"" >> $INSTALL/etc/retroarch.cfg
   echo "quick_menu_show_latency = \"false\"" >> $INSTALL/etc/retroarch.cfg
-  
+
+  # Menu
+  sed -i -e "s/# menu_show_core_updater = true/# menu_show_core_updater = false/" $INSTALL/etc/retroarch.cfg
+  sed -i -e "s/# menu_show_online_updater = true/# menu_show_online_updater = false/" $INSTALL/etc/retroarch.cfg
+  echo "menu_show_reboot = \"false\"" >> $INSTALL/etc/retroarch.cfg
+  echo "menu_show_shutdown = \"false\"" >> $INSTALL/etc/retroarch.cfg
+  echo "menu_show_quit_retroarch = \"true\"" >> $INSTALL/etc/retroarch.cfg
+
   # Video
   sed -i -e "s/# video_windowed_fullscreen = true/video_windowed_fullscreen = false/" $INSTALL/etc/retroarch.cfg
   sed -i -e "s/# video_smooth = true/video_smooth = false/" $INSTALL/etc/retroarch.cfg

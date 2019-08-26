@@ -20,6 +20,6 @@ make_target() {
 
 makeinstall_target() {
   echo $INSTALL $INSTALL
-  mkdir -p $INSTALL/usr/lib/libretro
-  cp *.so $INSTALL/usr/lib/libretro/
+  mkdir -p $INSTALL/usr/share/retroarch/cores
+  cp *.so $INSTALL/usr/share/retroarch/cores/
 }

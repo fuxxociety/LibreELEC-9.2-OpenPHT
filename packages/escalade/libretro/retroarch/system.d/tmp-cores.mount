@@ -8,7 +8,7 @@ DefaultDependencies=no
 What=none
 Where=/tmp/cores
 Type=overlay
-Options=lowerdir=/usr/lib/libretro,upperdir=/storage/.config/retroarch/cores,workdir=/storage/.tmp/cores-workdir
+Options=lowerdir=/usr/share/retroarch/cores,upperdir=/storage/.config/retroarch/cores,workdir=/storage/.tmp/cores-workdir
 
 [Install]
 WantedBy=multi-user.target

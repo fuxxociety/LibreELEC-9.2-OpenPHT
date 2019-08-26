@@ -32,6 +32,6 @@ make_target() {
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/lib/libretro
-  cp mame2010_libretro.so $INSTALL/usr/lib/libretro/
+  mkdir -p $INSTALL/usr/share/retroarch/cores
+  cp mame2010_libretro.so $INSTALL/usr/share/retroarch/cores/
 }

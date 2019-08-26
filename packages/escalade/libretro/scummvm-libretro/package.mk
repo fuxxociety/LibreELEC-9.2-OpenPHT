@@ -33,6 +33,6 @@ make_target() {
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/lib/libretro
-  cp backends/platform/libretro/build/*.so $INSTALL/usr/lib/libretro/
+  mkdir -p $INSTALL/usr/share/retroarch/cores
+  cp backends/platform/libretro/build/*.so $INSTALL/usr/share/retroarch/cores/
 }
