@@ -10,7 +10,7 @@
         #               athlon-fx amdfam10 barcelona
         # (Intel CPUs)  atom core2 nocona
         #
-        TARGET_CPU="x86-64"
+        TARGET_CPU="silvermont"
         TARGET_FEATURES="64bit"
         ;;
     esac
@@ -75,7 +75,7 @@
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
-    FIRMWARE="misc-firmware wlan-firmware iwlwifi-firmware"
+    FIRMWARE="misc-firmware wlan-firmware dvb-firmware iwlwifi-firmware"
 
   # additional drivers to install:
   # for a list of additional drivers see packages/linux-drivers
