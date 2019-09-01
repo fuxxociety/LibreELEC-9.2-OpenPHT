@@ -16,18 +16,11 @@ PKG_STAMP="$KERNEL_TARGET $KERNEL_MAKE_EXTRACMD"
 PKG_PATCH_DIRS="$LINUX"
 
 case "$LINUX" in
-  odroidxu3-5.0)
-    PKG_VERSION="876a55d" # 5.0.3
-    PKG_SHA256="551f229051334d89a91d0c172661925ef7ea11b91f5f299cd4ffcb872b6330de"
-    PKG_URL="https://github.com/mihailescu2m/linux/archive/$PKG_VERSION.tar.gz"
-    PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
-    PKG_BUILD_PERF="no"
-    ;;
   odroidxu3-4.14)
     PKG_VERSION="4.14.133-165"
     PKG_SHA256="fe3a1c1d8e86d84deda75c7d0694a2403f0752066f4433c436c32f9fb9f41ee6"
     PKG_URL="https://github.com/hardkernel/linux/archive/$PKG_VERSION.tar.gz"
-    PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
+    PKG_SOURCE_NAME="odroidxu3-$PKG_VERSION.tar.gz"
     PKG_BUILD_PERF="no"
     ;;
   rockchip-4.4)
@@ -37,16 +30,16 @@ case "$LINUX" in
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     ;;
   raspberrypi)
-    PKG_VERSION="cf9b886fbdb1f7a90484d8f5f28c5327f17c8487" # 5.2.8
-    PKG_SHA256="c46905f19a20ed85c854546d1a605d4d04b373f6d3df34e9a16241fd2bb17249"
+    PKG_VERSION="6fb3046ebed3b581bf7ae971a69eaf79e0561667" # 5.2.11
+    PKG_SHA256="8266f31f3370002e89d8004afcc75bfababf7c8b9c5ea9958f3282575f0ba760"
     PKG_URL="https://github.com/raspberrypi/linux/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     PKG_BUILD_PERF="no"
     ;;
   *)
-    PKG_VERSION="5.3-rc6"
-    PKG_SHA256="2f36395519fe01d8a9c81afd6bd1cfa81f893dd9e28db89164262e413224d060"
-PKG_URL="https://git.kernel.org/torvalds/t/linux-$PKG_VERSION.tar.gz"
+    PKG_VERSION="5.2.11"
+    PKG_SHA256="0c2a831f993dc8a8a8e1ca4186b467de72ff173c6f5855e2aab70f6f7fb033f9"
+    PKG_URL="https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.2.11.tar.xz"
     PKG_PATCH_DIRS="default"
     PKG_BUILD_PERF="no"
     ;;
