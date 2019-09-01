@@ -1,0 +1,390 @@
+diff --git a/firmware/edid/1024x600.bin b/firmware/edid/1024x600.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..fd22361c4a86c3ea6150b4a91ed5f6dead8f1946
+GIT binary patch
+literal 128
+zcmZSh4+ad1ISgRHBhAR1t1MFSD(=9NNUs^H3IQQN@x%j+C}4vygM(v)q=H0;FhlYM
+y0R{#cprZc_KACx?6$;7*Tnaz{6#2_wZL6Zj#sKDnMgA}t8W@>Wm>EFTgaH6No*V%H
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1024x768.bin b/firmware/edid/1024x768.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..bae478cead8bc655c2a5d9531b630cb666acf111
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952S6Qm!RosCkkzO-Y6#_ySI2aNg7*RlqB!hz^gPH-y1T%(Y
+wE<pwc383cx3_h88r4<Uw23!h202KMlU~Q{!$j$)fgGK&8)kL^Ef&>{t0Sq=A0RR91
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1152x864_75hz.bin b/firmware/edid/1152x864_75hz.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..49c9110d7ab3efed4cf471e395b3efdd09a85c2a
+GIT binary patch
+literal 128
+zcmZSh4+ad1ISgRHBhAR1t07nMD(=9NNUs^H3IQQN@j`z_6u_+6Fu^fF&A_8Um|=pB
+yAOnL8P|<$|pUk|{3I$~YE(IU}iu`5p@^NzEW&rcSB7YbR4NZ+IEX+(GYP10}xEuih
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1280x1024.bin b/firmware/edid/1280x1024.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..b4d16341a27e753641ca62e9a6cc16055656545d
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952S4X+xRosCkkzO-Y6#_zl;*AZAD8N9AVMZW>mV-foFvFf?
+xK?VjnprZc_KACx?6$;7*Tnaz{6#2_wZENSi%>d?uMgBn51V^|#0!0}X004Dp9svLV
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1280x720.bin b/firmware/edid/1280x720.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..1631cd184db9b3832c6052b413484af5ec1c49dc
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952S5c_qRosCkkzO-Y6#_zl;*AFwQGqN&L*NA&1&0Px2H)KR
+t3=DEWMgJLmGV@9+6qF6P6o3FI@|VHdR$G^Y0n7)B{DG?RaDk|q0sxkz9svLV
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1280x768.bin b/firmware/edid/1280x768.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..139191261c6418418dfac28f8602678e2ac8c8bc
+GIT binary patch
+literal 128
+zcmZSh4+ad1ISgRHBhAR1t0+?OD(=9NNUs^H3IQQN@x}v;D8NsiVL~8-w1Gp1FoW+2
+z0R{#cprZc_KACx?6$;7*Tnaz{6#2_wZL4R%$pGeqMgA}t8d(@rn44KZ)HnbDJRuwb
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1280x800.bin b/firmware/edid/1280x800.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..d7c59430b572232172a33b657680bd158cc4b4f2
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952S5c(mRosCkkzO-Y6#_zl;*AFwQNSK)h6Mo%;syo^W(>X;
+u1Q;0PfQtSz_+;jlRwyVNa47%*P~<OzwXJ~>2LqT77Wo5J<KY5PvmOAG2Oa?c
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1360x768.bin b/firmware/edid/1360x768.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..a6502e171e4782424f75d18313711508f4731f46
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952S6QUuRosCkkzO-Y6#_zl;@t-rQGm2!z=A*qX#<A|!VF0#
+z1Q-}(fQtSz_+;jlRwyVNa47%*P~<OzwXL23Cj*!d7Wu<qXl!OsVQyvtQBw&3i31%0
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1366x768.bin b/firmware/edid/1366x768.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..bfdd83fdddefb233ea3cab01ecca291158b49b99
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952S6QUuRosCkkzO-Y6#_zl;@u34D4<I*Y(pS}w1L+IVTR-r
+z0t^f?Kt=x<d@}P&D-@IsxD<c@DDs!V+E&kilL5>Ji~M0QG&VD<FgLS+s96jEZ@nD>
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1400x1050.bin b/firmware/edid/1400x1050.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..61627d0669ebfb7775efc361c6ac2762896f4c9c
+GIT binary patch
+literal 128
+zcmZSh4+ad1ISgRHBhAR1t0G<TD(=9NNUs^H3IQQN@d*x$C}4$t#e+a81&4?kIt)32
+zf(#6DKt=x<d@}P&D-@IsxD<c@DDs!V+ScBYmjTQNi~M0QG%+x!Ff=d)D`Kbw0Bx5Y
+A0RR91
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1440x900.bin b/firmware/edid/1440x900.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..03f96af1ba3bc8ab09d58f8618107f8ca17fdf26
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952S5>^?RosCkkzO-Y6#_zl;!_VWqJY&(3l;>lNEsL?m@$;U
+u5@2AE11kE@;FFnGTA`q9z@-2LK#{);*0yFAoD5(-SmX~>jfV?FjT->;P9FgP
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1600x1200.bin b/firmware/edid/1600x1200.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..369fc35a6464431d3c02fadf1a83c62775e16161
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952*IcvWRosCkkzO-Y6#_zl;wv2(QNR;B2ZN*yS`HZ-gc-CK
+zC^9g}02Tdb@X5?8tx!-l;8FkrpvYeaYg<omK?X1%Eb@oJ(9FP~!qCV7tcbx90NI%y
+A0RR91
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1600x900.bin b/firmware/edid/1600x900.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..02023c6ae60791153f4715d3647100a7492994bb
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952S5v&=RosCkkzO-Y6#_zl;wuj@qJSDb2Z5v(1%reY!VC*u
+y2{16o02Tdb@X5?8tx!-l;8FkrpvYeaYg;o59tJQUEb@oJ(9FP~!qNb$#t#77FdhK_
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1680x1050.bin b/firmware/edid/1680x1050.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..3b2a3b050c482c3dae2736b2d96884c4d24e1824
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952S6jN`RosCkkzO-Y6#_zl;+q*5QGlZ51cM|gb%%@%W(->e
+y1sNFRfQtSz_+;jlRwyVNa47%*P~<OzwXK5_KLeN#7Wo5J6CNDl?#QLUpauYeFdhK_
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1792x1344.bin b/firmware/edid/1792x1344.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..baf8143d3687eef83e798689e4b0edbe2fd7172d
+GIT binary patch
+literal 128
+zcmZSh4+ad1ISgRHBhAR1tEXJ?D(=9NNUs^H3IQQN@q-SGD1ae=VM39EQ9#29VTMa_
+zf(#5YKt=x<d@}P&D-@IsxD<c@DDs!V+BPUelmW~Ki~M0QG`BRWFf=wX0SPj^0sw^-
+B9svLV
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1920x1080.bin b/firmware/edid/1920x1080.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..e90256c4fd2c6518f87b82cecc7a8cf738677e76
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952*GQ(~RosCkkzO-Y6#_zl;ujAvq5vkV28luoU55xASB5W=
+wf(#6DKt=x<d@}P&D-@IsxD<c@DDs!V+SbX1p8?DVi~NDAar1Bi2{Nz(0Jtq40RR91
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1920x1080_23_976hz.bin b/firmware/edid/1920x1080_23_976hz.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..cd865e4b1c5fb2cb832a4057687158cc014e2bf4
+GIT binary patch
+literal 128
+zcmZSh4+ad1ISgRHBhAR1Ya~<gD(=9NNUs^H3IQQN@r!d9QNT}`2D@SlU57dy*M={W
+zf(#6DKt=x<d@}P&D-@IsxD<c@DDsy<TvAe+g8|G3i~M0Qv@|lPFf_0LD`MyX0Lzpf
+A0RR91
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1920x1080_24hz.bin b/firmware/edid/1920x1080_24hz.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..4856bd5399257872c4debcc0af450fc78217ddc6
+GIT binary patch
+literal 128
+zcmZSh4+ad1ISgRHBhAR1Ya~<gD(=9NNUs^H3IQQN@r!d9QGslOU9p9(L!FLm!xu?G
+z1_n8xqW=s&nR%rZ3d#mt3P1o9`O6?KDJ8?f0Oo^5{xBF?8W~g=8d!i8G1LM8gkK#2
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1920x1080_50hz.bin b/firmware/edid/1920x1080_50hz.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..cc1b5fb16a8194ba89da38182375b8b434d43cce
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952*GQ(~RosCkkzO-Y6#_zl;up6uq5vkVh6_a&x()(5t_)u!
+w1sNFRfQtSz_+;jlRwyVNa47%*P~<Ozp|QCoKLeN#7Wo5J<L2Q45@a|50MQE{0RR91
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1920x1200_30hz.bin b/firmware/edid/1920x1200_30hz.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..b2b13db1d670609af32dfa7c22ffdba6d10fe422
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952*GRtNRosCkkzO-Y6#_zl;ujw=q5yv727#gtq7EJhgc-hA
+z2r@9p02Tdb@X5?8tx!-l;8FkrpvYeaS$SnuP6jX^Eb@oJ(9+1D!qCV7tcYPQ0NZgM
+A0RR91
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1920x1200_60hz.bin b/firmware/edid/1920x1200_60hz.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..74bd878e232c66111c9f5230e41e221c2894e081
+GIT binary patch
+literal 128
+zcmZSh4+ad1ISgRHBhAR1Yb0OsD(=9NNUs^H3IQQN@rw+MC_uxeVL`zLWd}7aHHI%1
+zf(#5&Kt=x<d@}P&D-@IsxD<c@DDs!V+Sb!sfC0=0i~M0Qv@|lPFf=j%D`Kz&0C;2_
+A0RR91
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/1920x800.bin b/firmware/edid/1920x800.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..dda7700f92edbadc6a874a9cc56fb4ce3570b738
+GIT binary patch
+literal 128
+zcmZSh4+ad1ISgRHBhAR1Ya~+fD(=9NNUs^H3IQQN@rwr-Q2@VTLqd^)j6uc;VTLak
+y1Q-}(fQtSz_+;jlRwyVNa47%*P~<OzwXJ~>F9Vnl7Wu<qXlZ0nVPODOlMVpDi5>v}
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/480x800.bin b/firmware/edid/480x800.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..87f7e8f7fcaa1b4c0f42925d842cad4484081edf
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952S3tVrRosCkkzO-Y6#_zl;<ASrQ9uLFg9ZTwT>}k+%M8mz
+z85tNPfQtSz_+;jlRwyVNa47%*P~<Ozt-Y}+3j>%B7Wu<qVqs8WVE|F0z|aE#gZ3Q(
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/640x480.bin b/firmware/edid/640x480.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..4b8d85a269af73bf95c4b37964a01582c75bc1af
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952S4^PdRosCkkzO-Y6#_ySI2a5a7*W6t&V~gF4|D|t5*9Js
+wTL#o90mT0qd@}P&D-@IsxD<c@DDs!V+Ez}1nE}iPi~NDAiEwuW2{QBn0L8-}0RR91
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/720x480.bin b/firmware/edid/720x480.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..e7f5cbb1c53af80d152039a127f6522b3d40207f
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952S5lzjRosCkkzO-Y6#_zl;?@p~D4>VyLYKk=T>$~R`3%37
+u0ToC9@qY%N%)HVH1!V&+1t0*5{AIAVl~Z750Q12jf1qk2+#NxJ42uE3+8+S`
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/720x576.bin b/firmware/edid/720x576.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..2101a4995594b21c375e19d29215331d71de9ab7
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952SBSsjRosCkkzO-Y6#_zl;?@p~D4>Vy!UhEg5d{ecHHO{O
+vfC}V*_&<YBW?pH9g0caZ0uTU2{xVqG%E~h{fcapNKTtKn5$=vaQHHGmZABgd
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/800x480.bin b/firmware/edid/800x480.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..5bed2708823c2d58bd680d7bb078341f33a16859
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952SA?hHRosCkkzO-Y6#_zl;;wrcQ9uuu!U2N^!U7T=Rty(v
+zfePe+_&<YBW?pH9g0caZ0uTU2{xVotNy#uXfcapNKMejZLH?dD3T1{ML5BMPmarZH
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/800x600.bin b/firmware/edid/800x600.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..74204c27b43ab5fe6629a56fe9b8dc8161e687c5
+GIT binary patch
+literal 128
+zcmZSh4+ac|HyFTxRg952S6ZavRosCkkzO-Y6#_zl;;s&iC}07<!U}^383m07Q3lZq
+w0t^fiKt=x<d@}P&D-@IsxD<c@DDs!V+Ezo0l>y8Li~NDAiEwuW2{L#A08mIB0RR91
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/848x480.bin b/firmware/edid/848x480.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..48cea801e011a53ca12ceaceffe58e59352b3661
+GIT binary patch
+literal 128
+zcmZSh4+ad1ISgRHBhAR1D=Sd(D(=9NNUs^H3IQQNaqk0+D8QE|;DW&eK>>jXVFtBj
+z0t^f?Kt=x<d@}P&D-@IsxD<c@DDs!V+Ezx6g#pY5i~M1*FtMmGv4AL1VDJY3LA@LS
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/480x272.bin b/firmware/edid/480x272.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..a1cb28e133d9901efe6e9fc9d0659ac75840cd04
+GIT binary patch
+literal 128
+zcmZSh4+ad1ISgRHBhAR%Ai!DiD(=9NNUs^H3IQQNaajjO6mWy{frFsHUxA90c7|nf
+xKm`&&{GY)mGq1ElLD_&y0SJI1e;KT8<rJ71z<jXC9|jW(g9;;aBZv?~F#vAh9RUCU
+
+literal 0
+HcmV?d00001
+
+diff --git a/firmware/edid/480x320.bin b/firmware/edid/480x320.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..1dc62233ca16c5ae03c8db373db574e351ea0602
+GIT binary patch
+literal 128
+zcmZSh4+ad1ISgRHBhAR1E5KdxD(=9NNUs^H3IQQNaoGcmDBuR?0|!BevjP<<9SqCz
+xfeIvm_&<YBW?pH9g0caZ0uTU2{xVqG$|*22fcapNKMW=o1{KCe5G4u>KLD8d9svLV
+
+literal 0
+HcmV?d00001
+
+--- a/firmware/Makefile	2019-08-29 18:04:47.329596220 +0200
++++ b/firmware/Makefile	2019-08-29 18:04:47.329596220 +0200
+@@ -0,0 +1,40 @@
++# SPDX-License-Identifier: GPL-2.0
++
++# Create $(fwdir) from $(CONFIG_EXTRA_FIRMWARE_DIR) -- if it doesn't have a
++# leading /, it's relative to $(srctree).
++fwdir := $(subst $(quote),,$(CONFIG_EXTRA_FIRMWARE_DIR))
++fwdir := $(addprefix $(srctree)/,$(filter-out /%,$(fwdir)))$(filter /%,$(fwdir))
++
++obj-y  := $(addsuffix .gen.o, $(subst $(quote),,$(CONFIG_EXTRA_FIRMWARE)))
++
++FWNAME    = $(patsubst $(obj)/%.gen.S,%,$@)
++FWSTR     = $(subst /,_,$(subst .,_,$(subst -,_,$(FWNAME))))
++ASM_WORD  = $(if $(CONFIG_64BIT),.quad,.long)
++ASM_ALIGN = $(if $(CONFIG_64BIT),3,2)
++PROGBITS  = $(if $(CONFIG_ARM),%,@)progbits
++
++filechk_fwbin = \
++	echo "/* Generated by $(src)/Makefile */"		;\
++	echo "    .section .rodata"				;\
++	echo "    .p2align $(ASM_ALIGN)"			;\
++	echo "_fw_$(FWSTR)_bin:"				;\
++	echo "    .incbin \"$(fwdir)/$(FWNAME)\""		;\
++	echo "_fw_end:"						;\
++	echo "    .section .rodata.str,\"aMS\",$(PROGBITS),1"	;\
++	echo "    .p2align $(ASM_ALIGN)"			;\
++	echo "_fw_$(FWSTR)_name:"				;\
++	echo "    .string \"$(FWNAME)\""			;\
++	echo "    .section .builtin_fw,\"a\",$(PROGBITS)"	;\
++	echo "    .p2align $(ASM_ALIGN)"			;\
++	echo "    $(ASM_WORD) _fw_$(FWSTR)_name"		;\
++	echo "    $(ASM_WORD) _fw_$(FWSTR)_bin"			;\
++	echo "    $(ASM_WORD) _fw_end - _fw_$(FWSTR)_bin"
++
++$(obj)/%.gen.S: FORCE
++	$(call filechk,fwbin)
++
++# The .o files depend on the binaries directly; the .S files don't.
++$(addprefix $(obj)/, $(obj-y)): $(obj)/%.gen.o: $(fwdir)/%
++
++targets := $(patsubst $(obj)/%,%, \
++                                $(shell find $(obj) -name \*.gen.S 2>/dev/null))

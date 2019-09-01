@@ -52,8 +52,8 @@
     KERNEL_MAKE_EXTRACMD="dtbs"
 
   # Kernel to use. values can be:
-  # odroidxu3-4.14 odroidxu3-5.0
-    LINUX="odroidxu3-5.0"
+  # default odroidxu3-4.14
+    LINUX="default"
 
 
 ################################################################################
