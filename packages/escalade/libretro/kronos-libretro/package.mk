@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="kronos-libretro"
-PKG_VERSION="4a43d31"
+PKG_VERSION="d234e45"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/yabause"
@@ -15,7 +15,7 @@ PKG_TOOLCHAIN="make"
 make_target() {
   cd $PKG_BUILD/yabause/src/libretro
   make CC=$HOST_CC generate-files
-  make GIT_VERSION=$PKG_VERSION FORCE_GLES=1
+  make GIT_VERSION=$PKG_VERSION
 }
 
 makeinstall_target() {

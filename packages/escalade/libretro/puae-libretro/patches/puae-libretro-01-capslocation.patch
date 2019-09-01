@@ -1,0 +1,53 @@
+--- a/sources/src/caps/caps.c	2019-08-28 02:25:56.000000000 +0200
++++ b/sources/src/caps/caps.c	2019-08-28 10:43:43.356360001 +0200
+@@ -27,20 +27,11 @@
+ 
+ #include "uae_dlopen.h"
+ 
+-#ifdef __LIBRETRO__
+-#include "retro_files.h"
+-extern char *retro_system_directory;
+-char CAPSLIB_PATH[RETRO_PATH_MAX];
+-#endif
+-
+ #ifdef _WIN32
+ #define CAPSLIB_NAME    "capsimg.dll"
+-#define DIR_SEP_CHR     '\\'
+ #else
+ #define CAPSLIB_NAME    "capsimg.so"
+-#define DIR_SEP_CHR     '/'
+ #endif
+-
+ /*
+  * Repository for function pointers to the CAPSLib routines
+  * which gets filled when we link at run-time
+@@ -72,14 +63,8 @@
+ static int load_capslib (void)
+ {
+     /* This could be done more elegantly ;-) */
+-
+-#ifdef __LIBRETRO__
+-    snprintf(CAPSLIB_PATH, RETRO_PATH_MAX, "%s%c%s", retro_system_directory, DIR_SEP_CHR, CAPSLIB_NAME);
+-    if ((capslib.handle = uae_dlopen(CAPSLIB_PATH))) {
+-#else
+     if ((capslib.handle = uae_dlopen(CAPSLIB_NAME))) {
+-#endif
+-    write_log (CAPSLIB_NAME " opened\n");
++    write_log (CAPSLIB_NAME " opened\n.");
+ 	capslib.CAPSInit            = uae_dlsym (capslib.handle, "CAPSInit");            if (capslib.CAPSInit == NULL) return 0;
+ 	capslib.CAPSExit            = uae_dlsym (capslib.handle, "CAPSExit");            if (capslib.CAPSExit == NULL) return 0;
+ 	capslib.CAPSAddImage        = uae_dlsym (capslib.handle, "CAPSAddImage");        if (capslib.CAPSAddImage == NULL) return 0;
+@@ -94,11 +79,11 @@
+ 	capslib.CAPSUnlockAllTracks = uae_dlsym (capslib.handle, "CAPSUnlockAllTracks"); if (capslib.CAPSUnlockAllTracks == NULL) return 0;
+ 	capslib.CAPSGetPlatformName = uae_dlsym (capslib.handle, "CAPSGetPlatformName"); if (capslib.CAPSGetPlatformName == NULL) return 0;
+ 	capslib.CAPSGetVersionInfo  = uae_dlsym (capslib.handle, "CAPSGetVersionInfo");  if (capslib.CAPSGetVersionInfo == NULL) return 0;
+-	if (capslib.CAPSInit() != imgeOk)
+-		write_log ("Error while opening " CAPSLIB_NAME "\n");
++	if (capslib.CAPSInit() == imgeOk)
++		write_log ("Error while opening " CAPSLIB_NAME "\n.");
+ 	    return 1;
+     }
+-    write_log ("Unable to open " CAPSLIB_NAME "\n");
++    write_log ("Unable to open " CAPSLIB_NAME "\n.");
+     return 0;
+ }

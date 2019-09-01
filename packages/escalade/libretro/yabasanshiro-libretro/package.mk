@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="yabasanshiro-libretro"
-PKG_VERSION="9d1dea1"
+PKG_VERSION="9ab8975"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/yabause"
@@ -17,7 +17,7 @@ make_target() {
   make CC=$HOST_CC generate-files
   case $PROJECT in
     OdroidXU3)
-      make GIT_VERSION=$PKG_VERSION platform=odroid BOARD=ODROID-XU4
+      make GIT_VERSION=$PKG_VERSION platform=odroid BOARD=ODROID-XU4 DYNAREC_DEVMIYAX=1
       ;;
   esac
 }
