@@ -13,6 +13,11 @@ PKG_BUILD_FLAGS="+lto-parallel"
 
 PKG_CMAKE_OPTS_TARGET="-DLIBRETRO=1"
 
+pre_configure_target() {
+  export CFLAGS=`echo $CFLAGS | sed -e "s|-O.|-O3|g"`
+  export CXXFLAGS=`echo $CFLAGS | sed -e "s|-O.|-O3|g"`
+}
+
 makeinstall_target() {
   mkdir -p $INSTALL/usr/share/retroarch/cores
   mv *.so $INSTALL/usr/share/retroarch/cores/

@@ -2,8 +2,8 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="chdman"
-PKG_VERSION="ad45c9c"
-PKG_SHA256="00f5f5e4abdb705cbf9341b6c24e21061c288569f554979a0cff36f3e5c70315"
+PKG_VERSION="17e43da"
+PKG_SHA256="60c19769440e3470134a8637fe44175ab991e81cff1c5bee6b581e48a6e33428"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://www.mamedev.org"
