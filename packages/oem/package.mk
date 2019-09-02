@@ -66,9 +66,9 @@ post_install() {
     # Install custom file structure
     cp -PR $PKG_DIR/kodi/filesystem/* $INSTALL
     # Don't start Kodi automatically
-    rm $INSTALL/usr/lib/systemd/system/kodi.target.wants/kodi.service
-    rm $INSTALL/usr/lib/systemd/system/kodi.service.wants/kodi-autostart.service
-    sed -i '/Install/,+1 d' $INSTALL/usr/lib/systemd/system/kodi.target
+    rm -f $INSTALL/usr/lib/systemd/system/kodi.target.wants/kodi.service
+    rm -f $INSTALL/usr/lib/systemd/system/kodi.service.wants/kodi-autostart.service
+    sed -i '/Install/,+1 d' $INSTALL/usr/lib/systemd/system/kodi.target || true
     # Add custom addons to the image addon manifest
     if [ -n "$IMAGE_ADDONS" ]; then
       KODI_ADDON_MANIFEST="$BUILD/image/system/usr/share/kodi/system/addon-manifest.xml"
@@ -84,6 +84,6 @@ post_install() {
   fi
   # We use our own autostart service
   enable_service oem-autostart.service
-  # The frontend service will start $FRONTEND.service
-  echo -e "# The name of the systemd unit that will start a graphical frontend \nFRONTEND=$FRONTEND" > $INSTALL/usr/config/frontend.conf
+  # Set the default frontend
+  sed -i -e "s/@DEFAULT@/DEFAULT=\"${FRONTEND}\"/" $INSTALL/usr/bin/frontend.sh
 }

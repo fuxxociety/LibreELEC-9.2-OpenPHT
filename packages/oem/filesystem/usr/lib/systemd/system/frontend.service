@@ -4,8 +4,7 @@ After=multi-user.target
 
 [Service]
 Type=oneshot
-EnvironmentFile=/storage/.config/frontend.conf
-ExecStart=systemctl start $FRONTEND
+ExecStart=/usr/bin/frontend.sh
 RemainAfterExit=yes
 
 [Install]
