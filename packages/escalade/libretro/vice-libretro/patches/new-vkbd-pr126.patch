@@ -1,0 +1,461 @@
+From 2cbfd7bb344a92032f0ae61e8f898e4780674a19 Mon Sep 17 00:00:00 2001
+From: Tony Jansson <tony@pihaus.org>
+Date: Mon, 2 Sep 2019 23:45:16 +0300
+Subject: [PATCH 1/2] New VKBD layout
+
+---
+ libretro/libretro-core.h                      |  2 +-
+ libretro/nukleargui/app.c                     |  4 +-
+ libretro/nukleargui/nuklear/style.c           | 28 +++++-----
+ .../nukleargui/retro/nuklear_retro_soft.h     | 21 ++++----
+ libretro/nukleargui/vkboard.i                 | 31 ++++++++---
+ libretro/vkbd.i                               | 53 +++++++++++--------
+ vice/src/arch/libretro/retrostubs.c           | 43 +++++++++++++--
+ 7 files changed, 121 insertions(+), 61 deletions(-)
+
+diff --git a/libretro/libretro-core.h b/libretro/libretro-core.h
+index 384bc46f0..8e49d0bea 100644
+--- a/libretro/libretro-core.h
++++ b/libretro/libretro-core.h
+@@ -54,7 +54,7 @@
+ 
+ 
+ //VKBD
+-#define NPLGN 10
++#define NPLGN 11
+ #define NLIGN 7
+ #define NLETT 5
+ 
+diff --git a/libretro/nukleargui/app.c b/libretro/nukleargui/app.c
+index 4a6218d72..b4b7a3ec5 100644
+--- a/libretro/nukleargui/app.c
++++ b/libretro/nukleargui/app.c
+@@ -63,8 +63,8 @@ int app_init()
+ #endif
+ 
+     RSDL_font = (nk_retro_Font*)calloc(1, sizeof(nk_retro_Font));
+-    RSDL_font->width = 7;
+-    RSDL_font->height = 8;
++    RSDL_font->width = 6;
++    RSDL_font->height = 7;
+     if (!RSDL_font)
+         return -1;
+ 
+diff --git a/libretro/nukleargui/nuklear/style.c b/libretro/nukleargui/nuklear/style.c
+index dbb53eb24..01e119e6e 100644
+--- a/libretro/nukleargui/nuklear/style.c
++++ b/libretro/nukleargui/nuklear/style.c
+@@ -26,8 +26,8 @@ set_style(struct nk_context *ctx, enum theme theme)
+         table[NK_COLOR_SELECT_ACTIVE] = nk_rgba(48, 83, 111, 255);
+         table[NK_COLOR_SLIDER] = nk_rgba(50, 58, 61, 255);
+         table[NK_COLOR_SLIDER_CURSOR] = nk_rgba(48, 83, 111, 245);
+-        table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(53, 88, 116, 255);
+-        table[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgba(58, 93, 121, 255);
++        table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(89, 79, 78, 255); // datasette
++        table[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgba(128, 0, 0, 255); // reset
+         table[NK_COLOR_PROPERTY] = nk_rgba(144, 141, 129, 255); // hotkeys
+         table[NK_COLOR_EDIT] = nk_rgba(50, 58, 61, 225);
+         table[NK_COLOR_EDIT_CURSOR] = nk_rgba(210, 210, 210, 255);
+@@ -56,8 +56,8 @@ set_style(struct nk_context *ctx, enum theme theme)
+         table[NK_COLOR_SELECT_ACTIVE] = nk_rgba(48, 83, 111, 255);
+         table[NK_COLOR_SLIDER] = nk_rgba(50, 58, 61, 255);
+         table[NK_COLOR_SLIDER_CURSOR] = nk_rgba(48, 83, 111, 245);
+-        table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(53, 88, 116, 255);
+-        table[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgba(58, 93, 121, 255);
++        table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(109, 99, 98, 255); // datasette
++        table[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgba(128, 0, 0, 255); // reset
+         table[NK_COLOR_PROPERTY] = nk_rgba(144, 141, 124, 255); // hotkeys
+         table[NK_COLOR_EDIT] = nk_rgba(50, 58, 61, 225);
+         table[NK_COLOR_EDIT_CURSOR] = nk_rgba(210, 210, 210, 255);
+@@ -86,8 +86,8 @@ set_style(struct nk_context *ctx, enum theme theme)
+         table[NK_COLOR_SELECT_ACTIVE] = nk_rgba(48, 83, 111, 255);
+         table[NK_COLOR_SLIDER] = nk_rgba(50, 58, 61, 255);
+         table[NK_COLOR_SLIDER_CURSOR] = nk_rgba(48, 83, 111, 245);
+-        table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(53, 88, 116, 255);
+-        table[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgba(58, 93, 121, 255);
++        table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(89, 79, 78, 192); // datasette
++        table[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgba(128, 0, 0, 192); // reset
+         table[NK_COLOR_PROPERTY] = nk_rgba(144, 141, 129, 192); // hotkeys
+         table[NK_COLOR_EDIT] = nk_rgba(50, 58, 61, 225);
+         table[NK_COLOR_EDIT_CURSOR] = nk_rgba(210, 210, 210, 255);
+@@ -116,8 +116,8 @@ set_style(struct nk_context *ctx, enum theme theme)
+         table[NK_COLOR_SELECT_ACTIVE] = nk_rgba(48, 83, 111, 255);
+         table[NK_COLOR_SLIDER] = nk_rgba(50, 58, 61, 255);
+         table[NK_COLOR_SLIDER_CURSOR] = nk_rgba(48, 83, 111, 245);
+-        table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(53, 88, 116, 255);
+-        table[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgba(58, 93, 121, 255);
++        table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(109, 99, 98, 192); // datasette
++        table[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgba(128, 0, 0, 192); // reset
+         table[NK_COLOR_PROPERTY] = nk_rgba(144, 141, 124, 192); // hotkeys
+         table[NK_COLOR_EDIT] = nk_rgba(50, 58, 61, 225);
+         table[NK_COLOR_EDIT_CURSOR] = nk_rgba(210, 210, 210, 255);
+@@ -138,7 +138,7 @@ set_style(struct nk_context *ctx, enum theme theme)
+         table[NK_COLOR_BORDER] = nk_rgba(0, 0, 0, 1); 
+         table[NK_COLOR_BUTTON] = nk_rgba(32, 32, 32, 128); // regular keys
+         table[NK_COLOR_BUTTON_HOVER] = nk_rgba(144, 144, 144, 192);
+-        table[NK_COLOR_BUTTON_ACTIVE] = nk_rgba(80, 80, 80, 192);
++        table[NK_COLOR_BUTTON_ACTIVE] = nk_rgba(64, 64, 64, 224);
+         table[NK_COLOR_TOGGLE] = nk_rgba(50, 58, 61, 255);
+         table[NK_COLOR_TOGGLE_HOVER] = nk_rgba(45, 53, 56, 255);
+         table[NK_COLOR_TOGGLE_CURSOR] = nk_rgba(48, 83, 111, 255);
+@@ -146,8 +146,8 @@ set_style(struct nk_context *ctx, enum theme theme)
+         table[NK_COLOR_SELECT_ACTIVE] = nk_rgba(48, 83, 111, 255);
+         table[NK_COLOR_SLIDER] = nk_rgba(50, 58, 61, 255);
+         table[NK_COLOR_SLIDER_CURSOR] = nk_rgba(48, 83, 111, 245);
+-        table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(53, 88, 116, 255);
+-        table[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgba(58, 93, 121, 255);
++        table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(64, 64, 64, 128); // datasette
++        table[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgba(128, 0, 0, 128); // reset
+         table[NK_COLOR_PROPERTY] = nk_rgba(8, 8, 8, 128); // hotkeys
+         table[NK_COLOR_EDIT] = nk_rgba(50, 58, 61, 225);
+         table[NK_COLOR_EDIT_CURSOR] = nk_rgba(210, 210, 210, 255);
+@@ -168,7 +168,7 @@ set_style(struct nk_context *ctx, enum theme theme)
+         table[NK_COLOR_BORDER] = nk_rgba(0, 0, 0, 1); 
+         table[NK_COLOR_BUTTON] = nk_rgba(255, 255, 255, 128); // regular keys
+         table[NK_COLOR_BUTTON_HOVER] = nk_rgba(240, 240, 240, 192);
+-        table[NK_COLOR_BUTTON_ACTIVE] = nk_rgba(255, 255, 255, 192);
++        table[NK_COLOR_BUTTON_ACTIVE] = nk_rgba(255, 255, 255, 224);
+         table[NK_COLOR_TOGGLE] = nk_rgba(50, 58, 61, 255);
+         table[NK_COLOR_TOGGLE_HOVER] = nk_rgba(45, 53, 56, 255);
+         table[NK_COLOR_TOGGLE_CURSOR] = nk_rgba(48, 83, 111, 255);
+@@ -176,8 +176,8 @@ set_style(struct nk_context *ctx, enum theme theme)
+         table[NK_COLOR_SELECT_ACTIVE] = nk_rgba(48, 83, 111, 255);
+         table[NK_COLOR_SLIDER] = nk_rgba(50, 58, 61, 255);
+         table[NK_COLOR_SLIDER_CURSOR] = nk_rgba(48, 83, 111, 245);
+-        table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(53, 88, 116, 255);
+-        table[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgba(58, 93, 121, 255);
++        table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(200, 200, 200, 128); // datasette
++        table[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgba(128, 0, 0, 128); // reset
+         table[NK_COLOR_PROPERTY] = nk_rgba(160, 160, 160, 128); // hotkeys
+         table[NK_COLOR_EDIT] = nk_rgba(50, 58, 61, 225);
+         table[NK_COLOR_EDIT_CURSOR] = nk_rgba(210, 210, 210, 255);
+diff --git a/libretro/nukleargui/retro/nuklear_retro_soft.h b/libretro/nukleargui/retro/nuklear_retro_soft.h
+index 253c8d35f..b2ed49947 100644
+--- a/libretro/nukleargui/retro/nuklear_retro_soft.h
++++ b/libretro/nukleargui/retro/nuklear_retro_soft.h
+@@ -247,7 +247,7 @@ nk_retro_draw_text(RSDL_Surface *surface, short x, short y, unsigned short w, un
+     const char *text, int len, nk_retro_Font *font, struct nk_color cbg, struct nk_color cfg)
+ {
+     int i;
+-    nk_retro_fill_rect(surface, x, y, len * font->width, font->height, 0, cbg);
++    //nk_retro_fill_rect(surface, x, y, len * font->width, font->height, 0, cbg);
+ 
+     for (i = 0; i < len; i++) {
+         //characterRGBA(surface, x, y, text[i], cfg.r, cfg.g, cfg.b, cfg.a);
+@@ -422,7 +422,6 @@ nk_retrofont_create(const char *name, int size)
+     font->height = 8; /* Default in  the RSDL_gfx library */
+     if (!font)
+         return NULL;
+-   //font->handle
+ 
+     return font;
+ }
+@@ -452,13 +451,13 @@ void reset_mouse_pos(){
+ 	/* Starting point on F1 */
+ 	switch(retro_get_borders()) {
+ 	    case 0: /* Normal borders */
+-	        revent.gmx = 178;
+-	        revent.gmy = 164;
++	        revent.gmx = 324;
++	        revent.gmy = 138;
+         	break;
+         
+         case 3: /* No borders */
+-	        revent.gmx = 138;
+-	        revent.gmy = 134;
++	        revent.gmx = 288;
++	        revent.gmy = 100;
+             break;
+     }
+ 
+@@ -675,12 +674,12 @@ nk_retro_handle_event(int *evt,int poll)
+ 
+                 // Joypad wraparound
+                 // Offset changes depending on whether borders are on or off
+-                if(revent.gmx<offset.x+12)
+-                    revent.gmx=offset.x+319-20-12;
+-                if(revent.gmx>offset.x+319-12)
+-                    revent.gmx=offset.x+18+12;
++                if(revent.gmx<offset.x+10)
++                    revent.gmx=offset.x+319-20;
++                if(revent.gmx>offset.x+319-10)
++                    revent.gmx=offset.x+20;
+                 if(revent.gmy<offset.y+4)
+-                    revent.gmy=offset.y+199-12;
++                    revent.gmy=offset.y+199-20;
+                 if(revent.gmy>offset.y+199-4)
+                     revent.gmy=offset.y+20;
+             }
+diff --git a/libretro/nukleargui/vkboard.i b/libretro/nukleargui/vkboard.i
+index 84e9bc1e6..b25b3c8b9 100644
+--- a/libretro/nukleargui/vkboard.i
++++ b/libretro/nukleargui/vkboard.i
+@@ -1,17 +1,19 @@
+ int x = 0,y = 0;
+ 
+-ctx->style.window.padding = nk_vec2(10,2);
++ctx->style.window.padding = nk_vec2(3,2);
+ ctx->style.window.spacing = nk_vec2(2,2);
+ 
+-ctx->style.button.padding = nk_vec2(1,0);
++ctx->style.button.padding = nk_vec2(0,0);
+ ctx->style.button.border = 1;
+ ctx->style.button.rounding = 1;
+ 
+ struct nk_style_item key_color_default = ctx->style.button.normal;
+ struct nk_style_item key_color_alt = ctx->style.window.header.normal;
+ struct nk_style_item key_color_hotkey = ctx->style.property.normal;
++struct nk_style_item key_color_reset = ctx->style.slider.cursor_active;
++struct nk_style_item key_color_datasette = ctx->style.slider.cursor_hover;
+ 
+-nk_layout_row_dynamic(ctx, 26, NPLGN);
++nk_layout_row_dynamic(ctx, 25, NPLGN);
+ nk_button_set_behavior(ctx, NK_BUTTON_REPEATER);
+ 
+ vkey_pressed = -1;
+@@ -27,14 +29,31 @@ for(y=0;y<NLIGN;y++)
+              if(strcmp(MVk[(y*NPLGN)+x].norml, "F1") == 0 
+              || strcmp(MVk[(y*NPLGN)+x].norml, "F3") == 0 
+              || strcmp(MVk[(y*NPLGN)+x].norml, "F5") == 0 
+-             || strcmp(MVk[(y*NPLGN)+x].norml, "F7") == 0)
++             || strcmp(MVk[(y*NPLGN)+x].norml, "F7") == 0
++             )
+                     ctx->style.button.normal = key_color_alt;
+-                    
++
+              /* Hotkey color */
+              if(strcmp(MVk[(y*NPLGN)+x].norml, "Joy") == 0
+-             || strcmp(MVk[(y*NPLGN)+x].norml, "StB") == 0)
++             || strcmp(MVk[(y*NPLGN)+x].norml, "Stb") == 0
++             || strcmp(MVk[(y*NPLGN)+x].norml, "Rst") == 0
++             || strcmp(MVk[(y*NPLGN)+x].norml, "Ttf") == 0
++             )
+                     ctx->style.button.normal = key_color_hotkey;
+ 
++             /* Reset color */
++             if(strcmp(MVk[(y*NPLGN)+x].norml, "Rst") == 0)
++                    ctx->style.button.normal = key_color_reset;
++
++             /* Datasette color */
++             if(strcmp(MVk[(y*NPLGN)+x].norml, "DRe") == 0
++             || strcmp(MVk[(y*NPLGN)+x].norml, "DSt") == 0
++             || strcmp(MVk[(y*NPLGN)+x].norml, "DFw") == 0
++             || strcmp(MVk[(y*NPLGN)+x].norml, "DRs") == 0
++             || strcmp(MVk[(y*NPLGN)+x].norml, "DPl") == 0
++             )
++                    ctx->style.button.normal = key_color_datasette;
++
+              if (nk_button_text(ctx, SHIFTON == -1 ? MVk[(y*NPLGN)+x].norml : MVk[(y*NPLGN)+x].shift , \
+              SHIFTON == -1 ? strlen(MVk[(y*NPLGN)+x].norml) : strlen(MVk[(y*NPLGN)+x].shift)))
+              {
+diff --git a/libretro/vkbd.i b/libretro/vkbd.i
+index 07dbbc037..abb0dcd8b 100644
+--- a/libretro/vkbd.i
++++ b/libretro/vkbd.i
+@@ -12,8 +12,9 @@ Mvk MVk[NPLGN*NLIGN*2]={
+ 	{ "8"  ,"("   ,RETROK_8},
+ 	{ "9"  ,")"   ,RETROK_9},
+ 	{ "0"  ," "   ,RETROK_0},
++	{ "F1" ,"F2"  ,RETROK_F1},
+ 
+-	// 10
++	// 11
+ 	{ "q"  ,"Q"   ,RETROK_q},
+ 	{ "w"  ,"W"   ,RETROK_w},
+ 	{ "e"  ,"E"   ,RETROK_e},
+@@ -24,8 +25,9 @@ Mvk MVk[NPLGN*NLIGN*2]={
+ 	{ "i"  ,"I"   ,RETROK_i},
+ 	{ "o"  ,"O"   ,RETROK_o},
+ 	{ "p"  ,"P"   ,RETROK_p},
++	{ "F3" ,"F4"  ,RETROK_F3},
+ 
+-	// 20 
++	// 22
+ 	{ "a"  ,"A"   ,RETROK_a},
+ 	{ "s"  ,"S"   ,RETROK_s},
+ 	{ "d"  ,"D"   ,RETROK_d},
+@@ -36,8 +38,9 @@ Mvk MVk[NPLGN*NLIGN*2]={
+ 	{ "k"  ,"K"   ,RETROK_k},	
+ 	{ "l"  ,"L"   ,RETROK_l},
+ 	{ "Pnd","Pnd" ,RETROK_INSERT},
++	{ "F5" ,"F6"  ,RETROK_F5},
+ 
+-	// 30
++	// 33
+ 	{ "z"  ,"Z"   ,RETROK_z},
+ 	{ "x"  ,"X"   ,RETROK_x},
+ 	{ "c"  ,"C"   ,RETROK_c},
+@@ -48,42 +51,46 @@ Mvk MVk[NPLGN*NLIGN*2]={
+ 	{ ","  ,"<"   ,RETROK_COMMA},
+ 	{ "."  ,">"   ,RETROK_PERIOD},
+ 	{ "/"  ,"/"   ,RETROK_SLASH},
++	{ "F7" ,"F8"  ,RETROK_F7},
+ 
+-	// 40
+-	{ "<-" ,"<-"  ,RETROK_BACKQUOTE},
+-	{ "CTR","CTR" ,RETROK_TAB},
++	// 44
+ 	{ "+"  ,"+"   ,RETROK_MINUS},
+ 	{ "-"  ,"-"   ,RETROK_EQUALS},
+-	{ "F1" ,"F2"  ,RETROK_F1},
+-	{ "F3" ,"F4"  ,RETROK_F3},
+-	{ "RST","RST" ,RETROK_PAGEUP},
++	{ "@"  ,"@"   ,RETROK_LEFTBRACKET},
++	{ "*"  ,"*"   ,RETROK_RIGHTBRACKET},
++	{ "^"  ,"^"   ,RETROK_DELETE},
+ 	{ ":"  ,"["   ,RETROK_SEMICOLON},
+ 	{ ";"  ,"]"   ,RETROK_QUOTE},
+ 	{ "="  ,"="   ,RETROK_BACKSLASH},
++	{ "DRe","DRe" ,-11},
++	{ "DFw","DFw" ,-10},
++	{ "Stb","Stb" ,-3},
+ 
+-	// 50
++	// 55
++	{ "<-" ,"<-"  ,RETROK_BACKQUOTE},
+ 	{ "R/S","R/S" ,RETROK_ESCAPE},	
+-	{ "@"  ,"@"   ,RETROK_LEFTBRACKET},
+-	{ "*"  ,"*"   ,RETROK_RIGHTBRACKET},	
+-	{ "^"  ,"^"   ,RETROK_DELETE},	
+-	{ "F5" ,"F6"  ,RETROK_F5},
+-	{ "F7" ,"F8"  ,RETROK_F7},
++	{ "ShL","ShL" ,-5},
++	{ "RST","RST" ,RETROK_PAGEUP},
+ 	{ "CLR","CLR" ,RETROK_HOME},
+ 	{ "DEL","DEL" ,RETROK_BACKSPACE},
+-	{ "CrU","CrU" ,RETROK_UP},
++	{ "Cr^","Cr^" ,RETROK_UP},
+ 	{ "RET","RET" ,RETROK_RETURN},
++	{ "DSt","DSt" ,-8},
++	{ "DPl","DPl" ,-9},
++	{ "Joy","Joy" ,-4},
+ 
+-	// 60
++	// 66
++	{ "CTR","CTR" ,RETROK_TAB},
+ 	{ "C=" ,"C="  ,RETROK_LCTRL},
+-	{ "ShL","ShL" ,-10},
+ 	{ "LSh","LSh" ,RETROK_LSHIFT},
+ 	{ "Spc","Spc" ,RETROK_SPACE},
+-	{ "Joy","Joy" ,-4},
+-	{ "StB","StB" ,-5},
+ 	{ "RSh","RSh" ,RETROK_RSHIFT},
+-	{ "CrL","CrL" ,RETROK_LEFT},
+-	{ "CrD","CrD" ,RETROK_DOWN}, 
+-	{ "CrR","CrR" ,RETROK_RIGHT},
++	{ "Cr<","Cr<" ,RETROK_LEFT},
++	{ "Crv","Crv" ,RETROK_DOWN},
++	{ "Cr>","Cr>" ,RETROK_RIGHT},
++	{ "DRs","DRs" ,-12},
++	{ "Rst", "Rst",-2},
++	{ "Ttf","Ttf" ,-20},
+ };
+ 
+ const char* keyDesc[] = {
+diff --git a/vice/src/arch/libretro/retrostubs.c b/vice/src/arch/libretro/retrostubs.c
+index 04c7f0c3c..3644b8944 100644
+--- a/vice/src/arch/libretro/retrostubs.c
++++ b/vice/src/arch/libretro/retrostubs.c
+@@ -38,6 +38,7 @@ extern int mapper_keys[35];
+ int statusbar=0;
+ extern int RETROKEYRAHKEYPAD;
+ 
++int turbo_fire_button_disabled=-1;
+ int turbo_fire_button=-1;
+ unsigned int turbo_pulse=2;
+ unsigned int turbo_state[5]={0,0,0,0,0};
+@@ -156,16 +157,50 @@ void app_vkb_handle(void)
+     {
+         switch (vkey_pressed)
+         {
+-            case -4:
+-                emu_function(EMU_JOYPORT);
++            case -2:
++                emu_function(EMU_RESET);
+                 break;
+-            case -5:
++            case -3:
+                 emu_function(EMU_STATUSBAR);
+                 break;
+-            case -10: /* sticky shift */
++            case -4:
++                emu_function(EMU_JOYPORT);
++                break;
++            case -5: /* sticky shift */
+                 Keymap_KeyDown(RETROK_CAPSLOCK);
+                 Keymap_KeyUp(RETROK_CAPSLOCK);
+                 break;
++            case -20:
++                if(turbo_fire_button_disabled == -1 && turbo_fire_button == -1)
++                    break;
++                else if(turbo_fire_button_disabled != -1 && turbo_fire_button != -1)
++                    turbo_fire_button_disabled = -1;
++
++                if(turbo_fire_button_disabled != -1) {
++                    turbo_fire_button=turbo_fire_button_disabled;
++                    turbo_fire_button_disabled=-1;
++                } else {
++                    turbo_fire_button_disabled=turbo_fire_button;
++                    turbo_fire_button=-1;
++                }
++                break;
++
++            case -EMU_DATASETTE_STOP:
++                emu_function(EMU_DATASETTE_STOP);
++                break;
++            case -EMU_DATASETTE_START:
++                emu_function(EMU_DATASETTE_START);
++                break;
++            case -EMU_DATASETTE_FORWARD:
++                emu_function(EMU_DATASETTE_FORWARD);
++                break;
++            case -EMU_DATASETTE_REWIND:
++                emu_function(EMU_DATASETTE_REWIND);
++                break;
++            case -EMU_DATASETTE_RESET:
++                emu_function(EMU_DATASETTE_RESET);
++                break;
++
+             default:
+                 kbd_handle_keydown(vkey_pressed);
+                 break;
+
+From 3bac22a550297bcea3ca6508d4b4a1247b315de1 Mon Sep 17 00:00:00 2001
+From: Tony Jansson <tony@pihaus.org>
+Date: Tue, 3 Sep 2019 16:30:36 +0300
+Subject: [PATCH 2/2] Statusbar indicator for cur_port
+
+---
+ vice/src/arch/libretro/uistatusbar.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/vice/src/arch/libretro/uistatusbar.c b/vice/src/arch/libretro/uistatusbar.c
+index 8bc098474..f5df2e1a0 100755
+--- a/vice/src/arch/libretro/uistatusbar.c
++++ b/vice/src/arch/libretro/uistatusbar.c
+@@ -135,14 +135,23 @@ char* joystick_value_human(char val)
+     return str;
+ }
+ 
++extern unsigned int cur_port;
+ 
+ static void display_joyport(void)
+ {
+     int len;
+     char tmpstr[25];
++    char joy1[2];
++    char joy2[2];
++    sprintf(joy1, "%s", "1");
++    sprintf(joy2, "%s", "2");
++    if(cur_port == 1)
++        joy1[0] = (joy1[0] | 0x80);
++    else if(cur_port == 2)
++        joy2[0] = (joy2[0] | 0x80);
+     
+-    sprintf(tmpstr, "J%d%3s ", 1, joystick_value_human(joystick_value[1]));
+-    sprintf(tmpstr + strlen(tmpstr), "J%d%3s ", 2, joystick_value_human(joystick_value[2]));
++    sprintf(tmpstr, "J%s%3s ", joy1, joystick_value_human(joystick_value[1]));
++    sprintf(tmpstr + strlen(tmpstr), "J%s%3s ", joy2, joystick_value_human(joystick_value[2]));
+     sprintf(tmpstr + strlen(tmpstr), "J%d%3s ", 3, joystick_value_human(joystick_value[3]));
+     sprintf(tmpstr + strlen(tmpstr), "J%d%3s", 4, joystick_value_human(joystick_value[4]));
+ 

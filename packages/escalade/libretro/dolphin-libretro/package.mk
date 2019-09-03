@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="dolphin-libretro"
-PKG_VERSION="1d973f4"
+PKG_VERSION="11a7ed4"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/dolphin"

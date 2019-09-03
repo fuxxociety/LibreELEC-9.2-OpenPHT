@@ -7,7 +7,7 @@ PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/RetroArch"
 PKG_URL="https://github.com/libretro/RetroArch/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain alsa-lib freetype zlib retroarch-assets retroarch-overlays libretro-core-info retroarch-joypad-autoconfig glsl-shaders ffmpeg libass openal-soft-oem libxkbcommon"
+PKG_DEPENDS_TARGET="toolchain alsa-lib freetype zlib retroarch-assets retroarch-overlays libretro-core-info retroarch-joypad-autoconfig ffmpeg libass openal-soft-oem libxkbcommon"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="Reference frontend for the libretro API."
 
@@ -27,20 +27,22 @@ fi
 
 if [ ! -z "$VULKAN_DRIVERS" ]; then
   RETROARCH_OPTS+=" --enable-vulkan"
-  PKG_DEPENDS_TARGET+=" vulkan-loader slang-shaders"
+  PKG_DEPENDS_TARGET+=" vulkan-loader"
 fi
 
 case "$PROJECT" in
   Generic)
     RETROARCH_OPTS+=" --enable-kms"
-    PKG_DEPENDS_TARGET+=" nvidia-cg-toolkit"
+    PKG_DEPENDS_TARGET+=" nvidia-cg-toolkit slang-shaders"
     ;;
   RPi)
     RETROARCH_OPTS+=" --enable-opengles --disable-kms --disable-x11 --disable-opengl1 --disable-opengl_core --enable-neon"
     CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
+    PKG_DEPENDS_TARGET+=" glsl-shaders"
     ;;
   OdroidXU3)
    RETROARCH_OPTS+=" --enable-opengles --enable-kms --disable-x11 --disable-opengl1 --disable-opengl_core --enable-opengles3 --enable-neon"
+    PKG_DEPENDS_TARGET+=" glsl-shaders"
    ;;
 esac
 

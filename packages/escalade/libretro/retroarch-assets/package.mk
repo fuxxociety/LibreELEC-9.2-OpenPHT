@@ -11,11 +11,10 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="RetroArch assets"
 PKG_LONGDESC="RetroArch assets. Background and icon themes for the menu drivers."
-
-configure_target() {
-  cd $PKG_BUILD
-}
+PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
+  cd $PKG_BUILD
+  rm -rf switch wallpapers
   make install INSTALLDIR="$INSTALL/usr/share/retroarch/assets"
 }
