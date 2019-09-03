@@ -31,6 +31,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-dependency-tracking \
                            --enable-tools --enable-deprecated \
                            --enable-datafiles \
                            --disable-experimental \
+                           --enable-library \
                            --enable-sixaxis \
                            --with-gnu-ld \
                            $BLUEZ_CONFIG \
