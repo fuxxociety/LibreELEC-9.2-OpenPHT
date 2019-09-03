@@ -11,8 +11,6 @@ PKG_URL="http://xorg.freedesktop.org/archive/individual/lib/$PKG_NAME-$PKG_VERSI
 PKG_DEPENDS_TARGET="toolchain util-macros util-linux libICE"
 PKG_LONGDESC="This package provides the main interface to the X11 Session Management library."
 
-PKG_CONFIGURE_OPTS_TARGET="--enable-static \
-                           --disable-shared \
-                           --with-libuuid \
+PKG_CONFIGURE_OPTS_TARGET="--with-libuuid \
                            --without-xmlto \
                            --without-fop"
