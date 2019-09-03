@@ -1,0 +1,22 @@
+From 3a680df733f10726ef01a5025de2363ee5e73638 Mon Sep 17 00:00:00 2001
+From: jdgleaver <james@leaver.myzen.co.uk>
+Date: Tue, 3 Sep 2019 12:50:55 +0100
+Subject: [PATCH] (glcore) Ensure correct scaling of menu texture (RGUI)
+
+---
+ gfx/drivers/gl_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gfx/drivers/gl_core.c b/gfx/drivers/gl_core.c
+index 5cf6eb55db..76acada37f 100644
+--- a/gfx/drivers/gl_core.c
++++ b/gfx/drivers/gl_core.c
+@@ -1593,6 +1593,8 @@ static void gl_core_draw_menu_texture(gl_core_t *gl, video_frame_info_t *video_i
+ 
+    if (gl->menu_texture_full_screen)
+       glViewport(0, 0, video_info->width, video_info->height);
++   else
++      glViewport(gl->vp.x, gl->vp.y, gl->vp.width, gl->vp.height);
+ 
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, gl->menu_texture);

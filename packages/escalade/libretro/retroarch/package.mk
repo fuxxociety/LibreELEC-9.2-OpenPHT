@@ -27,7 +27,7 @@ fi
 
 if [ ! -z "$VULKAN_DRIVERS" ]; then
   RETROARCH_OPTS+=" --enable-vulkan"
-  PKG_DEPENDS_TARGET+=" vulkan-loader"
+  PKG_DEPENDS_TARGET+=" vulkan-loader slang-shaders"
 fi
 
 case "$PROJECT" in
