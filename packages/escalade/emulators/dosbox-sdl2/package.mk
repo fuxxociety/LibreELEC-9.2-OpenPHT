@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2018-present 5schatten (https://github.com/5schatten)
+# Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="dosbox-sdl2"
 PKG_VERSION="d4380b0"

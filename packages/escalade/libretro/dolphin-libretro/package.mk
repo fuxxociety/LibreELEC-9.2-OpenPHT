@@ -21,6 +21,6 @@ pre_configure_target() {
 makeinstall_target() {
   mkdir -p $INSTALL/usr/share/retroarch/cores
   mv *.so $INSTALL/usr/share/retroarch/cores/
-  mkdir -p $INSTALL/usr/config/retroarch/downloads/Dolphin
-  cp -a ../Data/Sys $INSTALL/usr/config/retroarch/downloads/Dolphin/
+  mkdir -p $INSTALL/usr/share/dolphin-emu
+  cp -a ../Data/Sys $INSTALL/usr/share/dolphin-emu/
 }
