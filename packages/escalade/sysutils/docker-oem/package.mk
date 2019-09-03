@@ -4,8 +4,9 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="docker-oem"
-PKG_VERSION="18.09.5"
-PKG_SHA256="57f2a5d3374d86a8eb680c91df4351f5cb648351b9b32520c6fd2d66e7e97fd5"
+PKG_VERSION="19.03.1"
+PKG_SHA256="dad9123e203751ce9981bc34773721593655231c32412e310e748b18f10f0053"
+PKG_GIT_COMMIT="74b1e89e8ac68948be88fe0aa1e2767ae28659fe"
 PKG_ARCH="any"
 PKG_ADDON_PROJECTS="any !WeTek_Core !WeTek_Play"
 PKG_LICENSE="ASL"
@@ -100,7 +101,7 @@ configure_target() {
   fi
 
   # used for docker version
-  export GITCOMMIT=${PKG_VERSION}
+  export GITCOMMIT=${PKG_GIT_COMMIT}
   export VERSION=${PKG_VERSION}
   export BUILDTIME="$(date --utc)"
 
@@ -111,9 +112,9 @@ configure_target() {
 
 make_target() {
   mkdir -p bin
-  PKG_CLI_FLAGS="-X 'github.com/docker/cli/cli.Version=${VERSION}'"
-  PKG_CLI_FLAGS="${PKG_CLI_FLAGS} -X 'github.com/docker/cli/cli.GitCommit=${GITCOMMIT}'"
-  PKG_CLI_FLAGS="${PKG_CLI_FLAGS} -X 'github.com/docker/cli/cli.BuildTime=${BUILDTIME}'"
+  PKG_CLI_FLAGS="-X 'github.com/docker/cli/cli/version=${VERSION}'"
+  PKG_CLI_FLAGS="${PKG_CLI_FLAGS} -X 'github.com/docker/cli/cli/version.GitCommit=${GITCOMMIT}'"
+  PKG_CLI_FLAGS="${PKG_CLI_FLAGS} -X 'github.com/docker/cli/cli/version.BuildTime=${BUILDTIME}'"
   $GOLANG build -v -o bin/docker -a -tags "$DOCKER_BUILDTAGS" -ldflags "$LDFLAGS ${PKG_CLI_FLAGS}" ./components/cli/cmd/docker
   $GOLANG build -v -o bin/dockerd -a -tags "$DOCKER_BUILDTAGS" -ldflags "$LDFLAGS" ./components/engine/cmd/dockerd
 }
