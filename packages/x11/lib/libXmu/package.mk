@@ -10,6 +10,5 @@ PKG_SITE="http://www.X.org"
 PKG_URL="http://xorg.freedesktop.org/archive/individual/lib/$PKG_NAME-$PKG_VERSION.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain util-macros libXext libX11 libXt"
 PKG_LONGDESC="LibXmu provides a set of miscellaneous utility convenience functions for X libraries to use."
-PKG_BUILD_FLAGS="+pic"
 
 PKG_CONFIGURE_OPTS_TARGET="--with-gnu-ld --without-xmlto"
