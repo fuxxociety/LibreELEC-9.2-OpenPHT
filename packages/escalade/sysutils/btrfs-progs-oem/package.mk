@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="btrfs-progs-oem"
-PKG_VERSION="v4.20.2"
+PKG_VERSION="v5.2.1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kdave/btrfs-progs"
