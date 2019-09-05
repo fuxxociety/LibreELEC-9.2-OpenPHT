@@ -7,7 +7,7 @@ PKG_ARCH="x86_64"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/dolphin-emu/dolphin"
 PKG_URL="https://github.com/dolphin-emu/dolphin/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain cmake:host openal-soft-oem libevdev ffmpeg zlib bluez pulseaudio alsa-lib libogg libvorbis libSM enet-system"
+PKG_DEPENDS_TARGET="toolchain cmake:host openal-soft-oem libevdev ffmpeg zlib bluez pulseaudio alsa-lib libogg libvorbis libSM enet-oem"
 PKG_SHORTDESC="Dolphin GameCube/Wii emulator"
 
 PKG_CMAKE_OPTS_TARGET="-DENABLE_LTO=off -DUSE_SHARED_ENET=on -DENABLE_HEADLESS=on"
