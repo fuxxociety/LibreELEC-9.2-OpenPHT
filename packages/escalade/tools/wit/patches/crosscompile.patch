@@ -1,0 +1,9 @@
+--- a/Makefile	2019-09-05 18:21:42.680805571 +0200
++++ b/Makefile	2019-09-05 18:21:51.510696631 +0200
+@@ -1031,6 +1031,5 @@
+ ###############################################################################
+ # local definitions
+ 
+--include makefiles-local/Makefile.local.$(SYSTEM)
+ -include Makefile.user
+ 

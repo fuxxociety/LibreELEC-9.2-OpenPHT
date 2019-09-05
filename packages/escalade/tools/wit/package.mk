@@ -14,5 +14,5 @@ PKG_LONGDESC="Wiimms ISO Tools"
 PKG_TOOLCHAIN="make"
 
 make_target() {
-  make INSTALL_PATH=$INSTALL/usr tools
+  make INSTALL_PATH=$INSTALL/usr CC=$CC CXX=$CXX STRIP=$STRIP tools
 }
