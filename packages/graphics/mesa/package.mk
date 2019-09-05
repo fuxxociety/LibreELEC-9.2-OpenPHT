@@ -11,7 +11,6 @@ PKG_URL="https://github.com/mesa3d/mesa/archive/mesa-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain expat libdrm Mako:host"
 PKG_LONGDESC="Mesa is a 3-D graphics library with an API."
 PKG_TOOLCHAIN="meson"
-PKG_BUILD_FLAGS="-lto"
 
 get_graphicdrivers
 
@@ -28,8 +27,6 @@ PKG_MESON_OPTS_TARGET="-Ddri-drivers=${DRI_DRIVERS// /,} \
                        -Dopengl=true \
                        -Dgbm=true \
                        -Degl=true \
-                       -Dglvnd=false \
-                       -Dasm=true \
                        -Dvalgrind=false \
                        -Dlibunwind=false \
                        -Dlmsensors=false \
@@ -38,14 +35,14 @@ PKG_MESON_OPTS_TARGET="-Ddri-drivers=${DRI_DRIVERS// /,} \
                        -Dosmesa=none"
 
 if [ "$DISPLAYSERVER" = "x11" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET xorgproto libXext libXdamage libXfixes libXxf86vm libxcb libX11 libxshmfence libXrandr"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET xorgproto libXext libXdamage libXfixes libXxf86vm libxcb libX11 libxshmfence libXrandr libglvnd"
   export X11_INCLUDES=
-  PKG_MESON_OPTS_TARGET+=" -Dplatforms=x11,drm -Ddri3=true -Dglx=dri"
+  PKG_MESON_OPTS_TARGET+=" -Dplatforms=x11,drm -Ddri3=true -Dglx=dri -Dglvnd=true"
 elif [ "$DISPLAYSERVER" = "weston" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET wayland wayland-protocols"
-  PKG_MESON_OPTS_TARGET+=" -Dplatforms=wayland,drm -Ddri3=false -Dglx=disabled"
+  PKG_MESON_OPTS_TARGET+=" -Dplatforms=wayland,drm -Ddri3=false -Dglx=disabled -Dglvnd=false"
 else
-  PKG_MESON_OPTS_TARGET+=" -Dplatforms=drm -Ddri3=false -Dglx=disabled"
+  PKG_MESON_OPTS_TARGET+=" -Dplatforms=drm -Ddri3=false -Dglx=disabled -Dglvnd=false"
 fi
 
 if [ "$LLVM_SUPPORT" = "yes" ]; then
@@ -82,14 +79,9 @@ else
   PKG_MESON_OPTS_TARGET+=" -Dgles1=false -Dgles2=false"
 fi
 
-post_makeinstall_target() {
-  # Similar hack is needed on EGL, GLES* front. Might as well drop it and test the GLVND?
+# Needed for LTO
+pre_configure_target() {
   if [ "$DISPLAYSERVER" = "x11" ]; then
-    # rename and relink for cooperate with nvidia drivers
-    rm -rf $INSTALL/usr/lib/libGL.so
-    rm -rf $INSTALL/usr/lib/libGL.so.1
-    ln -sf libGL.so.1 $INSTALL/usr/lib/libGL.so
-    ln -sf /var/lib/libGL.so $INSTALL/usr/lib/libGL.so.1
-    mv $INSTALL/usr/lib/libGL.so.1.2.0 $INSTALL/usr/lib/libGL_mesa.so.1
+    export LDFLAGS="$LDFLAGS -lGL"
   fi
 }
