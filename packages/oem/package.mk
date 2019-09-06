@@ -5,17 +5,17 @@ PKG_NAME="oem"
 PKG_VERSION="1.0"
 PKG_LICENSE="various"
 PKG_SITE="http://www.libreelec.tv"
-PKG_DEPENDS_TARGET="toolchain xfsprogs btrfs-progs-oem f2fs-tools vim-system retroarch fuse-libretro mame2003-plus-libretro snes9x-libretro snes9x2010-libretro flycast-libretro mupen64plus-next-libretro quicknes-libretro mgba-libretro fbneo-libretro dosbox-svn-libretro scummvm-libretro vice-libretro puae-libretro desmume-libretro ppsspp-libretro dolphin-libretro ppsspp joyutils sdl-jstest emulationstation dosbox-sdl2 scraper rsync unrar p7zip transmission SABnzbd htop-oem cgroup-tools tcpdump file mediainfo alsa-plugins strace screen headless-agent plymouth-lite ttyd-oem nfs-utils autofs chdman dec-decode wit repository.castagnait"
+PKG_DEPENDS_TARGET="toolchain xfsprogs btrfs-progs-oem f2fs-tools vim-system retroarch fuse-libretro snes9x-libretro snes9x2010-libretro flycast-libretro mupen64plus-next-libretro quicknes-libretro mgba-libretro fbneo-libretro dosbox-svn-libretro scummvm-libretro vice-libretro puae-libretro desmume-libretro ppsspp-libretro dolphin-libretro ppsspp joyutils sdl-jstest emulationstation dosbox-sdl2 scraper rsync unrar p7zip transmission SABnzbd htop-oem cgroup-tools tcpdump file mediainfo alsa-plugins strace screen headless-agent plymouth-lite ttyd-oem nfs-utils autofs chdman dec-decode wit"
 PKG_SECTION="oem"
 PKG_LONGDESC="OEM: Metapackage for various OEM packages"
 PKG_TOOLCHAIN="manual"
 
 case "$PROJECT" in
   OdroidXU3)
-    PKG_DEPENDS_TARGET+=" pcsx_rearmed-libretro mame2016-libretro yabasanshiro-libretro docker-oem"
+    PKG_DEPENDS_TARGET+=" pcsx_rearmed-libretro mame2016-libretro yabasanshiro-libretro docker-oem mame2003-plus-libretro"
     ;;
   RPi)
-    PKG_DEPENDS_TARGET+=" pcsx_rearmed-libretro omxplayer"
+    PKG_DEPENDS_TARGET+=" pcsx_rearmed-libretro omxplayer mame2003-plus-libretro"
     ;;
   Generic)
     PKG_DEPENDS_TARGET+=" beetle-psx-libretro fs-uae mame2016-libretro pcsx2 unclutter-xfixes docker-oem citra-libretro beetle-saturn-libretro"
@@ -23,7 +23,7 @@ case "$PROJECT" in
 esac
 
 if [ "$MEDIACENTER" = "kodi" ]; then
-  IMAGE_ADDONS="inputstream.adaptive"
+  IMAGE_ADDONS="inputstream.adaptive repository.castagnait"
   PKG_DEPENDS_TARGET+=" $IMAGE_ADDONS"
 fi
 
