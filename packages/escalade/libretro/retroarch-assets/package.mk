@@ -15,6 +15,6 @@ PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
   cd $PKG_BUILD
-  rm -rf switch wallpapers
+  rm -rf switch wallpapers xmb/retroactive xmb/systematic xmb/neoactive
   make install INSTALLDIR="$INSTALL/usr/share/retroarch/assets"
 }
