@@ -15,6 +15,14 @@ post_install() {
     cp $PKG_DIR/scripts/installer $INSTALL/usr/bin
     sed -e "s/@DISTRONAME@/$DISTRONAME/g" \
         -i  $INSTALL/usr/bin/installer
+    if [ "$TARGET_CPU" = "skylake" ]; then
+      sed -e "s/@FASTBOOT@/i915.fastboot=1/g" \
+          -i  $INSTALL/usr/bin/installer
+    else
+      sed -e "s/@FASTBOOT@//g" \
+          -i  $INSTALL/usr/bin/installer
+    fi
+
 
   mkdir -p $INSTALL/etc
     find_file_path config/installer.conf
