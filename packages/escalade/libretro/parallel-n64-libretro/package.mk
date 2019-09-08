@@ -8,11 +8,10 @@ PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/parallel-n64"
 PKG_URL="https://github.com/libretro/parallel-n64/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="parallel-n64-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="mupen64plus for libretro with multiple graphic plugins and vulkan support"
-PKG_BUILD_FLAGS=""
+PKG_BUILD_FLAGS="-lto"
 
 configure_target() {
   export GIT_VERSION=$PKG_VERSION
