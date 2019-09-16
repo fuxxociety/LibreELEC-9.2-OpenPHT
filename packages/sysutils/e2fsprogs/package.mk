@@ -52,7 +52,7 @@ pre_configure() {
                            --disable-blkid-debug \
                            --disable-testio-debug \
                            --enable-libuuid \
-                           --enable-libblkid \
+                           --disable-libblkid \
                            --disable-debugfs \
                            --disable-imager \
                            --enable-resizer \
