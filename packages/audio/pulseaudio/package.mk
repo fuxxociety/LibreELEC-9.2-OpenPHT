@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="pulseaudio"
-PKG_VERSION="12.99.2"
-PKG_SHA256="a8f29c719fc317d7e4b86a468d82a8f7619a49e024748606a2f2d3d68b3a4a3f"
+PKG_VERSION="12.99.3"
+PKG_SHA256="5d93bccbfedc2510bd1766a0e66a5f0c3da8064d3464248c8c9b979f36a6612b"
 PKG_LICENSE="GPL"
 PKG_SITE="http://pulseaudio.org/"
 PKG_URL="http://www.freedesktop.org/software/pulseaudio/releases/$PKG_NAME-$PKG_VERSION.tar.xz"
