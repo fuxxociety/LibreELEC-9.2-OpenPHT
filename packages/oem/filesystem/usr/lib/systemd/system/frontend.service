@@ -1,6 +1,6 @@
 [Unit]
 Description=Start the default frontend
-After=multi-user.target
+After=multi-user.target xorg.service
 
 [Service]
 Type=oneshot
