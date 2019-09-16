@@ -16,6 +16,13 @@ PKG_STAMP="$KERNEL_TARGET $KERNEL_MAKE_EXTRACMD"
 PKG_PATCH_DIRS="$LINUX"
 
 case "$LINUX" in
+  bleeding)
+    PKG_VERSION="5.3"
+    PKG_SHA256="69beef77f43b31a81f7b13750a189ab088589c64b79ce0d6d62c3d922ee59c0a"
+    PKG_URL="https://git.kernel.org/torvalds/t/linux-$PKG_VERSION.tar.gz"
+    PKG_PATCH_DIRS="bleeding"
+    PKG_BUILD_PERF="no"
+    ;;
   odroidxu3-4.14)
     PKG_VERSION="4.14.133-165"
     PKG_SHA256="fe3a1c1d8e86d84deda75c7d0694a2403f0752066f4433c436c32f9fb9f41ee6"
@@ -37,8 +44,8 @@ case "$LINUX" in
     PKG_BUILD_PERF="no"
     ;;
   *)
-    PKG_VERSION="5.2.13"
-    PKG_SHA256="17b60f55241dee4b9a2919a653de144ef1002e2de49ccf5d15225b1f07bc178a"
+    PKG_VERSION="5.2.15"
+    PKG_SHA256="eb561009da8106b463b1e1a16ab0f75cdef564784f49177148f5f92c32380c4a"
     PKG_URL="https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-$PKG_VERSION.tar.xz"
     PKG_PATCH_DIRS="default"
     PKG_BUILD_PERF="no"

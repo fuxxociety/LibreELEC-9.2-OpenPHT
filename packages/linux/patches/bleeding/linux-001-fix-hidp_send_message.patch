@@ -1,0 +1,35 @@
+diff --git a/drivers/hid/hid-microsoft.c b/drivers/hid/hid-microsoft.c
+index 8b3a922bdad3..2cf83856f2e4 100644
+--- a/drivers/hid/hid-microsoft.c
++++ b/drivers/hid/hid-microsoft.c
+@@ -303,7 +303,7 @@ static void ms_ff_worker(struct work_struct *work)
+ 	r->magnitude[MAGNITUDE_WEAK] = ms->weak;     /* right actuator */
+ 
+ 	ret = hid_hw_output_report(hdev, (__u8 *)r, sizeof(*r));
+-	if (ret)
++	if (ret < 0)
+ 		hid_warn(hdev, "failed to send FF report\n");
+ }
+ 
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 8d889969ae7e..bef84b95e2c4 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -267,7 +267,7 @@ static int hidp_get_raw_report(struct hid_device *hid,
+ 	set_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
+ 	data[0] = report_number;
+ 	ret = hidp_send_ctrl_message(session, report_type, data, 1);
+-	if (ret)
++	if (ret < 0)
+ 		goto err;
+ 
+ 	/* Wait for the return of the report. The returned report
+@@ -343,7 +343,7 @@ static int hidp_set_raw_report(struct hid_device *hid, unsigned char reportnum,
+ 	data[0] = reportnum;
+ 	set_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags);
+ 	ret = hidp_send_ctrl_message(session, report_type, data, count);
+-	if (ret)
++	if (ret < 0)
+ 		goto err;
+ 
+ 	/* Wait for the ACK from the device. */
