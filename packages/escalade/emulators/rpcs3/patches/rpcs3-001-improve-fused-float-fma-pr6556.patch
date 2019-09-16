@@ -1,0 +1,265 @@
+From 9d9b571520cd8d3a14354c46e67565867d2cf84b Mon Sep 17 00:00:00 2001
+From: Eladash <elad3356p@gmail.com>
+Date: Sat, 14 Sep 2019 12:00:05 +0300
+Subject: [PATCH 1/3] PPU Precise: Improve fused float ops accuracy by using
+ fma
+
+- Also cleanup add64_flags, remove redundent copy of s_ppu_itype.
+---
+ rpcs3/Emu/Cell/PPUInterpreter.cpp | 40 +++++++++++++++++++------------
+ rpcs3/Emu/Cell/PPUInterpreter.h   |  3 ++-
+ rpcs3/Emu/Cell/PPUThread.cpp      |  2 --
+ 3 files changed, 27 insertions(+), 18 deletions(-)
+
+diff --git a/rpcs3/Emu/Cell/PPUInterpreter.cpp b/rpcs3/Emu/Cell/PPUInterpreter.cpp
+index 161c5dae5d..d71449accd 100644
+--- a/rpcs3/Emu/Cell/PPUInterpreter.cpp
++++ b/rpcs3/Emu/Cell/PPUInterpreter.cpp
+@@ -288,8 +288,6 @@ struct add_flags_result_t
+ {
+ 	T result;
+ 	bool carry;
+-	bool zero;
+-	bool sign;
+ 
+ 	add_flags_result_t() = default;
+ 
+@@ -297,8 +295,6 @@ struct add_flags_result_t
+ 	add_flags_result_t(T a, T b)
+ 		: result(a + b)
+ 		, carry(result < a)
+-		, zero(result == 0)
+-		, sign(result >> (sizeof(T) * 8 - 1) != 0)
+ 	{
+ 	}
+ 
+@@ -309,8 +305,6 @@ struct add_flags_result_t
+ 		add_flags_result_t r(result, c);
+ 		result = r.result;
+ 		carry |= r.carry;
+-		zero = r.zero;
+-		sign = r.sign;
+ 	}
+ };
+ 
+@@ -904,12 +898,28 @@ bool ppu_interpreter::VLOGEFP(ppu_thread& ppu, ppu_opcode_t op)
+ 	return true;
+ }
+ 
+-bool ppu_interpreter::VMADDFP(ppu_thread& ppu, ppu_opcode_t op)
++bool ppu_interpreter_fast::VMADDFP(ppu_thread& ppu, ppu_opcode_t op)
+ {
+ 	ppu.vr[op.vd].vf = _mm_add_ps(_mm_mul_ps(ppu.vr[op.va].vf, ppu.vr[op.vc].vf), ppu.vr[op.vb].vf);
+ 	return true;
+ }
+ 
++bool ppu_interpreter_precise::VMADDFP(ppu_thread& ppu, ppu_opcode_t op)
++{
++	// TODO: Optimize
++	const auto& a = ppu.vr[op.va]._f;
++	const auto& b = ppu.vr[op.vb]._f;
++	const auto& c = ppu.vr[op.vc]._f;
++	auto& d = ppu.vr[op.rd]._f;
++
++	for (u32 i = 0; i < 4; i++)
++	{
++		d[i] = std::fma(a[i], c[i], b[i]);
++	}
++
++	return true;
++}
++
+ bool ppu_interpreter::VMAXFP(ppu_thread& ppu, ppu_opcode_t op)
+ {
+ 	ppu.vr[op.vd].vf = _mm_max_ps(ppu.vr[op.va].vf, ppu.vr[op.vb].vf);
+@@ -4691,7 +4701,7 @@ bool ppu_interpreter_fast::FMADDS(ppu_thread& ppu, ppu_opcode_t op)
+ 
+ bool ppu_interpreter_precise::FMADDS(ppu_thread& ppu, ppu_opcode_t op)
+ {
+-	const f64 res = ppu.fpr[op.frd] = f32(ppu.fpr[op.fra] * ppu.fpr[op.frc] + ppu.fpr[op.frb]);
++	const f64 res = ppu.fpr[op.frd] = f32(std::fma(ppu.fpr[op.fra], ppu.fpr[op.frc], ppu.fpr[op.frb]));
+ 	ppu_fpcc_set(ppu, res, 0., op.rc);
+ 	return true;
+ }
+@@ -4704,7 +4714,7 @@ bool ppu_interpreter_fast::FMSUBS(ppu_thread& ppu, ppu_opcode_t op)
+ 
+ bool ppu_interpreter_precise::FMSUBS(ppu_thread& ppu, ppu_opcode_t op)
+ {
+-	const f64 res = ppu.fpr[op.frd] = f32(ppu.fpr[op.fra] * ppu.fpr[op.frc] - ppu.fpr[op.frb]);
++	const f64 res = ppu.fpr[op.frd] = f32(std::fma(ppu.fpr[op.fra], ppu.fpr[op.frc], -ppu.fpr[op.frb]));
+ 	ppu_fpcc_set(ppu, res, 0., op.rc);
+ 	return true;
+ }
+@@ -4717,7 +4727,7 @@ bool ppu_interpreter_fast::FNMSUBS(ppu_thread& ppu, ppu_opcode_t op)
+ 
+ bool ppu_interpreter_precise::FNMSUBS(ppu_thread& ppu, ppu_opcode_t op)
+ {
+-	const f64 res = ppu.fpr[op.frd] = f32(-(ppu.fpr[op.fra] * ppu.fpr[op.frc] - ppu.fpr[op.frb]));
++	const f64 res = ppu.fpr[op.frd] = f32(-std::fma(ppu.fpr[op.fra], ppu.fpr[op.frc], -ppu.fpr[op.frb]));
+ 	ppu_fpcc_set(ppu, res, 0., op.rc);
+ 	return true;
+ }
+@@ -4730,7 +4740,7 @@ bool ppu_interpreter_fast::FNMADDS(ppu_thread& ppu, ppu_opcode_t op)
+ 
+ bool ppu_interpreter_precise::FNMADDS(ppu_thread& ppu, ppu_opcode_t op)
+ {
+-	const f64 res = ppu.fpr[op.frd] = f32(-(ppu.fpr[op.fra] * ppu.fpr[op.frc] + ppu.fpr[op.frb]));
++	const f64 res = ppu.fpr[op.frd] = f32(-std::fma(ppu.fpr[op.fra], ppu.fpr[op.frc], ppu.fpr[op.frb]));
+ 	ppu_fpcc_set(ppu, res, 0., op.rc);
+ 	return true;
+ }
+@@ -4942,7 +4952,7 @@ bool ppu_interpreter_fast::FMSUB(ppu_thread& ppu, ppu_opcode_t op)
+ 
+ bool ppu_interpreter_precise::FMSUB(ppu_thread& ppu, ppu_opcode_t op)
+ {
+-	const f64 res = ppu.fpr[op.frd] = ppu.fpr[op.fra] * ppu.fpr[op.frc] - ppu.fpr[op.frb];
++	const f64 res = ppu.fpr[op.frd] = std::fma(ppu.fpr[op.fra], ppu.fpr[op.frc], -ppu.fpr[op.frb]);
+ 	ppu_fpcc_set(ppu, res, 0., op.rc);
+ 	return true;
+ }
+@@ -4955,7 +4965,7 @@ bool ppu_interpreter_fast::FMADD(ppu_thread& ppu, ppu_opcode_t op)
+ 
+ bool ppu_interpreter_precise::FMADD(ppu_thread& ppu, ppu_opcode_t op)
+ {
+-	const f64 res = ppu.fpr[op.frd] = ppu.fpr[op.fra] * ppu.fpr[op.frc] + ppu.fpr[op.frb];
++	const f64 res = ppu.fpr[op.frd] = std::fma(ppu.fpr[op.fra], ppu.fpr[op.frc], ppu.fpr[op.frb]);
+ 	ppu_fpcc_set(ppu, res, 0., op.rc);
+ 	return true;
+ }
+@@ -4968,7 +4978,7 @@ bool ppu_interpreter_fast::FNMSUB(ppu_thread& ppu, ppu_opcode_t op)
+ 
+ bool ppu_interpreter_precise::FNMSUB(ppu_thread& ppu, ppu_opcode_t op)
+ {
+-	const f64 res = ppu.fpr[op.frd] = -(ppu.fpr[op.fra] * ppu.fpr[op.frc] - ppu.fpr[op.frb]);
++	const f64 res = ppu.fpr[op.frd] = -std::fma(ppu.fpr[op.fra], ppu.fpr[op.frc], -ppu.fpr[op.frb]);
+ 	ppu_fpcc_set(ppu, res, 0., op.rc);
+ 	return true;
+ }
+@@ -4981,7 +4991,7 @@ bool ppu_interpreter_fast::FNMADD(ppu_thread& ppu, ppu_opcode_t op)
+ 
+ bool ppu_interpreter_precise::FNMADD(ppu_thread& ppu, ppu_opcode_t op)
+ {
+-	const f64 res = ppu.fpr[op.frd] = -(ppu.fpr[op.fra] * ppu.fpr[op.frc] + ppu.fpr[op.frb]);
++	const f64 res = ppu.fpr[op.frd] = -std::fma(ppu.fpr[op.fra], ppu.fpr[op.frc], ppu.fpr[op.frb]);
+ 	ppu_fpcc_set(ppu, res, 0., op.rc);
+ 	return true;
+ }
+diff --git a/rpcs3/Emu/Cell/PPUInterpreter.h b/rpcs3/Emu/Cell/PPUInterpreter.h
+index a6f309d8d7..14e0ba08ef 100644
+--- a/rpcs3/Emu/Cell/PPUInterpreter.h
++++ b/rpcs3/Emu/Cell/PPUInterpreter.h
+@@ -40,7 +40,6 @@ struct ppu_interpreter
+ 	static bool VCMPGTUW(ppu_thread&, ppu_opcode_t);
+ 	static bool VEXPTEFP(ppu_thread&, ppu_opcode_t);
+ 	static bool VLOGEFP(ppu_thread&, ppu_opcode_t);
+-	static bool VMADDFP(ppu_thread&, ppu_opcode_t);
+ 	static bool VMAXFP(ppu_thread&, ppu_opcode_t);
+ 	static bool VMAXSB(ppu_thread&, ppu_opcode_t);
+ 	static bool VMAXSH(ppu_thread&, ppu_opcode_t);
+@@ -373,6 +372,7 @@ struct ppu_interpreter_precise final : ppu_interpreter
+ 	static bool VSUM4UBS(ppu_thread&, ppu_opcode_t);
+ 	static bool VCTSXS(ppu_thread&, ppu_opcode_t);
+ 	static bool VCTUXS(ppu_thread&, ppu_opcode_t);
++	static bool VMADDFP(ppu_thread&, ppu_opcode_t);
+ 
+ 	static bool FDIVS(ppu_thread&, ppu_opcode_t);
+ 	static bool FSUBS(ppu_thread&, ppu_opcode_t);
+@@ -439,6 +439,7 @@ struct ppu_interpreter_fast final : ppu_interpreter
+ 	static bool VSUM4UBS(ppu_thread&, ppu_opcode_t);
+ 	static bool VCTSXS(ppu_thread&, ppu_opcode_t);
+ 	static bool VCTUXS(ppu_thread&, ppu_opcode_t);
++	static bool VMADDFP(ppu_thread&, ppu_opcode_t);
+ 
+ 	static bool FDIVS(ppu_thread&, ppu_opcode_t);
+ 	static bool FSUBS(ppu_thread&, ppu_opcode_t);
+diff --git a/rpcs3/Emu/Cell/PPUThread.cpp b/rpcs3/Emu/Cell/PPUThread.cpp
+index d08c8468da..edd0d6a174 100644
+--- a/rpcs3/Emu/Cell/PPUThread.cpp
++++ b/rpcs3/Emu/Cell/PPUThread.cpp
+@@ -928,8 +928,6 @@ void ppu_thread::stack_pop_verbose(u32 addr, u32 size) noexcept
+ 	LOG_ERROR(PPU, "Invalid thread" HERE);
+ }
+ 
+-const ppu_decoder<ppu_itype> s_ppu_itype;
+-
+ extern u64 get_timebased_time();
+ extern ppu_function_t ppu_get_syscall(u64 code);
+ 
+
+From fa2c6043b630d11aa8e1fa653e0afcca21803e93 Mon Sep 17 00:00:00 2001
+From: Eladash <elad3356p@gmail.com>
+Date: Sat, 14 Sep 2019 18:34:02 +0300
+Subject: [PATCH 2/3] cellSysCacheClear/Mount() improved
+
+Clear() error checking simplified a bit
+Mount() now pads getCachePath with zeroes (uses libc's __sys_strncpy() internally)
+---
+ rpcs3/Emu/Cell/Modules/cellSysutil.cpp | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/rpcs3/Emu/Cell/Modules/cellSysutil.cpp b/rpcs3/Emu/Cell/Modules/cellSysutil.cpp
+index a69aac0ef7..a3adec6d5e 100644
+--- a/rpcs3/Emu/Cell/Modules/cellSysutil.cpp
++++ b/rpcs3/Emu/Cell/Modules/cellSysutil.cpp
+@@ -322,13 +322,11 @@ s32 cellSysCacheClear()
+ 
+ 	std::string local_dir = vfs::get(cache->cache_path);
+ 
+-	if (!fs::exists(local_dir) || !fs::is_dir(local_dir))
++	if (!fs::remove_all(local_dir, false))
+ 	{
+ 		return CELL_SYSCACHE_ERROR_ACCESS_ERROR;
+ 	}
+ 
+-	fs::remove_all(local_dir, false);
+-
+ 	return CELL_SYSCACHE_RET_OK_CLEARED;
+ }
+ 
+@@ -343,9 +341,9 @@ s32 cellSysCacheMount(vm::ptr<CellSysCacheParam> param)
+ 		return CELL_SYSCACHE_ERROR_PARAM;
+ 	}
+ 
+-	std::string cache_id = param->cacheId;
++	std::string cache_id(+param->cacheId);
+ 	std::string cache_path = "/dev_hdd1/cache/" + cache_id;
+-	strcpy_trunc(param->getCachePath, cache_path);
++	strncpy(param->getCachePath, cache_path.data(), sizeof(param->getCachePath));
+ 
+ 	if (!fs::create_dir(vfs::get(cache_path)) && !cache_id.empty())
+ 	{
+
+From a5b783fe2cbec77ba6167a6b8681166d94d79629 Mon Sep 17 00:00:00 2001
+From: Eladash <elad3356p@gmail.com>
+Date: Sat, 14 Sep 2019 21:00:07 +0300
+Subject: [PATCH 3/3] ppu disasm: Improve disassembly of BCTR and LWSYNC
+
+---
+ rpcs3/Emu/Cell/PPUDisAsm.cpp | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/rpcs3/Emu/Cell/PPUDisAsm.cpp b/rpcs3/Emu/Cell/PPUDisAsm.cpp
+index 6d2e842581..dcc53a8a62 100644
+--- a/rpcs3/Emu/Cell/PPUDisAsm.cpp
++++ b/rpcs3/Emu/Cell/PPUDisAsm.cpp
+@@ -1005,6 +1005,11 @@ void PPUDisAsm::BCCTR(ppu_opcode_t op)
+ 	const u32 bi = op.bi;
+ 	const u32 bh = op.bh;
+ 
++	if (bo == 20)
++	{
++		return Write(op.lk ? "bctrl" : "bctr");
++	}
++
+ 	switch (op.lk)
+ 	{
+ 	case 0: DisAsm_INT3("bcctr", bo, bi, bh); break;
+@@ -1664,7 +1669,7 @@ void PPUDisAsm::LFSUX(ppu_opcode_t op)
+ 
+ void PPUDisAsm::SYNC(ppu_opcode_t op)
+ {
+-	Write("sync");
++	Write(!op.l10 ? "sync" : "lwsync");
+ }
+ 
+ void PPUDisAsm::LFDX(ppu_opcode_t op)
