@@ -1,0 +1,57 @@
+diff --git a/qtbase/mkspecs/common/clang.conf b/qtbase/mkspecs/common/clang.conf
+index ee9c1b8..fbe370e 100644
+--- a/qtbase/mkspecs/common/clang.conf
++++ b/qtbase/mkspecs/common/clang.conf
+@@ -16,7 +16,6 @@ QMAKE_LINK_SHLIB        = $$QMAKE_CXX
+ CONFIG                 += clang_pch_style
+ QMAKE_PCH_OUTPUT_EXT    = .pch
+ 
+-QMAKE_CFLAGS_ISYSTEM             = -isystem
+ QMAKE_CFLAGS_PRECOMPILE          = -x c-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}
+ QMAKE_CFLAGS_USE_PRECOMPILE      = -Xclang -include-pch -Xclang ${QMAKE_PCH_OUTPUT}
+ QMAKE_CFLAGS_LTCG                = -flto
+diff --git a/qtbase/mkspecs/common/gcc-base.conf b/qtbase/mkspecs/common/gcc-base.conf
+index 6e043f5..df8d314 100644
+--- a/qtbase/mkspecs/common/gcc-base.conf
++++ b/qtbase/mkspecs/common/gcc-base.conf
+@@ -46,7 +46,6 @@
+ QMAKE_CFLAGS_SHLIB         += $$QMAKE_CFLAGS_PIC
+ QMAKE_CFLAGS_STATIC_LIB    += $$QMAKE_CFLAGS_PIC
+ QMAKE_CFLAGS_APP           += $$QMAKE_CFLAGS_PIC
+-QMAKE_CFLAGS_ISYSTEM        = -isystem
+ QMAKE_CFLAGS_YACC          += -Wno-unused -Wno-parentheses
+ QMAKE_CFLAGS_HIDESYMS      += -fvisibility=hidden
+ QMAKE_CFLAGS_EXCEPTIONS_OFF += -fno-exceptions
+--- a/qtbase/qmake/generators/unix/unixmake2.cpp
++++ b/qtbase/qmake/generators/unix/unixmake2.cpp
+@@ -176,16 +176,10 @@ UnixMakefileGenerator::writeMakeParts(QTextStream &t)
+     t << "CXXFLAGS      = " << var("QMAKE_CXXFLAGS") << " $(DEFINES)\n";
+     t << "INCPATH       =";
+     {
+-        QString isystem = var("QMAKE_CFLAGS_ISYSTEM");
+         const ProStringList &incs = project->values("INCLUDEPATH");
+         for(int i = 0; i < incs.size(); ++i) {
+             const ProString &inc = incs.at(i);
+-            if (inc.isEmpty())
+-                continue;
+-
+-            if (!isystem.isEmpty() && isSystemInclude(inc.toQString()))
+-                t << ' ' << isystem << ' ';
+-            else
++            if (!inc.isEmpty())
+                 t << " -I";
+             t << escapeFilePath(inc);
+         }
+@@ -1328,10 +1322,8 @@ void UnixMakefileGenerator::init2()
+     }
+ 
+     if (include_deps && project->isActiveConfig("gcc_MD_depends")) {
+-        // use -MMD if we know about -isystem too
+-        ProString MD_flag(project->values("QMAKE_CFLAGS_ISYSTEM").isEmpty() ? "-MD" : "-MMD");
+-        project->values("QMAKE_CFLAGS") += MD_flag;
+-        project->values("QMAKE_CXXFLAGS") += MD_flag;
++        project->values("QMAKE_CFLAGS") += "-MD";
++        project->values("QMAKE_CXXFLAGS") += "-MD";
+     }
+ }
+ 
