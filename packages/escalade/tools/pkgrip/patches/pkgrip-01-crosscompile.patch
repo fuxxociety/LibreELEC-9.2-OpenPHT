@@ -1,0 +1,11 @@
+--- a/src/Makefile	2019-09-09 23:33:46.143974652 +0200
++++ b/src/Makefile	2019-09-09 23:34:43.804330936 +0200
+@@ -1,7 +1,4 @@
+-CC = gcc
+-CFLAGS = -Wall -Wextra -Werror -I./libkirk
+-
+-CFLAGS+=-O2
++CFLAGS+ = -I./libkirk
+ 
+ TARGET1 = libkirk/libkirk.a
+ OBJS1 = libkirk/kirk_engine.o libkirk/aes.o libkirk/sha1.o libkirk/amctrl.o libkirk/bn.o libkirk/ec.o
