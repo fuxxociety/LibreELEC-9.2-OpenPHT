@@ -1,0 +1,3411 @@
+From a6386ac31baf4358bb542ea4013b1bc2b9487dc8 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Sat, 24 Aug 2019 17:54:52 +0900
+Subject: [PATCH 01/20] Fix screen flickers OutRun, DraculaX, Astra Super
+ starts COTTONS, ext
+
+(cherry picked from commit c3dcb80e15c4274465b385b0eb8bac1ad2346412)
+---
+ yabause/src/vdp2.c   |  2 ++
+ yabause/src/vidogl.c | 30 ++++++++++++++++++++++--------
+ yabause/src/ygl.h    |  1 +
+ yabause/src/ygles.c  |  7 +++++++
+ 4 files changed, 32 insertions(+), 8 deletions(-)
+
+diff --git a/yabause/src/vdp2.c b/yabause/src/vdp2.c
+index ee244dfc4..d9f92c091 100644
+--- a/yabause/src/vdp2.c
++++ b/yabause/src/vdp2.c
+@@ -274,6 +274,8 @@ int Vdp2Init(void) {
+    if ((Vdp2ColorRam = T2MemoryInit(0x1000)) == NULL)
+       return -1;
+ 
++   memset(Vdp2Lines, 0, sizeof(Vdp2) * 270);
++
+    Vdp2Reset();
+ 
+ #if defined(YAB_ASYNC_RENDERING)
+diff --git a/yabause/src/vidogl.c b/yabause/src/vidogl.c
+index c5e71f338..12221f99f 100644
+--- a/yabause/src/vidogl.c
++++ b/yabause/src/vidogl.c
+@@ -209,7 +209,7 @@ static int m_b1WindowChg;
+ static vdp2Lineinfo lineNBG0[512];
+ static vdp2Lineinfo lineNBG1[512];
+ 
+-
++int Vdp2DrawLineColorScreen(void);
+ 
+ vdp2rotationparameter_struct  paraA = { 0 };
+ vdp2rotationparameter_struct  paraB = { 0 };
+@@ -3891,6 +3891,12 @@ void VIDOGLVdp1DrawStart(void)
+ 
+   FrameProfileAdd("Vdp1Command start");
+ 
++  if (_Ygl->frame_sync != 0) {
++    glClientWaitSync(_Ygl->frame_sync, 0, GL_TIMEOUT_IGNORED);
++    glDeleteSync(_Ygl->frame_sync);
++    _Ygl->frame_sync = 0;
++  }
++  
+   if (_Ygl->texture_manager == NULL) {
+     _Ygl->texture_manager = YglTM;
+     YglTMReset(YglTM);
+@@ -5431,6 +5437,11 @@ void VIDOGLVdp2DrawStart(void)
+     glDeleteSync(_Ygl->sync);
+     _Ygl->sync = 0;
+   }
++  if (_Ygl->frame_sync != 0) {
++    glClientWaitSync(_Ygl->frame_sync, 0, GL_TIMEOUT_IGNORED);
++    glDeleteSync(_Ygl->frame_sync);
++    _Ygl->frame_sync = 0;
++  }
+   YglTmPull(YglTM, 0);
+   YglTMReset(YglTM);
+   YglCacheReset(YglTM);
+@@ -5563,21 +5574,21 @@ static void Vdp2DrawBackScreen(void)
+ //////////////////////////////////////////////////////////////////////////////
+ // 11.3 Line Color insertion
+ //  7.1 Line Color Screen
+-static void Vdp2DrawLineColorScreen(void)
++int Vdp2DrawLineColorScreen(void)
+ {
+ 
+   u32 cacheaddr = 0xFFFFFFFF;
+   int inc = 0;
+   int line_cnt = vdp2height;
+-  int i;
+-  u32 * line_pixel_data;
+-  u32 addr;
++  int i = 0;
++  u32 * line_pixel_data = NULL;
++  u32 addr = 0;
+ 
+-  if (fixVdp2Regs->LNCLEN == 0) return;
++  if (fixVdp2Regs->LNCLEN == 0) return 0;
+ 
+   line_pixel_data = YglGetLineColorPointer();
+   if (line_pixel_data == NULL) {
+-    return;
++    return 0;
+   }
+ 
+   if ((fixVdp2Regs->LCTA.part.U & 0x8000)) {
+@@ -5604,6 +5615,8 @@ static void Vdp2DrawLineColorScreen(void)
+ 
+   YglSetLineColor(line_pixel_data, line_cnt);
+ 
++  return 1;
++
+ }
+ 
+ void Vdp2GeneratePerLineColorCalcuration(vdp2draw_struct * info, int id) {
+@@ -5855,6 +5868,7 @@ static void Vdp2DrawNBG0(void)
+     return;
+   }
+ 
++  
+ 
+ 
+   ReadMosaicData(&info, 0x1, fixVdp2Regs);
+@@ -7041,7 +7055,7 @@ void VIDOGLVdp2DrawScreens(void)
+   
+   Vdp2DrawBackScreen();
+   Vdp2DrawLineColorScreen();
+-
++    
+   Vdp2DrawNBG3();
+   FrameProfileAdd("NBG3 end");
+   Vdp2DrawNBG2();
+diff --git a/yabause/src/ygl.h b/yabause/src/ygl.h
+index 27cc81f42..b7838d7b5 100644
+--- a/yabause/src/ygl.h
++++ b/yabause/src/ygl.h
+@@ -585,6 +585,7 @@ typedef struct {
+    int rbg_use_compute_shader;
+    YglTextureManager * texture_manager;
+    GLsync sync;
++   GLsync frame_sync;
+     GLuint default_fbo;
+    YglPerLineInfo bg[enBGMAX];
+    u32 targetfbo;
+diff --git a/yabause/src/ygles.c b/yabause/src/ygles.c
+index 9437a12d0..f287b60ce 100644
+--- a/yabause/src/ygles.c
++++ b/yabause/src/ygles.c
+@@ -4444,6 +4444,13 @@ void VIDOGLSync(){
+   YglTmPull(YglTM, GL_MAP_INVALIDATE_BUFFER_BIT);
+   _Ygl->texture_manager = NULL;
+   RBGGenerator_onFinish();
++  //glFinish();
++  glFlush();
++  if (_Ygl->frame_sync != 0) {
++    glDeleteSync(_Ygl->frame_sync);
++    _Ygl->frame_sync = 0;
++  }
++  _Ygl->frame_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+ }
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+
+From a60b4dfb3a9409976f1f911c09a5cd202a9cc142 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Sat, 24 Aug 2019 20:16:04 +0900
+Subject: [PATCH 02/20] minimize sync
+
+(cherry picked from commit 71cb1f1b99e92aa40699873ce00db08855d25e08)
+---
+ yabause/src/vidogl.c | 20 ++++++++++----------
+ yabause/src/ygles.c  |  2 +-
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/yabause/src/vidogl.c b/yabause/src/vidogl.c
+index 12221f99f..7708a5183 100644
+--- a/yabause/src/vidogl.c
++++ b/yabause/src/vidogl.c
+@@ -3891,11 +3891,11 @@ void VIDOGLVdp1DrawStart(void)
+ 
+   FrameProfileAdd("Vdp1Command start");
+ 
+-  if (_Ygl->frame_sync != 0) {
+-    glClientWaitSync(_Ygl->frame_sync, 0, GL_TIMEOUT_IGNORED);
+-    glDeleteSync(_Ygl->frame_sync);
+-    _Ygl->frame_sync = 0;
+-  }
++  //if (_Ygl->frame_sync != 0) {
++  //  glClientWaitSync(_Ygl->frame_sync, 0, GL_TIMEOUT_IGNORED);
++  //  glDeleteSync(_Ygl->frame_sync);
++  //  _Ygl->frame_sync = 0;
++  //}
+   
+   if (_Ygl->texture_manager == NULL) {
+     _Ygl->texture_manager = YglTM;
+@@ -5432,11 +5432,11 @@ void VIDOGLVdp2DrawStart(void)
+     YglTM = YglTMInit(new_width, new_height);
+   }
+   YglReset();
+-  if (_Ygl->sync != 0) {
+-    glClientWaitSync(_Ygl->sync, 0, GL_TIMEOUT_IGNORED);
+-    glDeleteSync(_Ygl->sync);
+-    _Ygl->sync = 0;
+-  }
++  //if (_Ygl->sync != 0) {
++  //  glClientWaitSync(_Ygl->sync, 0, GL_TIMEOUT_IGNORED);
++  //  glDeleteSync(_Ygl->sync);
++  //  _Ygl->sync = 0;
++  //}
+   if (_Ygl->frame_sync != 0) {
+     glClientWaitSync(_Ygl->frame_sync, 0, GL_TIMEOUT_IGNORED);
+     glDeleteSync(_Ygl->frame_sync);
+diff --git a/yabause/src/ygles.c b/yabause/src/ygles.c
+index f287b60ce..8c1779108 100644
+--- a/yabause/src/ygles.c
++++ b/yabause/src/ygles.c
+@@ -4445,11 +4445,11 @@ void VIDOGLSync(){
+   _Ygl->texture_manager = NULL;
+   RBGGenerator_onFinish();
+   //glFinish();
+-  glFlush();
+   if (_Ygl->frame_sync != 0) {
+     glDeleteSync(_Ygl->frame_sync);
+     _Ygl->frame_sync = 0;
+   }
++  glFlush();
+   _Ygl->frame_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+ }
+ 
+
+From 510bc70f8d2b7c88a82e444a17d3cc917b8ad9e1 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Sat, 24 Aug 2019 20:19:40 +0900
+Subject: [PATCH 03/20] up to 2.7
+
+(cherry picked from commit f62dd90ade3a34e8c373894d37e74cee58b9297d)
+---
+ yabause/src/android/app/build.gradle | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/yabause/src/android/app/build.gradle b/yabause/src/android/app/build.gradle
+index 91168cbca..3c0335cdd 100644
+--- a/yabause/src/android/app/build.gradle
++++ b/yabause/src/android/app/build.gradle
+@@ -9,8 +9,8 @@ android {
+         minSdkVersion 19
+         targetSdkVersion 25
+         multiDexEnabled true
+-        versionCode 82
+-        versionName '2.6.8'
++        versionCode 83
++        versionName '2.7.0'
+         multiDexEnabled true
+         vectorDrawables.useSupportLibrary = true
+ 
+
+From 40485ab62cd81e18e12601d451df28ed8db8ae82 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Sat, 24 Aug 2019 20:22:24 +0900
+Subject: [PATCH 04/20] set version 2.7.0
+
+(cherry picked from commit 7a462e359978a28eed5fad238302028c8d48de93)
+---
+ yabause/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/yabause/CMakeLists.txt b/yabause/CMakeLists.txt
+index 2277298db..118b07cee 100644
+--- a/yabause/CMakeLists.txt
++++ b/yabause/CMakeLists.txt
+@@ -18,8 +18,8 @@ endif(YAB_FORCE_GLES20)
+ 
+ set(YAB_PACKAGE yabause)
+ set(YAB_VERSION_MAJOR 2)
+-set(YAB_VERSION_MINOR 6)
+-set(YAB_VERSION_PATCH 8)
++set(YAB_VERSION_MINOR 7)
++set(YAB_VERSION_PATCH 0)
+ set(YAB_VERSION "${YAB_VERSION_MAJOR}.${YAB_VERSION_MINOR}.${YAB_VERSION_PATCH}")
+ 
+ include(GetGitRevisionDescription)
+
+From b50f7b3e520642960c0768028278f8a84da15c0d Mon Sep 17 00:00:00 2001
+From: barbudreadmon <barbudreadmon@gmail.com>
+Date: Sat, 22 Jun 2019 09:44:59 +0200
+Subject: [PATCH 05/20] Add TAO bin/cue support
+
+# Conflicts:
+#	yabause/src/cdbase.c
+
+(cherry picked from commit 98df46e5885bafb8b4b56bc96a70cb8b0a1be697)
+---
+ yabause/src/cdbase.c | 350 +++++++++++++++++++++++++------------------
+ 1 file changed, 204 insertions(+), 146 deletions(-)
+
+diff --git a/yabause/src/cdbase.c b/yabause/src/cdbase.c
+index 84553fe3c..952de50a5 100644
+--- a/yabause/src/cdbase.c
++++ b/yabause/src/cdbase.c
+@@ -22,8 +22,12 @@
+ /*! \file cdbase.c
+     \brief Dummy and ISO, BIN/CUE, MDS CD Interfaces
+ */
+-
++#define _GNU_SOURCE
+ #include <string.h>
++#ifndef WIN32
++#include <strings.h>
++#include <dirent.h>
++#endif
+ #include <stdlib.h>
+ #include <assert.h>
+ #include <ctype.h>
+@@ -32,6 +36,8 @@
+ #include "error.h"
+ #include "debug.h"
+ 
++// Remove this for now, execution on windows fails because of it
++// #include "streams/file_stream_transforms.h"
+ #ifndef HAVE_STRICMP
+ #ifdef HAVE_STRCASECMP
+ #define stricmp strcasecmp
+@@ -267,10 +273,10 @@ typedef struct
+    u32 file_offset;
+    u32 sector_size;
+    FILE *fp;
+-	FILE *sub_fp;
+    int file_size;
+    int file_id;
+    int interleaved_sub;
++   char* filename;
+    u32 frames;
+    u32 extraframes;
+    u32 pregap;
+@@ -382,9 +388,117 @@ static u32 isoTOC[102];
+ static disc_info_struct disc;
+ static int iso_cd_status = 0;
+ 
++static int current_file_id = 0;
++
+ #define MSF_TO_FAD(m,s,f) ((m * 4500) + (s * 75) + f)
+ 
+ //////////////////////////////////////////////////////////////////////////////
++static int shallBeEscaped(char c) {
++  return ((c=='\\'));
++}
++
++static int charToEscape(char *buffer) {
++  int i;
++  int ret = 0;
++  for (i=0; i<strlen(buffer); i++) {
++    if(shallBeEscaped(buffer[i])) ret++;
++  }
++  return ret;
++}
++
++#ifndef WIN32
++static FILE* fopenInPath(char* filename, char* path){
++  int nbFiles,i,k;
++  char* tmp;
++  int l = strlen(filename) + 2;
++  struct dirent **fileListTemp;
++  nbFiles = scandir(path, &fileListTemp, NULL, alphasort);
++  for(i = 0; i < nbFiles; i++){
++    if (strncasecmp(filename, fileListTemp[i]->d_name, l) == 0) {
++      int p= (l + charToEscape(filename) + charToEscape(path)+strlen(path));
++      char* filepath = malloc(p*sizeof(char));
++      tmp = filepath;
++      for (k=0; k<strlen(path); k++) {
++        if (shallBeEscaped(path[k])) *tmp++='\\';
++           *tmp++ = path[k];
++      }
++      *tmp++ = '/';
++      for (k=0; k<strlen(fileListTemp[i]->d_name); k++) {
++        if (shallBeEscaped(fileListTemp[i]->d_name[k])) *tmp++='\\';
++           *tmp++ = fileListTemp[i]->d_name[k];
++      }
++      *tmp++ = '\0';
++      return fopen(filepath,"rb");
++    }
++  }
++  return NULL;
++
++}
++#else
++static FILE* fopenInPath(char* filename, char* path){
++  int l = strlen(filename)+2;
++  int k;
++  char* filepath = malloc((l + charToEscape(filename) + charToEscape(path)+strlen(path))*sizeof(char));
++  char* tmp;
++  tmp = filepath;
++  for (k=0; k<strlen(path); k++) {
++    if (shallBeEscaped(path[k])) *tmp++='\\';
++    *tmp++ = path[k];
++  }
++  *tmp++ = '\\';
++  for (k=0; k<strlen(filename); k++) {
++    if (shallBeEscaped(filename[k])) *tmp++='\\';
++    *tmp++ = filename[k];
++  }
++  *tmp++ = '\0';
++  return fopen(filepath,"rb");
++}
++#endif
++
++static FILE* OpenFile(char* buffer, const char* cue) {
++   char *filename, *endofpath;
++   char *path;
++   int tmp;
++   FILE *ret_file = NULL;
++   // Now go and open up the image file, figure out its size, etc.
++   if ((ret_file = fopen(buffer, "rb")) == NULL)
++   {
++      // Ok, exact path didn't work. Let's trim the path and try opening the
++      // file from the same directory as the cue.
++
++      // find the start of filename
++      filename = buffer;
++      for (tmp=0; tmp < strlen(buffer); tmp++)
++      {
++         if ((buffer[tmp] == '/') || (buffer[tmp] == '\\'))
++           filename = &buffer[tmp+1];
++      }
++
++      // append directory of cue file with bin filename
++      // find end of path
++      endofpath = (char*)cue;
++      for (tmp=0; tmp < strlen(cue); tmp++)
++      {
++         if ((cue[tmp] == '/') || (cue[tmp] == '\\'))
++           endofpath = (char*)&cue[tmp];
++      }
++
++      if ((path = (char *)calloc((endofpath - cue +1)*sizeof(char), 1)) == NULL)
++      {
++         return NULL;
++      }
++      strncpy(path, cue, endofpath - cue);
++
++      // Let's give it another try
++      ret_file = fopenInPath(filename, path);
++      free(path);
++      if (ret_file == NULL)
++      {
++         YabSetError(YAB_ERR_FILENOTFOUND, buffer);
++      }
++   }
++   return ret_file;
++}
+ 
+ static int LoadCHD(const char *chd_filename, FILE *iso_file);
+ static int ISOCDReadSectorFADFromCHD(u32 FAD, void *buffer);
+@@ -392,18 +506,19 @@ static int ISOCDReadSectorFADFromCHD(u32 FAD, void *buffer);
+ static int LoadBinCue(const char *cuefilename, FILE *iso_file)
+ {
+    long size;
+-   char *temp_buffer, *temp_buffer2;
++   char* temp_buffer;
+    unsigned int track_num;
+    unsigned int indexnum, min, sec, frame;
+    unsigned int pregap=0;
+-   char *p, *p2;
+    track_info_struct trk[100];
+-   int file_size;
+    int i;
+-   FILE * bin_file;
+    int matched = 0;
++   FILE *trackfp = NULL;
++   int trackfp_size = 0;
++   int fad = 0;
++   int current_file_id = 0;
+ 
+-	memset(trk, 0, sizeof(trk));
++   memset(trk, 0, sizeof(trk));
+    disc.session_num = 1;
+    disc.session = malloc(sizeof(session_info_struct) * disc.session_num);
+    if (disc.session == NULL)
+@@ -427,13 +542,6 @@ static int LoadBinCue(const char *cuefilename, FILE *iso_file)
+    if ((temp_buffer = (char *)calloc(size, 1)) == NULL)
+       return -1;
+ 
+-   // Skip image filename
+-   if (fscanf(iso_file, "FILE \"%*[^\"]\" %*s\r\n") == EOF)
+-   {
+-      free(temp_buffer);
+-      return -1;
+-   }
+-
+    // Time to generate TOC
+    for (;;)
+    {
+@@ -441,6 +549,22 @@ static int LoadBinCue(const char *cuefilename, FILE *iso_file)
+       if (fscanf(iso_file, "%s", temp_buffer) == EOF)
+          break;
+ 
++      if (strncmp(temp_buffer, "FILE", 4) == 0)
++      {
++         matched = fscanf(iso_file, " \"%[^\"]\"", temp_buffer);
++         trackfp = OpenFile(temp_buffer, cuefilename);
++         if (trackfp == NULL) {
++           printf("Can not open file %s\n", temp_buffer);
++           free(temp_buffer);
++           return -1;
++         }
++         fseek(trackfp, 0, SEEK_END);
++         trackfp_size = ftell(trackfp);
++         fseek(trackfp, 0, SEEK_SET);
++         current_file_id++;
++         continue;
++      }
++
+       // Figure out what it is
+       if (strncmp(temp_buffer, "TRACK", 5) == 0)
+       {
+@@ -448,6 +572,15 @@ static int LoadBinCue(const char *cuefilename, FILE *iso_file)
+          if (fscanf(iso_file, "%d %[^\r\n]\r\n", &track_num, temp_buffer) == EOF)
+             break;
+ 
++         trk[track_num-1].fp = trackfp;
++         trk[track_num-1].file_size = trackfp_size;
++         trk[track_num-1].file_id = current_file_id;
++
++         if (track_num > 1) {
++           fad += (trk[track_num-2].file_size-trk[track_num-2].file_offset)/trk[track_num-2].sector_size;
++           trk[track_num-2].fad_end = trk[track_num-2].fad_start+(trk[track_num-2].file_size-trk[track_num-2].file_offset)/trk[track_num-2].sector_size;
++         }
++
+          if (strncmp(temp_buffer, "MODE1", 5) == 0 ||
+             strncmp(temp_buffer, "MODE2", 5) == 0)
+          {
+@@ -472,7 +605,8 @@ static int LoadBinCue(const char *cuefilename, FILE *iso_file)
+          if (indexnum == 1)
+          {
+             // Update toc entry
+-            trk[track_num-1].fad_start = (MSF_TO_FAD(min, sec, frame) + pregap + 150);
++            fad += MSF_TO_FAD(min, sec, frame) + pregap + 150;
++            trk[track_num-1].fad_start = fad;
+             trk[track_num-1].file_offset = MSF_TO_FAD(min, sec, frame) * trk[track_num-1].sector_size;
+          }
+       }
+@@ -488,92 +622,14 @@ static int LoadBinCue(const char *cuefilename, FILE *iso_file)
+          if (fscanf(iso_file, "%d:%d:%d\r\n", &min, &sec, &frame) == EOF)
+             break;
+       }
+-      else if (strncmp(temp_buffer, "FILE", 4) == 0)
+-      {
+-         YabSetError(YAB_ERR_OTHER, "Unsupported cue format");
+-         free(temp_buffer);
+-         return -1;
+-      }
+    }
+ 
+    trk[track_num].file_offset = 0;
+    trk[track_num].fad_start = 0xFFFFFFFF;
+ 
+-   // Go back, retrieve image filename
+-   fseek(iso_file, 0, SEEK_SET);
+-   matched = fscanf(iso_file, "FILE \"%[^\"]\" %*s\r\n", temp_buffer);
+-
+-   // Now go and open up the image file, figure out its size, etc.
+-   if ((bin_file = fopen(temp_buffer, "rb")) == NULL)
+-   {
+-      // Ok, exact path didn't work. Let's trim the path and try opening the
+-      // file from the same directory as the cue.
+-
+-      // find the start of filename
+-      p = temp_buffer;
+-
+-      for (;;)
+-      {
+-         if (strcspn(p, "/\\") == strlen(p))
+-         break;
+-
+-         p += strcspn(p, "/\\") + 1;
+-      }
+-
+-      // append directory of cue file with bin filename
+-      if ((temp_buffer2 = (char *)calloc(strlen(cuefilename) + strlen(p) + 1, 1)) == NULL)
+-      {
+-         free(temp_buffer);
+-         return -1;
+-      }
+-
+-      // find end of path
+-      p2 = (char *)cuefilename;
++   trk[track_num-1].fad_end = trk[track_num-1].fad_start+(trk[track_num-1].file_size-trk[track_num-1].file_offset)/trk[track_num-1].sector_size;
+ 
+-      for (;;)
+-      {
+-         if (strcspn(p2, "/\\") == strlen(p2))
+-            break;
+-         p2 += strcspn(p2, "/\\") + 1;
+-      }
+-
+-      // Make sure there was at least some kind of path, otherwise our
+-      // second check is pretty useless
+-      if (cuefilename == p2 && temp_buffer == p)
+-      {
+-         free(temp_buffer);
+-         free(temp_buffer2);
+-         return -1;
+-      }
+-
+-      strncpy(temp_buffer2, cuefilename, p2 - cuefilename);
+-      strcat(temp_buffer2, p);
+-
+-      // Let's give it another try
+-      bin_file = fopen(temp_buffer2, "rb");
+-      free(temp_buffer2);
+-
+-      if (bin_file == NULL)
+-      {
+-         YabSetError(YAB_ERR_FILENOTFOUND, temp_buffer);
+-         free(temp_buffer);
+-         return -1;
+-      }
+-   }
+-
+-   fseek(bin_file, 0, SEEK_END);
+-   file_size = ftell(bin_file);
+-   fseek(bin_file, 0, SEEK_SET);
+-
+-   for (i = 0; i < track_num; i++)
+-   {
+-      trk[i].fad_end = trk[i+1].fad_start-1;
+-      trk[i].file_id = 0;
+-      trk[i].fp = bin_file;
+-      trk[i].file_size = file_size;
+-   }
+-
+-   trk[track_num-1].fad_end = trk[track_num-1].fad_start+(file_size-trk[track_num-1].file_offset)/trk[track_num-1].sector_size;
++   //for (int i =0; i<track_num; i++) printf("Track %d [%d - %d]\n", i+1, trk[i].fad_start, trk[i].fad_end);
+ 
+    disc.session[0].fad_start = 150;
+    disc.session[0].fad_end = trk[track_num-1].fad_end;
+@@ -589,9 +645,6 @@ static int LoadBinCue(const char *cuefilename, FILE *iso_file)
+ 
+    memcpy(disc.session[0].track, trk, track_num * sizeof(track_info_struct));
+ 
+-   // buffer is no longer needed
+-   free(temp_buffer);
+-
+    fclose(iso_file);
+    return 0;
+ }
+@@ -686,7 +739,11 @@ int LoadMDSTracks(const char *mds_filename, FILE *iso_file, mds_session_struct *
+                else
+                   wcscpy(filename, img_filename);
+ 
++#if defined(NX)
++               fp = fopen(filename, L"rb");
++#else
+                fp = _wfopen(filename, L"rb");
++#endif
+             }
+             else
+             {
+@@ -905,23 +962,23 @@ int LoadParseCCD(FILE *ccd_fp, ccd_struct *ccd)
+ 	int lineno = 0, error = 0, max_size = 100;
+ 
+ 	ccd->dict = (ccd_dict_struct *)malloc(sizeof(ccd_dict_struct)*max_size);
+-	if (ccd->dict == NULL) 
++	if (ccd->dict == NULL)
+ 		return -1;
+ 
+ 	ccd->num_dict = 0;
+ 
+ 	// Read CCD file
+-	while (fgets(text, sizeof(text), ccd_fp) != NULL) 
++	while (fgets(text, sizeof(text), ccd_fp) != NULL)
+ 	{
+ 		lineno++;
+ 
+ 		start = StripPreSuffixWhitespace(text);
+ 
+-		if (start[0] == '[') 
++		if (start[0] == '[')
+ 		{
+ 			// Section
+ 			end = strchr(start+1, ']');
+-			if (end == NULL) 
++			if (end == NULL)
+ 			{
+ 				// ] missing from section
+ 				error = lineno;
+@@ -934,11 +991,11 @@ int LoadParseCCD(FILE *ccd_fp, ccd_struct *ccd)
+ 				old_name[0] = '\0';
+ 			}
+ 		}
+-		else if (start[0]) 
++		else if (start[0])
+ 		{
+ 			// Name/Value pair
+ 			end = strchr(start, '=');
+-			if (end) 
++			if (end)
+ 			{
+ 				end[0] = '\0';
+ 				name = StripPreSuffixWhitespace(start);
+@@ -993,7 +1050,7 @@ static int GetIntCCD(ccd_struct *ccd, char *section, char *name)
+ 			 stricmp(ccd->dict[i].name, name) == 0)
+ #endif
+ 			return strtol(ccd->dict[i].value, NULL, 0);
+-        
++
+ 	}
+ 
+ 	return -1;
+@@ -1177,7 +1234,6 @@ static int ISOCDInit(const char * iso) {
+    int ret;
+    FILE *iso_file;
+    size_t num_read = 0;
+-
+    memset(isoTOC, 0xFF, 0xCC * 2);
+    memset(&disc, 0, sizeof(disc));
+    iso_cd_status = 0;
+@@ -1195,7 +1251,7 @@ static int ISOCDInit(const char * iso) {
+    ext = strrchr(iso, '.');
+ 
+    // Figure out what kind of image format we're dealing with
+-   if (stricmp(ext, ".CUE") == 0 && strncmp(header, "FILE \"", 6) == 0)
++   if (stricmp(ext, ".CUE") == 0)
+    {
+       // It's a BIN/CUE
+       imgtype = IMG_BINCUE;
+@@ -1234,7 +1290,7 @@ static int ISOCDInit(const char * iso) {
+          fclose(iso_file);
+       iso_file = NULL;
+       return -1;
+-   }   
++   }
+ 
+    BuildTOC();
+    return 0;
+@@ -1300,10 +1356,13 @@ static s32 ISOCDReadTOC(u32 * TOC) {
+ 
+ //////////////////////////////////////////////////////////////////////////////
+ 
++track_info_struct *currentTrack = NULL;
++
+ static int ISOCDReadSectorFAD(u32 FAD, void *buffer) {
+    int i,j;
+    size_t num_read = 0;
+-   track_info_struct *track=NULL;
++   int found = 0;
++   int offset = 0;
+ 
+    assert(disc.session);
+ 
+@@ -1319,68 +1378,67 @@ static int ISOCDReadSectorFAD(u32 FAD, void *buffer) {
+       {
+          if (FAD >= disc.session[i].track[j].fad_start &&
+              FAD <= disc.session[i].track[j].fad_end)
+-         {             
+-            track = &disc.session[i].track[j];
++         {
++            track_info_struct *track = &disc.session[i].track[j];
++            if ((currentTrack != track) || (currentTrack == NULL)){
++              currentTrack = track;
++              found = 1;
++            }
+             break;
+          }
++         if (found == 1) break;
+       }
+    }
+ 
+-   if (track == NULL)
++   if (currentTrack == NULL)
+    {
+-      CDLOG("Warning: Sector not found in track list");
++      CDLOG("Warning: Sector not found in track list\n");
+       return 0;
+    }
++   offset = currentTrack->file_offset + (FAD-currentTrack->fad_start) * currentTrack->sector_size;
++   
++   fseek(currentTrack->fp, offset, SEEK_SET);
+ 
+-   fseek(track->fp, track->file_offset + (FAD-track->fad_start) * track->sector_size, SEEK_SET);
+-	if (track->sub_fp)
+-		fseek(track->sub_fp, track->file_offset + (FAD-track->fad_start) * 96, SEEK_SET);
+-   if (track->sector_size == 2448)
++   if (currentTrack->sector_size == 2448)
+    {
+-      if (!track->interleaved_sub)
+-		{
+-			if (track->sub_fp)
+-			{
+-            num_read = fread(buffer, 2352, 1, track->fp);
+-            num_read = fread((char *)buffer + 2352, 96, 1, track->sub_fp);
+-			}
+-			else
+-            num_read = fread(buffer, 2448, 1, track->fp);
+-		}
++      if (!currentTrack->interleaved_sub)
++      {
++         num_read = fread(buffer, 2448, 1, currentTrack->fp);
++      }
+       else
+       {
+          const u16 deint_offsets[] = {
+-            0, 66, 125, 191, 100, 50, 150, 175, 8, 33, 58, 83, 
+-            108, 133, 158, 183, 16, 41, 25, 91, 116, 141, 166, 75, 
+-            24, 90, 149, 215, 124, 74, 174, 199, 32, 57, 82, 107, 
+-            132, 157, 182, 207, 40, 65, 49, 115, 140, 165, 190, 99, 
+-            48, 114, 173, 239, 148, 98, 198, 223, 56, 81, 106, 131, 
+-            156, 181, 206, 231, 64, 89, 73, 139, 164, 189, 214, 123, 
+-            72, 138, 197, 263, 172, 122, 222, 247, 80, 105, 130, 155, 
++            0, 66, 125, 191, 100, 50, 150, 175, 8, 33, 58, 83,
++            108, 133, 158, 183, 16, 41, 25, 91, 116, 141, 166, 75,
++            24, 90, 149, 215, 124, 74, 174, 199, 32, 57, 82, 107,
++            132, 157, 182, 207, 40, 65, 49, 115, 140, 165, 190, 99,
++            48, 114, 173, 239, 148, 98, 198, 223, 56, 81, 106, 131,
++            156, 181, 206, 231, 64, 89, 73, 139, 164, 189, 214, 123,
++            72, 138, 197, 263, 172, 122, 222, 247, 80, 105, 130, 155,
+             180, 205, 230, 255, 88, 113, 97, 163, 188, 213, 238, 147
+          };
+          u8 subcode_buffer[96 * 3];
+-
+-         num_read = fread(buffer, 2352, 1, track->fp);
+-
+-         num_read = fread(subcode_buffer, 96, 1, track->fp);
+-         fseek(track->fp, 2352, SEEK_CUR);
+-         num_read = fread(subcode_buffer + 96, 96, 1, track->fp);
+-         fseek(track->fp, 2352, SEEK_CUR);
+-         num_read = fread(subcode_buffer + 192, 96, 1, track->fp);
++         
++         num_read = fread(buffer, 2352, 1, currentTrack->fp);
++
++         num_read = fread(subcode_buffer, 96, 1, currentTrack->fp);
++         fseek(currentTrack->fp, 2352, SEEK_CUR);
++         num_read = fread(subcode_buffer + 96, 96, 1, currentTrack->fp);
++         fseek(currentTrack->fp, 2352, SEEK_CUR);
++         num_read = fread(subcode_buffer + 192, 96, 1, currentTrack->fp);
+          for (i = 0; i < 96; i++)
+             ((u8 *)buffer)[2352+i] = subcode_buffer[deint_offsets[i]];
+       }
+    }
+-   else if (track->sector_size == 2352)
++   else if (currentTrack->sector_size == 2352)
+    {
+       // Generate subcodes here
+-      num_read = fread(buffer, 2352, 1, track->fp);
++      num_read = fread(buffer, 2352, 1, currentTrack->fp);
+    }
+-   else if (track->sector_size == 2048)
++   else if (currentTrack->sector_size == 2048)
+    {
+       memcpy(buffer, syncHdr, 12);
+-      num_read = fread((char *)buffer + 0x10, 2048, 1, track->fp);
++      num_read = fread((char *)buffer + 0x10, 2048, 1, currentTrack->fp);
+    }
+ 	return 1;
+ }
+
+From fc1ce5e66bbde25c0da12d35aff9b6e6a3ad4997 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Sun, 25 Aug 2019 07:42:15 +0900
+Subject: [PATCH 06/20] Data tracks (except first track) ignore pregap, Audio
+ tracks jump to pregap
+
+(cherry picked from commit e45ded845de52d1109b1b7a10a310aeeeaf5db4e)
+---
+ yabause/src/cdbase.c | 56 ++++++++++++++++++++++++++++++++------------
+ 1 file changed, 41 insertions(+), 15 deletions(-)
+
+diff --git a/yabause/src/cdbase.c b/yabause/src/cdbase.c
+index 952de50a5..14737dc4d 100644
+--- a/yabause/src/cdbase.c
++++ b/yabause/src/cdbase.c
+@@ -576,6 +576,10 @@ static int LoadBinCue(const char *cuefilename, FILE *iso_file)
+          trk[track_num-1].file_size = trackfp_size;
+          trk[track_num-1].file_id = current_file_id;
+ 
++         if (track_num == 1) {
++           fad += 150; // lead-in
++         }
++
+          if (track_num > 1) {
+            fad += (trk[track_num-2].file_size-trk[track_num-2].file_offset)/trk[track_num-2].sector_size;
+            trk[track_num-2].fad_end = trk[track_num-2].fad_start+(trk[track_num-2].file_size-trk[track_num-2].file_offset)/trk[track_num-2].sector_size;
+@@ -594,6 +598,7 @@ static int LoadBinCue(const char *cuefilename, FILE *iso_file)
+             trk[track_num-1].sector_size = 2352;
+             trk[track_num-1].ctl_addr = 0x01;
+          }
++         trk[track_num - 1].fad_start = 0;
+       }
+       else if (strncmp(temp_buffer, "INDEX", 5) == 0)
+       {
+@@ -602,13 +607,21 @@ static int LoadBinCue(const char *cuefilename, FILE *iso_file)
+          if (fscanf(iso_file, "%d %d:%d:%d\r\n", &indexnum, &min, &sec, &frame) == EOF)
+             break;
+ 
+-         if (indexnum == 1)
++         // Data tracks (except first track) ignore pregap
++         if (indexnum == 0 && trk[track_num - 1].ctl_addr == 0x41) { 
++           fad += MSF_TO_FAD(min, sec, frame) + pregap;
++           trk[track_num - 1].fad_start = fad;
++           trk[track_num - 1].file_offset = MSF_TO_FAD(min, sec, frame) * trk[track_num - 1].sector_size;
++         }
++
++         // Audio tracks jump to pregap
++         if (indexnum == 1 && trk[track_num - 1].fad_start == 0 )
+          {
+-            // Update toc entry
+-            fad += MSF_TO_FAD(min, sec, frame) + pregap + 150;
+-            trk[track_num-1].fad_start = fad;
+-            trk[track_num-1].file_offset = MSF_TO_FAD(min, sec, frame) * trk[track_num-1].sector_size;
++            fad += MSF_TO_FAD(min, sec, frame) + pregap;
++            trk[track_num - 1].fad_start = fad;
++            trk[track_num - 1].file_offset = MSF_TO_FAD(min, sec, frame) * trk[track_num - 1].sector_size;
+          }
++         
+       }
+       else if (strncmp(temp_buffer, "PREGAP", 6) == 0)
+       {
+@@ -1376,6 +1389,9 @@ static int ISOCDReadSectorFAD(u32 FAD, void *buffer) {
+    {
+       for (j = 0; j < disc.session[i].track_num; j++)
+       {
++        if (j == 1) {
++          int a = 0;
++        }
+          if (FAD >= disc.session[i].track[j].fad_start &&
+              FAD <= disc.session[i].track[j].fad_end)
+          {
+@@ -1607,13 +1623,14 @@ static int LoadCHD(const char *chd_filename, FILE *iso_file)
+     {
+       trk[num_tracks].ctl_addr = 0x01;
+       trk[num_tracks].sector_size = 2352;
++      //trk[num_tracks].pregap = 0;
+     }
+    
+-    trk[num_tracks].fad_start = trk[num_tracks].fad_start + pregap;
+-    trk[num_tracks].fad_end = trk[num_tracks].fad_start + (frame - 1) - pregap;
+-    frame = trk[num_tracks].fad_end+1;
++    //trk[num_tracks].fad_start = trk[num_tracks].fad_start + pregap;
++    //trk[num_tracks].fad_end = trk[num_tracks].fad_start + (frame - 1) + postgap;
++    //frame = trk[num_tracks].fad_end+1;
+     num_tracks++;
+-    trk[num_tracks].fad_start = frame;
++    //trk[num_tracks].fad_start = frame;
+   }
+   free(buf);
+ 
+@@ -1622,17 +1639,20 @@ static int LoadCHD(const char *chd_filename, FILE *iso_file)
+ 
+   u32 chdofs = 0;
+   u32 physofs = 0;
+-  u32 logofs = 0;
++  u32 logofs = 150;
+   int i;
+   for (i = 0; i < num_tracks; i++)
+   {
+-    trk[i].logframeofs = logofs;
++    trk[i].fad_start = logofs;
++    
+     trk[i].physframeofs = physofs;
+     trk[i].chdframeofs = chdofs;
++    trk[i].logframeofs = logofs;
+ 
+-    logofs += trk[i].pregap;
+-    logofs += trk[i].postgap;
++    //logofs += trk[i].pregap;
++    //logofs += trk[i].postgap;
+     logofs += trk[i].frames;
++    trk[i].fad_end = logofs-1;
+ 
+     physofs += trk[i].frames;
+ 
+@@ -1680,18 +1700,24 @@ static int ISOCDReadSectorFADFromCHD(u32 FAD, void *buffer) {
+   track_info_struct *track = NULL;
+   u32 chdlba;
+   u32 physlba;
+-  u32 loglba = FAD - 150;
++  u32 loglba = FAD;
+ 
+   chdlba = loglba;
+   for (i = 0; i < disc.session_num; i++)
+   {
+     for (j = 0; j < disc.session[i].track_num; j++)
+     {
++      if (j == 1) {
++        int a = 0;
++      }
+       if (loglba < disc.session[i].track[j+1].logframeofs) {
+         if ((loglba > disc.session[i].track[j].pregap)) {
+-          loglba -= disc.session[i].track[j].pregap;
++          //loglba -= disc.session[i].track[j].pregap;
+         }
+         physlba = disc.session[i].track[j].physframeofs + (loglba - disc.session[i].track[j].logframeofs);
++        if (disc.session[i].track[j].ctl_addr == 0x01) {
++          physlba += disc.session[i].track[j].pregap;
++        }
+         chdlba = physlba - disc.session[i].track[j].physframeofs + disc.session[i].track[j].chdframeofs;
+         track = &disc.session[i].track[j];
+         break;
+
+From 4bc383e8a03fbe89e9d5100469cb85239a6af4f4 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Sun, 25 Aug 2019 07:56:25 +0900
+Subject: [PATCH 07/20] ver 2.7.1
+
+(cherry picked from commit 2c0e1b51f34be680d2bf3feb3e3c9091e9a80b1d)
+---
+ yabause/CMakeLists.txt               | 2 +-
+ yabause/src/android/app/build.gradle | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/yabause/CMakeLists.txt b/yabause/CMakeLists.txt
+index 118b07cee..1786862df 100644
+--- a/yabause/CMakeLists.txt
++++ b/yabause/CMakeLists.txt
+@@ -19,7 +19,7 @@ endif(YAB_FORCE_GLES20)
+ set(YAB_PACKAGE yabause)
+ set(YAB_VERSION_MAJOR 2)
+ set(YAB_VERSION_MINOR 7)
+-set(YAB_VERSION_PATCH 0)
++set(YAB_VERSION_PATCH 1)
+ set(YAB_VERSION "${YAB_VERSION_MAJOR}.${YAB_VERSION_MINOR}.${YAB_VERSION_PATCH}")
+ 
+ include(GetGitRevisionDescription)
+diff --git a/yabause/src/android/app/build.gradle b/yabause/src/android/app/build.gradle
+index 3c0335cdd..e0ef4c7f8 100644
+--- a/yabause/src/android/app/build.gradle
++++ b/yabause/src/android/app/build.gradle
+@@ -9,8 +9,8 @@ android {
+         minSdkVersion 19
+         targetSdkVersion 25
+         multiDexEnabled true
+-        versionCode 83
+-        versionName '2.7.0'
++        versionCode 84
++        versionName '2.7.1'
+         multiDexEnabled true
+         vectorDrawables.useSupportLibrary = true
+ 
+
+From e47d59805cb60e0c1d5211078392df8491a08cf2 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Sun, 25 Aug 2019 15:01:07 +0900
+Subject: [PATCH 08/20] double buffered glMapBufferRange
+
+(cherry picked from commit 8e58269c6a99db8bafaa449817fb559bd72ac5cd)
+---
+ yabause/src/vidogl.c      |  10 +-
+ yabause/src/ygl.h         |  11 +-
+ yabause/src/ygles.c       | 213 ++++++++++++++++++++++----------------
+ yabause/src/yglshaderes.c |  28 ++---
+ 4 files changed, 152 insertions(+), 110 deletions(-)
+
+diff --git a/yabause/src/vidogl.c b/yabause/src/vidogl.c
+index 7708a5183..e3bb4e563 100644
+--- a/yabause/src/vidogl.c
++++ b/yabause/src/vidogl.c
+@@ -5437,11 +5437,11 @@ void VIDOGLVdp2DrawStart(void)
+   //  glDeleteSync(_Ygl->sync);
+   //  _Ygl->sync = 0;
+   //}
+-  if (_Ygl->frame_sync != 0) {
+-    glClientWaitSync(_Ygl->frame_sync, 0, GL_TIMEOUT_IGNORED);
+-    glDeleteSync(_Ygl->frame_sync);
+-    _Ygl->frame_sync = 0;
+-  }
++  //if (_Ygl->frame_sync != 0) {
++  //  glClientWaitSync(_Ygl->frame_sync, 0, GL_TIMEOUT_IGNORED);
++  //  glDeleteSync(_Ygl->frame_sync);
++  //  _Ygl->frame_sync = 0;
++  //}
+   YglTmPull(YglTM, 0);
+   YglTMReset(YglTM);
+   YglCacheReset(YglTM);
+diff --git a/yabause/src/ygl.h b/yabause/src/ygl.h
+index b7838d7b5..8b45d1df4 100644
+--- a/yabause/src/ygl.h
++++ b/yabause/src/ygl.h
+@@ -252,8 +252,15 @@ typedef struct {
+ 	YglCacheHash *HashTable[HASHSIZE];
+ 	YglCacheHash CashLink[HASHSIZE * 2];
+ 	u32 CashLink_index;
+-	GLuint textureID;
+-	GLuint pixelBufferID;
++
++	//GLuint textureID;
++	//GLuint pixelBufferID;
++
++  int current;
++  GLuint textureID_in[2];
++  GLuint pixelBufferID_in[2];
++  unsigned int * texture_in[2];
++
+ } YglTextureManager;
+ 
+ extern YglTextureManager * YglTM;
+diff --git a/yabause/src/ygles.c b/yabause/src/ygles.c
+index 8c1779108..7ed8f11be 100644
+--- a/yabause/src/ygles.c
++++ b/yabause/src/ygles.c
+@@ -493,38 +493,43 @@ YglTextureManager * YglTMInit(unsigned int w, unsigned int h) {
+   memset(tm, 0, sizeof(YglTextureManager));
+   tm->width = w;
+   tm->height = h;
++  tm->current = 0;
+ 
+   YglTMReset(tm);
+ 
+-  glGenBuffers(1, &tm->pixelBufferID);
+-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
+-  glBufferData(GL_PIXEL_UNPACK_BUFFER, tm->width * tm->height * 4, NULL, GL_DYNAMIC_DRAW);
+-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
++  for (int i = 0; i < 2; i++) {
+ 
+-  glGetError();
+-  glGenTextures(1, &tm->textureID);
+-  glBindTexture(GL_TEXTURE_2D, tm->textureID);
+-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tm->width, tm->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+-  if ((error = glGetError()) != GL_NO_ERROR)
+-  {
+-    YGLDEBUG("Fail to init YglTM->textureID %04X", error);
+-    abort();
+-  }
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
++    glGenBuffers(1, &tm->pixelBufferID_in[i]);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[i]);
++    glBufferData(GL_PIXEL_UNPACK_BUFFER, tm->width * tm->height * 4, NULL, GL_DYNAMIC_DRAW);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+ 
+-  glBindTexture(GL_TEXTURE_2D, tm->textureID);
+-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
+-  tm->texture = (unsigned int *)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT );
+-  if ((error = glGetError()) != GL_NO_ERROR)
+-  {
+-    YGLDEBUG("Fail to init YglTM->texture %04X", error);
+-    abort();
++    glGetError();
++    glGenTextures(1, &tm->textureID_in[i]);
++    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[i]);
++    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tm->width, tm->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
++    if ((error = glGetError()) != GL_NO_ERROR)
++    {
++      YGLDEBUG("Fail to init YglTM->textureID %04X", error);
++      abort();
++    }
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
++  
++    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[i]);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[i]);
++    tm->texture_in[i] = (unsigned int *)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
++    if ((error = glGetError()) != GL_NO_ERROR)
++    {
++      YGLDEBUG("Fail to init YglTM->texture %04X", error);
++      abort();
++    }
++   
+   }
++  tm->texture = tm->texture_in[tm->current];
+   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+-
+   YglGetColorRamPointer();
+ 
+   return tm;
+@@ -533,15 +538,19 @@ YglTextureManager * YglTMInit(unsigned int w, unsigned int h) {
+ //////////////////////////////////////////////////////////////////////////////
+ 
+ void YglTMDeInit(YglTextureManager * tm) {
+-  glBindTexture(GL_TEXTURE_2D, tm->textureID);
+-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+-  glBindTexture(GL_TEXTURE_2D, 0);
+-  glFinish();
+ 
+-  glDeleteTextures(1, &tm->textureID);
+-  tm->textureID = 0;
+-  glDeleteBuffers(1, &tm->pixelBufferID);
+-  tm->pixelBufferID = 0;
++  for (int i = 0; i < 2; i++) {
++    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[i]);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
++    glBindTexture(GL_TEXTURE_2D, 0);
++    glFinish();
++
++    glDeleteTextures(1, &tm->textureID_in[i]);
++    tm->textureID_in[i] = 0;
++    glDeleteBuffers(1, &tm->pixelBufferID_in[i]);
++    tm->pixelBufferID_in[i] = 0;
++  }
++
+   free(tm);
+ }
+ 
+@@ -570,9 +579,9 @@ void YglTMReserve(YglTextureManager * tm, unsigned int w, unsigned int h){
+ 
+ void YglTmPush(YglTextureManager * tm){
+   glActiveTexture(GL_TEXTURE0);
+-  glBindTexture(GL_TEXTURE_2D, tm->textureID);
++  glBindTexture(GL_TEXTURE_2D, tm->textureID_in[tm->current] );
+   if (tm->texture != NULL ) {
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[tm->current] );
+     glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tm->width, tm->yMax, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+@@ -582,88 +591,114 @@ void YglTmPush(YglTextureManager * tm){
+ 
+ void YglTmPull(YglTextureManager * tm, u32 flg){
+   if (tm->texture == NULL) {
++
++    int prev = tm->current;
++
++    if (tm->current == 0) {
++      tm->current = 1;
++    }
++    else {
++      tm->current = 0;
++    }
++
++    tm->texture = tm->texture_in[tm->current];
++
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, tm->textureID);
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
+-    tm->texture = (int*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | flg | GL_MAP_UNSYNCHRONIZED_BIT  );
+-    if (tm->texture == NULL){
++    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[prev]);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[prev]);
++    tm->texture_in[prev] = (int*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | flg | GL_MAP_UNSYNCHRONIZED_BIT  );
++    if (tm->texture_in[prev] == NULL){
+       abort();
+     }
+-	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
++	  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
++
++    glFlush();
++
++    glActiveTexture(GL_TEXTURE0);
++    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[tm->current]);
++
+   }
+ }
+ 
+ 
+ void YglTMRealloc(YglTextureManager * tm, unsigned int width, unsigned int height ){
+ 
+-  GLuint new_textureID;
+-  GLuint new_pixelBufferID;
+-  unsigned int * new_texture;
++  GLuint new_textureID[2];
++  GLuint new_pixelBufferID[2];
++  unsigned int * new_texture[2];
+   GLuint error;
+ 
+   Vdp2RgbTextureSync();
+ 
+-  if (tm->texture != NULL) {
++  if (tm->texture_in[tm->current] != NULL) {
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, tm->textureID);
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
++    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[tm->current] );
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[tm->current]);
+     glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+-    tm->texture = NULL;
++    tm->texture_in[tm->current] = NULL;
+   }
+ 
+   glGetError();
+ 
+-
+-  glGenTextures(1, &new_textureID);
+-  glBindTexture(GL_TEXTURE_2D, new_textureID);
++  for (int i = 0; i < 2; i++) {
++    glGenTextures(1, &new_textureID[i]);
++    glBindTexture(GL_TEXTURE_2D, new_textureID[i]);
+     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+-  if ((error = glGetError()) != GL_NO_ERROR){
+-    YGLDEBUG("Fail to init new_textureID %d, %04X(%d,%d)\n", new_textureID, error,width, height);
+-    abort();
+-  }
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
++    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
++    if ((error = glGetError()) != GL_NO_ERROR) {
++      YGLDEBUG("Fail to init new_textureID %d, %04X(%d,%d)\n", new_textureID, error, width, height);
++      abort();
++    }
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+ 
+ 
+-  glGenBuffers(1, &new_pixelBufferID);
+-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, new_pixelBufferID);
+-  glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height * 4, NULL, GL_DYNAMIC_DRAW);
++    glGenBuffers(1, &new_pixelBufferID[i]);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, new_pixelBufferID[i]);
++    glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height * 4, NULL, GL_DYNAMIC_DRAW);
+ 
+-  int dh = tm->height;
+-  if (dh > height) dh = height;
++    int dh = tm->height;
++    if (dh > height) dh = height;
+ 
+-  glBindBuffer(GL_COPY_READ_BUFFER, tm->pixelBufferID);
+-  glBindBuffer(GL_COPY_WRITE_BUFFER, new_pixelBufferID);
+-  glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, tm->width * dh * 4);
+-  if ((error = glGetError()) != GL_NO_ERROR){
+-    YGLDEBUG("Fail to init new_texture %04X", error);
+-    abort();
++    glBindBuffer(GL_COPY_READ_BUFFER, tm->pixelBufferID_in[tm->current]);
++    glBindBuffer(GL_COPY_WRITE_BUFFER, new_pixelBufferID[i]);
++    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, tm->width * dh * 4);
++    if ((error = glGetError()) != GL_NO_ERROR) {
++      YGLDEBUG("Fail to init new_texture %04X", error);
++      abort();
++    }
+   }
+ 
+   glBindBuffer(GL_COPY_READ_BUFFER, 0);
+   glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+ 
++  for (int i = 0; i < 2; i++) {
+ 
+-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, new_pixelBufferID);
+-  new_texture = (unsigned int *)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, width * height * 4, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT );
+-  if ((error = glGetError()) != GL_NO_ERROR){
+-    YGLDEBUG("Fail to init new_texture %04X", error);
+-    abort();
+-  }
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, new_pixelBufferID[i]);
++    new_texture[i] = (unsigned int *)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, width * height * 4, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
++    if ((error = glGetError()) != GL_NO_ERROR) {
++      YGLDEBUG("Fail to init new_texture %04X", error);
++      abort();
++    }
++
++    // Free textures
++    glDeleteTextures(1, &tm->textureID_in[i]);
++    glDeleteBuffers(1, &tm->pixelBufferID_in[i]);
++    
++    tm->texture_in[i] = new_texture[i];
++    tm->textureID_in[i] = new_textureID[i];
++    tm->pixelBufferID_in[i] = new_pixelBufferID[i];
+ 
+-  // Free textures
+-  glDeleteTextures(1, &tm->textureID);
+-  glDeleteBuffers(1, &tm->pixelBufferID);
++  }
+ 
+   // user new texture
+-    tm->width = width;
++  tm->width = width;
+   tm->height = height;
+-  tm->texture = new_texture;
+-  tm->textureID = new_textureID;
+-  tm->pixelBufferID = new_pixelBufferID;
++  tm->texture = tm->texture_in[tm->current];
++  //tm->textureID = new_textureID;
++  //tm->pixelBufferID = new_pixelBufferID;
+ 
+   return;
+ 
+@@ -2906,7 +2941,7 @@ void YglRenderVDP1(void) {
+   glViewport(0,0,_Ygl->width,_Ygl->height);
+   glScissor(0, 0, _Ygl->width, _Ygl->height);
+   glActiveTexture(GL_TEXTURE0);
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current] );
+ 
+   for( j=0;j<(level->prgcurrent+1); j++ ) {
+     if( level->prg[j].prgid != cprg ) {
+@@ -3568,7 +3603,7 @@ void YglRender(void) {
+    }
+    
+    if (_Ygl->texture_manager == NULL) goto render_finish;
+-   glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++   glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+ 
+    YglUpdateVdp2Reg();
+@@ -3610,7 +3645,7 @@ void YglRender(void) {
+         // clean up
+         cprg = -1;
+         glUseProgram(0);
+-        glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++        glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+                 glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+ 
+       }
+@@ -3946,7 +3981,7 @@ void YglRenderDestinationAlpha(void) {
+       // clean up
+       cprg = -1;
+       glUseProgram(0);
+-      glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++      glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+             glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+     }
+     glDisable(GL_STENCIL_TEST);
+@@ -4449,8 +4484,8 @@ void VIDOGLSync(){
+     glDeleteSync(_Ygl->frame_sync);
+     _Ygl->frame_sync = 0;
+   }
+-  glFlush();
+-  _Ygl->frame_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
++  //glFlush();
++  //_Ygl->frame_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+ }
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+diff --git a/yabause/src/yglshaderes.c b/yabause/src/yglshaderes.c
+index ba4df5be6..8cafdb44c 100644
+--- a/yabause/src/yglshaderes.c
++++ b/yabause/src/yglshaderes.c
+@@ -271,7 +271,7 @@ int Ygl_cleanupNormal(void * p)
+   prg = p;
+   if (prg->interuput_texture != 0) {
+ 	  glActiveTexture(GL_TEXTURE0);
+-	  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++	  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+   return 0;
+ }
+@@ -366,7 +366,7 @@ int Ygl_cleanupNormalCram(void * p)
+   prg = p;
+   glActiveTexture(GL_TEXTURE0);
+   if (prg->interuput_texture != 0) {
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+   return 0;
+ }
+@@ -556,7 +556,7 @@ int Ygl_uniformNormalCramLine(void * p)
+   glBindTexture(GL_TEXTURE_2D, _Ygl->cram_tex);
+ 
+   glActiveTexture(GL_TEXTURE2);
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+ 
+ 
+   // Disable blend mode if extend Color calcuration  is not enabled
+@@ -572,7 +572,7 @@ int Ygl_cleanupNormalCramLine(void * p)
+   YglProgram * prg = p;
+   glActiveTexture(GL_TEXTURE0);
+   if (prg->interuput_texture != 0) {
+-	  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++	  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+   return 0;
+ }
+@@ -633,7 +633,7 @@ int Ygl_uniformMosaic(void * p)
+     glBindTexture(GL_TEXTURE_2D, _Ygl->cram_tex);
+ 
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+ 
+   }
+   else {
+@@ -642,7 +642,7 @@ int Ygl_uniformMosaic(void * p)
+     glDisableVertexAttribArray(2);
+     glUniform1i(id_normal_s_texture, 0);
+     glUniform4fv(prg->color_offset, 1, prg->color_offset_val);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+ 
+   return 0;
+@@ -668,7 +668,7 @@ int Ygl_cleanupMosaic(void * p)
+   // call blit method
+   YglBlitMosaic(_Ygl->tmpfbotex, _Ygl->targetfbo, _Ygl->rwidth, _Ygl->rheight, prg->matrix, prg->mosaic);
+ 
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+ 
+   return 0;
+ }
+@@ -702,7 +702,7 @@ int Ygl_uniformPerLineAlpha(void * p)
+     glBindTexture(GL_TEXTURE_2D, _Ygl->cram_tex);
+ 
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+ 
+   }
+   else {
+@@ -711,7 +711,7 @@ int Ygl_uniformPerLineAlpha(void * p)
+     glDisableVertexAttribArray(2);
+     glUniform1i(id_normal_s_texture, 0);
+     glUniform4fv(prg->color_offset, 1, prg->color_offset_val);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+ 
+   if (prg->interuput_texture != 0) {
+@@ -752,10 +752,10 @@ int Ygl_cleanupPerLineAlpha(void * p)
+   // call blit method
+   YglBlitPerLineAlpha(_Ygl->tmpfbotex, _Ygl->targetfbo, _Ygl->rwidth, _Ygl->rheight, prg->matrix, prg->lineTexture);
+ 
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   glActiveTexture(GL_TEXTURE0);
+   if (prg->interuput_texture != 0) {
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+   return 0;
+ }
+@@ -787,7 +787,7 @@ int Ygl_uniformNormal_blur(void * p)
+     glBindTexture(GL_TEXTURE_2D, _Ygl->cram_tex);
+ 
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+ 
+   }
+   else {
+@@ -796,7 +796,7 @@ int Ygl_uniformNormal_blur(void * p)
+     glDisableVertexAttribArray(2);
+     glUniform1i(id_normal_s_texture, 0);
+     glUniform4fv(prg->color_offset, 1, prg->color_offset_val);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+ 
+   //glEnableVertexAttribArray(prg->vertexp);
+@@ -837,7 +837,7 @@ int Ygl_cleanupNormal_blur(void * p)
+    // call blit method
+   YglBlitBlur(_Ygl->tmpfbotex, _Ygl->targetfbo, _Ygl->rwidth, _Ygl->rheight, prg->matrix);
+ 
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+ 
+   return 0;
+ }
+
+From aec3fab61c5c2234f85b6d6b434306a96ea9e5a0 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Sun, 25 Aug 2019 15:03:12 +0900
+Subject: [PATCH 09/20] fix screen flicker
+
+# Conflicts:
+#	yabause/src/vidogl.c
+#	yabause/src/ygles.c
+---
+ yabause/CMakeLists.txt               | 2 +-
+ yabause/src/android/app/build.gradle | 4 ++--
+ yabause/src/vidogl.c                 | 9 ++++-----
+ yabause/src/vidshared.h              | 4 ++--
+ yabause/src/ygles.c                  | 8 ++++----
+ 5 files changed, 13 insertions(+), 14 deletions(-)
+
+diff --git a/yabause/CMakeLists.txt b/yabause/CMakeLists.txt
+index 1786862df..cac35d97c 100644
+--- a/yabause/CMakeLists.txt
++++ b/yabause/CMakeLists.txt
+@@ -19,7 +19,7 @@ endif(YAB_FORCE_GLES20)
+ set(YAB_PACKAGE yabause)
+ set(YAB_VERSION_MAJOR 2)
+ set(YAB_VERSION_MINOR 7)
+-set(YAB_VERSION_PATCH 1)
++set(YAB_VERSION_PATCH 2)
+ set(YAB_VERSION "${YAB_VERSION_MAJOR}.${YAB_VERSION_MINOR}.${YAB_VERSION_PATCH}")
+ 
+ include(GetGitRevisionDescription)
+diff --git a/yabause/src/android/app/build.gradle b/yabause/src/android/app/build.gradle
+index e0ef4c7f8..2e06d33f3 100644
+--- a/yabause/src/android/app/build.gradle
++++ b/yabause/src/android/app/build.gradle
+@@ -9,8 +9,8 @@ android {
+         minSdkVersion 19
+         targetSdkVersion 25
+         multiDexEnabled true
+-        versionCode 84
+-        versionName '2.7.1'
++        versionCode 85
++        versionName '2.7.2'
+         multiDexEnabled true
+         vectorDrawables.useSupportLibrary = true
+ 
+diff --git a/yabause/src/vidogl.c b/yabause/src/vidogl.c
+index e3bb4e563..1cf6119d0 100644
+--- a/yabause/src/vidogl.c
++++ b/yabause/src/vidogl.c
+@@ -5432,11 +5432,10 @@ void VIDOGLVdp2DrawStart(void)
+     YglTM = YglTMInit(new_width, new_height);
+   }
+   YglReset();
+-  //if (_Ygl->sync != 0) {
+-  //  glClientWaitSync(_Ygl->sync, 0, GL_TIMEOUT_IGNORED);
+-  //  glDeleteSync(_Ygl->sync);
+-  //  _Ygl->sync = 0;
+-  //}
++  if (_Ygl->sync != 0) {
++    glClientWaitSync(_Ygl->sync, 0, GL_TIMEOUT_IGNORED);
++    glDeleteSync(_Ygl->sync);
++    _Ygl->sync = 0;
+   //if (_Ygl->frame_sync != 0) {
+   //  glClientWaitSync(_Ygl->frame_sync, 0, GL_TIMEOUT_IGNORED);
+   //  glDeleteSync(_Ygl->frame_sync);
+diff --git a/yabause/src/vidshared.h b/yabause/src/vidshared.h
+index 4b851178c..8171f75c0 100644
+--- a/yabause/src/vidshared.h
++++ b/yabause/src/vidshared.h
+@@ -200,8 +200,8 @@ typedef struct
+       int flipfunction;
+    }pipe[2];
+ 
+-   u8 char_bank[4];
+-   u8 pname_bank[4];
++   u16 char_bank[4];
++   u16 pname_bank[4];
+ 
+ } vdp2draw_struct;
+ 
+diff --git a/yabause/src/ygles.c b/yabause/src/ygles.c
+index 7ed8f11be..cfbcfd3f3 100644
+--- a/yabause/src/ygles.c
++++ b/yabause/src/ygles.c
+@@ -4480,10 +4480,10 @@ void VIDOGLSync(){
+   _Ygl->texture_manager = NULL;
+   RBGGenerator_onFinish();
+   //glFinish();
+-  if (_Ygl->frame_sync != 0) {
+-    glDeleteSync(_Ygl->frame_sync);
+-    _Ygl->frame_sync = 0;
+-  }
++  //if (_Ygl->frame_sync != 0) {
++  //  glDeleteSync(_Ygl->frame_sync);
++  //  _Ygl->frame_sync = 0;
++  //}
+   //glFlush();
+   //_Ygl->frame_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+ }
+
+From 244c7ca10b5403ed8611528d1a7f99fe3d3ad9e0 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Sun, 25 Aug 2019 22:17:44 +0900
+Subject: [PATCH 10/20] Separate single file mode and multi file mode
+
+(cherry picked from commit 80b0fc8aa3bb28dff07ecbc7181a69cfb66304af)
+---
+ yabause/src/cdbase.c | 225 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 220 insertions(+), 5 deletions(-)
+
+diff --git a/yabause/src/cdbase.c b/yabause/src/cdbase.c
+index 14737dc4d..b9f2a07db 100644
+--- a/yabause/src/cdbase.c
++++ b/yabause/src/cdbase.c
+@@ -503,6 +503,214 @@ static FILE* OpenFile(char* buffer, const char* cue) {
+ static int LoadCHD(const char *chd_filename, FILE *iso_file);
+ static int ISOCDReadSectorFADFromCHD(u32 FAD, void *buffer);
+ 
++static int LoadBinCueSingleFile(const char *cuefilename, FILE *iso_file)
++{
++  long size;
++  char *temp_buffer, *temp_buffer2;
++  unsigned int track_num;
++  unsigned int indexnum, min, sec, frame;
++  unsigned int pregap = 0;
++  char *p, *p2;
++  track_info_struct trk[100];
++  int file_size;
++  int i;
++  FILE * bin_file;
++  int matched = 0;
++
++  memset(trk, 0, sizeof(trk));
++  disc.session_num = 1;
++  disc.session = malloc(sizeof(session_info_struct) * disc.session_num);
++  if (disc.session == NULL)
++  {
++    YabSetError(YAB_ERR_MEMORYALLOC, NULL);
++    return -1;
++  }
++
++  fseek(iso_file, 0, SEEK_END);
++  size = ftell(iso_file);
++
++  if (size <= 0)
++  {
++    YabSetError(YAB_ERR_FILEREAD, cuefilename);
++    return -1;
++  }
++
++  fseek(iso_file, 0, SEEK_SET);
++
++  // Allocate buffer with enough space for reading cue
++  if ((temp_buffer = (char *)calloc(size, 1)) == NULL)
++    return -1;
++
++  // Skip image filename
++  if (fscanf(iso_file, "FILE \"%*[^\"]\" %*s\r\n") == EOF)
++  {
++    free(temp_buffer);
++    return -1;
++  }
++
++  // Time to generate TOC
++  for (;;)
++  {
++    // Retrieve a line in cue
++    if (fscanf(iso_file, "%s", temp_buffer) == EOF)
++      break;
++
++    // Figure out what it is
++    if (strncmp(temp_buffer, "TRACK", 5) == 0)
++    {
++      // Handle accordingly
++      if (fscanf(iso_file, "%d %[^\r\n]\r\n", &track_num, temp_buffer) == EOF)
++        break;
++
++      if (strncmp(temp_buffer, "MODE1", 5) == 0 ||
++        strncmp(temp_buffer, "MODE2", 5) == 0)
++      {
++        // Figure out the track sector size
++        trk[track_num - 1].sector_size = atoi(temp_buffer + 6);
++        trk[track_num - 1].ctl_addr = 0x41;
++      }
++      else if (strncmp(temp_buffer, "AUDIO", 5) == 0)
++      {
++        // Update toc entry
++        trk[track_num - 1].sector_size = 2352;
++        trk[track_num - 1].ctl_addr = 0x01;
++      }
++    }
++    else if (strncmp(temp_buffer, "INDEX", 5) == 0)
++    {
++      // Handle accordingly
++
++      if (fscanf(iso_file, "%d %d:%d:%d\r\n", &indexnum, &min, &sec, &frame) == EOF)
++        break;
++
++      if (indexnum == 1)
++      {
++        // Update toc entry
++        trk[track_num - 1].fad_start = (MSF_TO_FAD(min, sec, frame) + pregap + 150);
++        trk[track_num - 1].file_offset = MSF_TO_FAD(min, sec, frame) * trk[track_num - 1].sector_size;
++      }
++    }
++    else if (strncmp(temp_buffer, "PREGAP", 6) == 0)
++    {
++      if (fscanf(iso_file, "%d:%d:%d\r\n", &min, &sec, &frame) == EOF)
++        break;
++
++      pregap += MSF_TO_FAD(min, sec, frame);
++    }
++    else if (strncmp(temp_buffer, "POSTGAP", 7) == 0)
++    {
++      if (fscanf(iso_file, "%d:%d:%d\r\n", &min, &sec, &frame) == EOF)
++        break;
++    }
++    else if (strncmp(temp_buffer, "FILE", 4) == 0)
++    {
++      YabSetError(YAB_ERR_OTHER, "Unsupported cue format");
++      free(temp_buffer);
++      return -1;
++    }
++  }
++
++  trk[track_num].file_offset = 0;
++  trk[track_num].fad_start = 0xFFFFFFFF;
++
++  // Go back, retrieve image filename
++  fseek(iso_file, 0, SEEK_SET);
++  matched = fscanf(iso_file, "FILE \"%[^\"]\" %*s\r\n", temp_buffer);
++
++  // Now go and open up the image file, figure out its size, etc.
++  if ((bin_file = fopen(temp_buffer, "rb")) == NULL)
++  {
++    // Ok, exact path didn't work. Let's trim the path and try opening the
++    // file from the same directory as the cue.
++
++    // find the start of filename
++    p = temp_buffer;
++
++    for (;;)
++    {
++      if (strcspn(p, "/\\") == strlen(p))
++        break;
++
++      p += strcspn(p, "/\\") + 1;
++    }
++
++    // append directory of cue file with bin filename
++    if ((temp_buffer2 = (char *)calloc(strlen(cuefilename) + strlen(p) + 1, 1)) == NULL)
++    {
++      free(temp_buffer);
++      return -1;
++    }
++
++    // find end of path
++    p2 = (char *)cuefilename;
++
++    for (;;)
++    {
++      if (strcspn(p2, "/\\") == strlen(p2))
++        break;
++      p2 += strcspn(p2, "/\\") + 1;
++    }
++
++    // Make sure there was at least some kind of path, otherwise our
++    // second check is pretty useless
++    if (cuefilename == p2 && temp_buffer == p)
++    {
++      free(temp_buffer);
++      free(temp_buffer2);
++      return -1;
++    }
++
++    strncpy(temp_buffer2, cuefilename, p2 - cuefilename);
++    strcat(temp_buffer2, p);
++
++    // Let's give it another try
++    bin_file = fopen(temp_buffer2, "rb");
++    free(temp_buffer2);
++
++    if (bin_file == NULL)
++    {
++      YabSetError(YAB_ERR_FILENOTFOUND, temp_buffer);
++      free(temp_buffer);
++      return -1;
++    }
++  }
++
++  fseek(bin_file, 0, SEEK_END);
++  file_size = ftell(bin_file);
++  fseek(bin_file, 0, SEEK_SET);
++
++  for (i = 0; i < track_num; i++)
++  {
++    trk[i].fad_end = trk[i + 1].fad_start - 1;
++    trk[i].file_id = 0;
++    trk[i].fp = bin_file;
++    trk[i].file_size = file_size;
++  }
++
++  trk[track_num - 1].fad_end = trk[track_num - 1].fad_start + (file_size - trk[track_num - 1].file_offset) / trk[track_num - 1].sector_size;
++
++  disc.session[0].fad_start = 150;
++  disc.session[0].fad_end = trk[track_num - 1].fad_end;
++  disc.session[0].track_num = track_num;
++  disc.session[0].track = malloc(sizeof(track_info_struct) * disc.session[0].track_num);
++  if (disc.session[0].track == NULL)
++  {
++    YabSetError(YAB_ERR_MEMORYALLOC, NULL);
++    free(disc.session);
++    disc.session = NULL;
++    return -1;
++  }
++
++  memcpy(disc.session[0].track, trk, track_num * sizeof(track_info_struct));
++
++  // buffer is no longer needed
++  free(temp_buffer);
++
++  fclose(iso_file);
++  return 0;
++}
++
++
+ static int LoadBinCue(const char *cuefilename, FILE *iso_file)
+ {
+    long size;
+@@ -642,6 +850,10 @@ static int LoadBinCue(const char *cuefilename, FILE *iso_file)
+ 
+    trk[track_num-1].fad_end = trk[track_num-1].fad_start+(trk[track_num-1].file_size-trk[track_num-1].file_offset)/trk[track_num-1].sector_size;
+ 
++   for (int i = 0; i < track_num - 1; i++) {
++     trk[i].fad_end = trk[i + 1].fad_start - 1;
++   }
++
+    //for (int i =0; i<track_num; i++) printf("Track %d [%d - %d]\n", i+1, trk[i].fad_start, trk[i].fad_end);
+ 
+    disc.session[0].fad_start = 150;
+@@ -1264,9 +1476,15 @@ static int ISOCDInit(const char * iso) {
+    ext = strrchr(iso, '.');
+ 
+    // Figure out what kind of image format we're dealing with
+-   if (stricmp(ext, ".CUE") == 0)
++   if (stricmp(ext, ".CUE") == 0 && strncmp(header, "FILE \"", 6) == 0)
+    {
+-      // It's a BIN/CUE
++     // It's a Single BIN/CUE
++     imgtype = IMG_BINCUE;
++     ret = LoadBinCueSingleFile(iso, iso_file);
++   }
++   else if (stricmp(ext, ".CUE") == 0 && strncmp(header, "CATALO", 6) == 0)
++   {
++      // It's a Multifile BIN/CUE
+       imgtype = IMG_BINCUE;
+       ret = LoadBinCue(iso, iso_file);
+    }
+@@ -1389,9 +1607,6 @@ static int ISOCDReadSectorFAD(u32 FAD, void *buffer) {
+    {
+       for (j = 0; j < disc.session[i].track_num; j++)
+       {
+-        if (j == 1) {
+-          int a = 0;
+-        }
+          if (FAD >= disc.session[i].track[j].fad_start &&
+              FAD <= disc.session[i].track[j].fad_end)
+          {
+
+From 7454053b0d155c0d2856dc4bdafb90c241a63fe0 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Mon, 26 Aug 2019 04:13:06 +0900
+Subject: [PATCH 11/20] Revert "double buffered glMapBufferRange"
+
+# Conflicts:
+#	yabause/src/vidogl.c
+---
+ yabause/src/vidogl.c      |  10 +-
+ yabause/src/ygl.h         |  11 +-
+ yabause/src/ygles.c       | 209 ++++++++++++++++----------------------
+ yabause/src/yglshaderes.c |  28 ++---
+ 4 files changed, 108 insertions(+), 150 deletions(-)
+
+diff --git a/yabause/src/vidogl.c b/yabause/src/vidogl.c
+index 1cf6119d0..11bcd22b6 100644
+--- a/yabause/src/vidogl.c
++++ b/yabause/src/vidogl.c
+@@ -5436,11 +5436,11 @@ void VIDOGLVdp2DrawStart(void)
+     glClientWaitSync(_Ygl->sync, 0, GL_TIMEOUT_IGNORED);
+     glDeleteSync(_Ygl->sync);
+     _Ygl->sync = 0;
+-  //if (_Ygl->frame_sync != 0) {
+-  //  glClientWaitSync(_Ygl->frame_sync, 0, GL_TIMEOUT_IGNORED);
+-  //  glDeleteSync(_Ygl->frame_sync);
+-  //  _Ygl->frame_sync = 0;
+-  //}
++  if (_Ygl->frame_sync != 0) {
++    glClientWaitSync(_Ygl->frame_sync, 0, GL_TIMEOUT_IGNORED);
++    glDeleteSync(_Ygl->frame_sync);
++    _Ygl->frame_sync = 0;
++  }
+   YglTmPull(YglTM, 0);
+   YglTMReset(YglTM);
+   YglCacheReset(YglTM);
+diff --git a/yabause/src/ygl.h b/yabause/src/ygl.h
+index 8b45d1df4..b7838d7b5 100644
+--- a/yabause/src/ygl.h
++++ b/yabause/src/ygl.h
+@@ -252,15 +252,8 @@ typedef struct {
+ 	YglCacheHash *HashTable[HASHSIZE];
+ 	YglCacheHash CashLink[HASHSIZE * 2];
+ 	u32 CashLink_index;
+-
+-	//GLuint textureID;
+-	//GLuint pixelBufferID;
+-
+-  int current;
+-  GLuint textureID_in[2];
+-  GLuint pixelBufferID_in[2];
+-  unsigned int * texture_in[2];
+-
++	GLuint textureID;
++	GLuint pixelBufferID;
+ } YglTextureManager;
+ 
+ extern YglTextureManager * YglTM;
+diff --git a/yabause/src/ygles.c b/yabause/src/ygles.c
+index cfbcfd3f3..875acc11d 100644
+--- a/yabause/src/ygles.c
++++ b/yabause/src/ygles.c
+@@ -493,43 +493,38 @@ YglTextureManager * YglTMInit(unsigned int w, unsigned int h) {
+   memset(tm, 0, sizeof(YglTextureManager));
+   tm->width = w;
+   tm->height = h;
+-  tm->current = 0;
+ 
+   YglTMReset(tm);
+ 
+-  for (int i = 0; i < 2; i++) {
++  glGenBuffers(1, &tm->pixelBufferID);
++  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
++  glBufferData(GL_PIXEL_UNPACK_BUFFER, tm->width * tm->height * 4, NULL, GL_DYNAMIC_DRAW);
++  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+ 
+-    glGenBuffers(1, &tm->pixelBufferID_in[i]);
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[i]);
+-    glBufferData(GL_PIXEL_UNPACK_BUFFER, tm->width * tm->height * 4, NULL, GL_DYNAMIC_DRAW);
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
++  glGetError();
++  glGenTextures(1, &tm->textureID);
++  glBindTexture(GL_TEXTURE_2D, tm->textureID);
++  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tm->width, tm->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
++  if ((error = glGetError()) != GL_NO_ERROR)
++  {
++    YGLDEBUG("Fail to init YglTM->textureID %04X", error);
++    abort();
++  }
++  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
++  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
++  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
++  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+ 
+-    glGetError();
+-    glGenTextures(1, &tm->textureID_in[i]);
+-    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[i]);
+-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tm->width, tm->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+-    if ((error = glGetError()) != GL_NO_ERROR)
+-    {
+-      YGLDEBUG("Fail to init YglTM->textureID %04X", error);
+-      abort();
+-    }
+-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+-  
+-    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[i]);
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[i]);
+-    tm->texture_in[i] = (unsigned int *)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+-    if ((error = glGetError()) != GL_NO_ERROR)
+-    {
+-      YGLDEBUG("Fail to init YglTM->texture %04X", error);
+-      abort();
+-    }
+-   
++  glBindTexture(GL_TEXTURE_2D, tm->textureID);
++  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
++  tm->texture = (unsigned int *)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT );
++  if ((error = glGetError()) != GL_NO_ERROR)
++  {
++    YGLDEBUG("Fail to init YglTM->texture %04X", error);
++    abort();
+   }
+-  tm->texture = tm->texture_in[tm->current];
+   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
++
+   YglGetColorRamPointer();
+ 
+   return tm;
+@@ -538,19 +533,15 @@ YglTextureManager * YglTMInit(unsigned int w, unsigned int h) {
+ //////////////////////////////////////////////////////////////////////////////
+ 
+ void YglTMDeInit(YglTextureManager * tm) {
++  glBindTexture(GL_TEXTURE_2D, tm->textureID);
++  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
++  glBindTexture(GL_TEXTURE_2D, 0);
++  glFinish();
+ 
+-  for (int i = 0; i < 2; i++) {
+-    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[i]);
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+-    glBindTexture(GL_TEXTURE_2D, 0);
+-    glFinish();
+-
+-    glDeleteTextures(1, &tm->textureID_in[i]);
+-    tm->textureID_in[i] = 0;
+-    glDeleteBuffers(1, &tm->pixelBufferID_in[i]);
+-    tm->pixelBufferID_in[i] = 0;
+-  }
+-
++  glDeleteTextures(1, &tm->textureID);
++  tm->textureID = 0;
++  glDeleteBuffers(1, &tm->pixelBufferID);
++  tm->pixelBufferID = 0;
+   free(tm);
+ }
+ 
+@@ -579,9 +570,9 @@ void YglTMReserve(YglTextureManager * tm, unsigned int w, unsigned int h){
+ 
+ void YglTmPush(YglTextureManager * tm){
+   glActiveTexture(GL_TEXTURE0);
+-  glBindTexture(GL_TEXTURE_2D, tm->textureID_in[tm->current] );
++  glBindTexture(GL_TEXTURE_2D, tm->textureID);
+   if (tm->texture != NULL ) {
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[tm->current] );
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
+     glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tm->width, tm->yMax, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+@@ -591,114 +582,88 @@ void YglTmPush(YglTextureManager * tm){
+ 
+ void YglTmPull(YglTextureManager * tm, u32 flg){
+   if (tm->texture == NULL) {
+-
+-    int prev = tm->current;
+-
+-    if (tm->current == 0) {
+-      tm->current = 1;
+-    }
+-    else {
+-      tm->current = 0;
+-    }
+-
+-    tm->texture = tm->texture_in[tm->current];
+-
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[prev]);
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[prev]);
+-    tm->texture_in[prev] = (int*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | flg | GL_MAP_UNSYNCHRONIZED_BIT  );
+-    if (tm->texture_in[prev] == NULL){
++    glBindTexture(GL_TEXTURE_2D, tm->textureID);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
++    tm->texture = (int*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | flg | GL_MAP_UNSYNCHRONIZED_BIT  );
++    if (tm->texture == NULL){
+       abort();
+     }
+-	  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+-
+-    glFlush();
+-
+-    glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[tm->current]);
+-
++	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+   }
+ }
+ 
+ 
+ void YglTMRealloc(YglTextureManager * tm, unsigned int width, unsigned int height ){
+ 
+-  GLuint new_textureID[2];
+-  GLuint new_pixelBufferID[2];
+-  unsigned int * new_texture[2];
++  GLuint new_textureID;
++  GLuint new_pixelBufferID;
++  unsigned int * new_texture;
+   GLuint error;
+ 
+   Vdp2RgbTextureSync();
+ 
+-  if (tm->texture_in[tm->current] != NULL) {
++  if (tm->texture != NULL) {
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[tm->current] );
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[tm->current]);
++    glBindTexture(GL_TEXTURE_2D, tm->textureID);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
+     glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+-    tm->texture_in[tm->current] = NULL;
++    tm->texture = NULL;
+   }
+ 
+   glGetError();
+ 
+-  for (int i = 0; i < 2; i++) {
+-    glGenTextures(1, &new_textureID[i]);
+-    glBindTexture(GL_TEXTURE_2D, new_textureID[i]);
++
++  glGenTextures(1, &new_textureID);
++  glBindTexture(GL_TEXTURE_2D, new_textureID);
+     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+-    if ((error = glGetError()) != GL_NO_ERROR) {
+-      YGLDEBUG("Fail to init new_textureID %d, %04X(%d,%d)\n", new_textureID, error, width, height);
+-      abort();
+-    }
+-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
++  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
++  if ((error = glGetError()) != GL_NO_ERROR){
++    YGLDEBUG("Fail to init new_textureID %d, %04X(%d,%d)\n", new_textureID, error,width, height);
++    abort();
++  }
++  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
++  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
++  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
++  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+ 
+ 
+-    glGenBuffers(1, &new_pixelBufferID[i]);
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, new_pixelBufferID[i]);
+-    glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height * 4, NULL, GL_DYNAMIC_DRAW);
++  glGenBuffers(1, &new_pixelBufferID);
++  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, new_pixelBufferID);
++  glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height * 4, NULL, GL_DYNAMIC_DRAW);
+ 
+-    int dh = tm->height;
+-    if (dh > height) dh = height;
++  int dh = tm->height;
++  if (dh > height) dh = height;
+ 
+-    glBindBuffer(GL_COPY_READ_BUFFER, tm->pixelBufferID_in[tm->current]);
+-    glBindBuffer(GL_COPY_WRITE_BUFFER, new_pixelBufferID[i]);
+-    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, tm->width * dh * 4);
+-    if ((error = glGetError()) != GL_NO_ERROR) {
+-      YGLDEBUG("Fail to init new_texture %04X", error);
+-      abort();
+-    }
++  glBindBuffer(GL_COPY_READ_BUFFER, tm->pixelBufferID);
++  glBindBuffer(GL_COPY_WRITE_BUFFER, new_pixelBufferID);
++  glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, tm->width * dh * 4);
++  if ((error = glGetError()) != GL_NO_ERROR){
++    YGLDEBUG("Fail to init new_texture %04X", error);
++    abort();
+   }
+ 
+   glBindBuffer(GL_COPY_READ_BUFFER, 0);
+   glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+ 
+-  for (int i = 0; i < 2; i++) {
+-
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, new_pixelBufferID[i]);
+-    new_texture[i] = (unsigned int *)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, width * height * 4, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+-    if ((error = glGetError()) != GL_NO_ERROR) {
+-      YGLDEBUG("Fail to init new_texture %04X", error);
+-      abort();
+-    }
+-
+-    // Free textures
+-    glDeleteTextures(1, &tm->textureID_in[i]);
+-    glDeleteBuffers(1, &tm->pixelBufferID_in[i]);
+-    
+-    tm->texture_in[i] = new_texture[i];
+-    tm->textureID_in[i] = new_textureID[i];
+-    tm->pixelBufferID_in[i] = new_pixelBufferID[i];
+ 
++  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, new_pixelBufferID);
++  new_texture = (unsigned int *)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, width * height * 4, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT );
++  if ((error = glGetError()) != GL_NO_ERROR){
++    YGLDEBUG("Fail to init new_texture %04X", error);
++    abort();
+   }
+ 
++  // Free textures
++  glDeleteTextures(1, &tm->textureID);
++  glDeleteBuffers(1, &tm->pixelBufferID);
++
+   // user new texture
+-  tm->width = width;
++    tm->width = width;
+   tm->height = height;
+-  tm->texture = tm->texture_in[tm->current];
+-  //tm->textureID = new_textureID;
+-  //tm->pixelBufferID = new_pixelBufferID;
++  tm->texture = new_texture;
++  tm->textureID = new_textureID;
++  tm->pixelBufferID = new_pixelBufferID;
+ 
+   return;
+ 
+@@ -2941,7 +2906,7 @@ void YglRenderVDP1(void) {
+   glViewport(0,0,_Ygl->width,_Ygl->height);
+   glScissor(0, 0, _Ygl->width, _Ygl->height);
+   glActiveTexture(GL_TEXTURE0);
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current] );
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+ 
+   for( j=0;j<(level->prgcurrent+1); j++ ) {
+     if( level->prg[j].prgid != cprg ) {
+@@ -3603,7 +3568,7 @@ void YglRender(void) {
+    }
+    
+    if (_Ygl->texture_manager == NULL) goto render_finish;
+-   glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++   glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+ 
+    YglUpdateVdp2Reg();
+@@ -3645,7 +3610,7 @@ void YglRender(void) {
+         // clean up
+         cprg = -1;
+         glUseProgram(0);
+-        glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++        glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+                 glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+ 
+       }
+@@ -3981,7 +3946,7 @@ void YglRenderDestinationAlpha(void) {
+       // clean up
+       cprg = -1;
+       glUseProgram(0);
+-      glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++      glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+             glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+     }
+     glDisable(GL_STENCIL_TEST);
+diff --git a/yabause/src/yglshaderes.c b/yabause/src/yglshaderes.c
+index 8cafdb44c..ba4df5be6 100644
+--- a/yabause/src/yglshaderes.c
++++ b/yabause/src/yglshaderes.c
+@@ -271,7 +271,7 @@ int Ygl_cleanupNormal(void * p)
+   prg = p;
+   if (prg->interuput_texture != 0) {
+ 	  glActiveTexture(GL_TEXTURE0);
+-	  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++	  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+   }
+   return 0;
+ }
+@@ -366,7 +366,7 @@ int Ygl_cleanupNormalCram(void * p)
+   prg = p;
+   glActiveTexture(GL_TEXTURE0);
+   if (prg->interuput_texture != 0) {
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+   }
+   return 0;
+ }
+@@ -556,7 +556,7 @@ int Ygl_uniformNormalCramLine(void * p)
+   glBindTexture(GL_TEXTURE_2D, _Ygl->cram_tex);
+ 
+   glActiveTexture(GL_TEXTURE2);
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+ 
+ 
+   // Disable blend mode if extend Color calcuration  is not enabled
+@@ -572,7 +572,7 @@ int Ygl_cleanupNormalCramLine(void * p)
+   YglProgram * prg = p;
+   glActiveTexture(GL_TEXTURE0);
+   if (prg->interuput_texture != 0) {
+-	  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++	  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+   }
+   return 0;
+ }
+@@ -633,7 +633,7 @@ int Ygl_uniformMosaic(void * p)
+     glBindTexture(GL_TEXTURE_2D, _Ygl->cram_tex);
+ 
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+ 
+   }
+   else {
+@@ -642,7 +642,7 @@ int Ygl_uniformMosaic(void * p)
+     glDisableVertexAttribArray(2);
+     glUniform1i(id_normal_s_texture, 0);
+     glUniform4fv(prg->color_offset, 1, prg->color_offset_val);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+   }
+ 
+   return 0;
+@@ -668,7 +668,7 @@ int Ygl_cleanupMosaic(void * p)
+   // call blit method
+   YglBlitMosaic(_Ygl->tmpfbotex, _Ygl->targetfbo, _Ygl->rwidth, _Ygl->rheight, prg->matrix, prg->mosaic);
+ 
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+ 
+   return 0;
+ }
+@@ -702,7 +702,7 @@ int Ygl_uniformPerLineAlpha(void * p)
+     glBindTexture(GL_TEXTURE_2D, _Ygl->cram_tex);
+ 
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+ 
+   }
+   else {
+@@ -711,7 +711,7 @@ int Ygl_uniformPerLineAlpha(void * p)
+     glDisableVertexAttribArray(2);
+     glUniform1i(id_normal_s_texture, 0);
+     glUniform4fv(prg->color_offset, 1, prg->color_offset_val);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+   }
+ 
+   if (prg->interuput_texture != 0) {
+@@ -752,10 +752,10 @@ int Ygl_cleanupPerLineAlpha(void * p)
+   // call blit method
+   YglBlitPerLineAlpha(_Ygl->tmpfbotex, _Ygl->targetfbo, _Ygl->rwidth, _Ygl->rheight, prg->matrix, prg->lineTexture);
+ 
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+   glActiveTexture(GL_TEXTURE0);
+   if (prg->interuput_texture != 0) {
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+   }
+   return 0;
+ }
+@@ -787,7 +787,7 @@ int Ygl_uniformNormal_blur(void * p)
+     glBindTexture(GL_TEXTURE_2D, _Ygl->cram_tex);
+ 
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+ 
+   }
+   else {
+@@ -796,7 +796,7 @@ int Ygl_uniformNormal_blur(void * p)
+     glDisableVertexAttribArray(2);
+     glUniform1i(id_normal_s_texture, 0);
+     glUniform4fv(prg->color_offset, 1, prg->color_offset_val);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+   }
+ 
+   //glEnableVertexAttribArray(prg->vertexp);
+@@ -837,7 +837,7 @@ int Ygl_cleanupNormal_blur(void * p)
+    // call blit method
+   YglBlitBlur(_Ygl->tmpfbotex, _Ygl->targetfbo, _Ygl->rwidth, _Ygl->rheight, prg->matrix);
+ 
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
+ 
+   return 0;
+ }
+
+From 060a7539a0e7783147a1858fa44eb726636bc854 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Mon, 26 Aug 2019 06:52:51 +0900
+Subject: [PATCH 12/20] set version 2.7.3
+
+(cherry picked from commit d47b9b6f9ad699fbb785aa64e854b446d9cb7711)
+---
+ yabause/CMakeLists.txt               | 2 +-
+ yabause/src/android/app/build.gradle | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/yabause/CMakeLists.txt b/yabause/CMakeLists.txt
+index cac35d97c..467217672 100644
+--- a/yabause/CMakeLists.txt
++++ b/yabause/CMakeLists.txt
+@@ -19,7 +19,7 @@ endif(YAB_FORCE_GLES20)
+ set(YAB_PACKAGE yabause)
+ set(YAB_VERSION_MAJOR 2)
+ set(YAB_VERSION_MINOR 7)
+-set(YAB_VERSION_PATCH 2)
++set(YAB_VERSION_PATCH 3)
+ set(YAB_VERSION "${YAB_VERSION_MAJOR}.${YAB_VERSION_MINOR}.${YAB_VERSION_PATCH}")
+ 
+ include(GetGitRevisionDescription)
+diff --git a/yabause/src/android/app/build.gradle b/yabause/src/android/app/build.gradle
+index 2e06d33f3..892e47031 100644
+--- a/yabause/src/android/app/build.gradle
++++ b/yabause/src/android/app/build.gradle
+@@ -9,8 +9,8 @@ android {
+         minSdkVersion 19
+         targetSdkVersion 25
+         multiDexEnabled true
+-        versionCode 85
+-        versionName '2.7.2'
++        versionCode 86
++        versionName '2.7.3'
+         multiDexEnabled true
+         vectorDrawables.useSupportLibrary = true
+ 
+
+From ca9c76937b867953a1e17632615e7dbc615aa084 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Mon, 26 Aug 2019 07:40:37 +0900
+Subject: [PATCH 13/20] Change the way of switching multi file mode.
+
+(cherry picked from commit 6992f1b55636bdd7ca2cc96f063993a5efd07ac3)
+---
+ yabause/src/cdbase.c | 27 ++++++++++++---------------
+ 1 file changed, 12 insertions(+), 15 deletions(-)
+
+diff --git a/yabause/src/cdbase.c b/yabause/src/cdbase.c
+index b9f2a07db..261d13c97 100644
+--- a/yabause/src/cdbase.c
++++ b/yabause/src/cdbase.c
+@@ -36,6 +36,11 @@
+ #include "error.h"
+ #include "debug.h"
+ 
++static int LoadCHD(const char *chd_filename, FILE *iso_file);
++static int ISOCDReadSectorFADFromCHD(u32 FAD, void *buffer);
++static int LoadBinCueMultiFile(const char *cuefilename, FILE *iso_file);
++static int LoadBinCue(const char *cuefilename, FILE *iso_file);
++
+ // Remove this for now, execution on windows fails because of it
+ // #include "streams/file_stream_transforms.h"
+ #ifndef HAVE_STRICMP
+@@ -500,10 +505,7 @@ static FILE* OpenFile(char* buffer, const char* cue) {
+    return ret_file;
+ }
+ 
+-static int LoadCHD(const char *chd_filename, FILE *iso_file);
+-static int ISOCDReadSectorFADFromCHD(u32 FAD, void *buffer);
+-
+-static int LoadBinCueSingleFile(const char *cuefilename, FILE *iso_file)
++static int LoadBinCue(const char *cuefilename, FILE *iso_file)
+ {
+   long size;
+   char *temp_buffer, *temp_buffer2;
+@@ -604,9 +606,10 @@ static int LoadBinCueSingleFile(const char *cuefilename, FILE *iso_file)
+     }
+     else if (strncmp(temp_buffer, "FILE", 4) == 0)
+     {
+-      YabSetError(YAB_ERR_OTHER, "Unsupported cue format");
++      //YabSetError(YAB_ERR_OTHER, "Unsupported cue format");
+       free(temp_buffer);
+-      return -1;
++      fseek(iso_file, 0, SEEK_SET);
++      return LoadBinCueMultiFile(cuefilename, iso_file);
+     }
+   }
+ 
+@@ -711,7 +714,7 @@ static int LoadBinCueSingleFile(const char *cuefilename, FILE *iso_file)
+ }
+ 
+ 
+-static int LoadBinCue(const char *cuefilename, FILE *iso_file)
++static int LoadBinCueMultiFile(const char *cuefilename, FILE *iso_file)
+ {
+    long size;
+    char* temp_buffer;
+@@ -1476,17 +1479,11 @@ static int ISOCDInit(const char * iso) {
+    ext = strrchr(iso, '.');
+ 
+    // Figure out what kind of image format we're dealing with
+-   if (stricmp(ext, ".CUE") == 0 && strncmp(header, "FILE \"", 6) == 0)
++   if (stricmp(ext, ".CUE") == 0 )
+    {
+      // It's a Single BIN/CUE
+      imgtype = IMG_BINCUE;
+-     ret = LoadBinCueSingleFile(iso, iso_file);
+-   }
+-   else if (stricmp(ext, ".CUE") == 0 && strncmp(header, "CATALO", 6) == 0)
+-   {
+-      // It's a Multifile BIN/CUE
+-      imgtype = IMG_BINCUE;
+-      ret = LoadBinCue(iso, iso_file);
++     ret = LoadBinCue(iso, iso_file);
+    }
+    else if (stricmp(ext, ".MDS") == 0 && strncmp(header, "MEDIA ", sizeof(header)) == 0)
+    {
+
+From d4ee12331a4b94495df247cc15870ae14da51bae Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Mon, 26 Aug 2019 04:05:12 +0000
+Subject: [PATCH 14/20] build for ver 2.7.3
+
+ Conflicts:
+#	yabause/src/retro_arena/CMakeLists.txt
+#	yabause/src/retro_arena/main.cpp
+---
+ yabause/src/retro_arena/CMakeLists.txt | 6 ++++--
+ yabause/src/retro_arena/README.md      | 6 +++---
+ yabause/src/retro_arena/main.cpp       | 2 +-
+ 3 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/yabause/src/retro_arena/CMakeLists.txt b/yabause/src/retro_arena/CMakeLists.txt
+index 433c117fc..2cd92837f 100644
+--- a/yabause/src/retro_arena/CMakeLists.txt
++++ b/yabause/src/retro_arena/CMakeLists.txt
+@@ -66,12 +66,14 @@ set(yabause_ra_SOURCES
+     ../about.h
+     ../about.c
+ ) 
+-
++link_directories( ${link_directories} ${LIBCHDR_LIB_DIR} )
+ include_directories( ${PORT_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} "nanogui-sdl/include" "nanogui-sdl/ext/eigen" )
+ link_directories( ${link_directories} ${LIBCHDR_LIB_DIR} )
+ add_executable(yabause-retro-arena ${yabause_ra_SOURCES})
+ target_link_libraries(yabause-retro-arena yabause  ${Boost_LIBRARIES} pugixml ${YABAUSE_LIBRARIES} ${PORT_LIBRARIES} nanogui stdc++fs  ${LIBCHDR_LIBRARIES} )
+-add_dependencies(yabause-retro-arena Json png zlib)
++target_link_libraries( yabause-retro-arena ${LIBCHDR_LIBRARIES} )
++target_link_libraries( yabause-retro-arena ${zlib_STATIC_LIBRARIES} )
++add_dependencies(yabause-retro-arena Json png zlib libchd )
+ yab_port_success(yabause-retro-arena)
+ set_target_properties(yabause-retro-arena PROPERTIES OUTPUT_NAME yabasanshiro)
+ 
+diff --git a/yabause/src/retro_arena/README.md b/yabause/src/retro_arena/README.md
+index fa09e0486..194b37824 100644
+--- a/yabause/src/retro_arena/README.md
++++ b/yabause/src/retro_arena/README.md
+@@ -15,19 +15,19 @@ $ cd build
+ ### Generate Makefile for ODROID XU4
+ 
+ ```
+-$ cmake ../yabause -DYAB_PORTS=retro_arena -DYAB_WANT_DYNAREC_DEVMIYAX=ON -DYAB_WANT_ARM7=ON -DCMAKE_TOOLCHAIN_FILE=../yabause/src/retro_arena/xu4.cmake -DCMAKE_INSTALL_PREFIX=/opt/retroarena/emulators/yabause/
++$ cmake ../yabause -DGIT_EXECUTABLE=/usr/bin/git -DYAB_PORTS=retro_arena -DYAB_WANT_DYNAREC_DEVMIYAX=ON -DYAB_WANT_ARM7=ON -DCMAKE_TOOLCHAIN_FILE=../yabause/src/retro_arena/xu4.cmake -DCMAKE_INSTALL_PREFIX=/opt/retroarena/emulators/yabause/
+ ```
+ 
+ ### Generate Makefile for ODROID N2
+ 
+ ```
+-$ cmake ../yabause -DYAB_PORTS=retro_arena -DYAB_WANT_DYNAREC_DEVMIYAX=ON -DCMAKE_TOOLCHAIN_FILE=../yabause/src/retro_arena/n2.cmake -DCMAKE_INSTALL_PREFIX=/opt/retroarena/emulators/yabause/
++$ cmake ../yabause -DGIT_EXECUTABLE=/usr/bin/git -DYAB_PORTS=retro_arena -DYAB_WANT_DYNAREC_DEVMIYAX=ON -DCMAKE_TOOLCHAIN_FILE=../yabause/src/retro_arena/n2.cmake -DCMAKE_INSTALL_PREFIX=/opt/retroarena/emulators/yabause/
+ ```
+ 
+ ### Generate Makefile for RockPro64
+ 
+ ```
+-$ cmake ../yabause -DYAB_PORTS=retro_arena -DYAB_WANT_DYNAREC_DEVMIYAX=ON -DYAB_WANT_ARM7=ON -DCMAKE_TOOLCHAIN_FILE=../yabause/src/retro_arena/rp64.cmake -DCMAKE_INSTALL_PREFIX=/opt/retroarena/emulators/yabause/
++$ cmake ../yabause -DGIT_EXECUTABLE=/usr/bin/git -DYAB_PORTS=retro_arena -DYAB_WANT_DYNAREC_DEVMIYAX=ON -DYAB_WANT_ARM7=ON -DCMAKE_TOOLCHAIN_FILE=../yabause/src/retro_arena/rp64.cmake -DCMAKE_INSTALL_PREFIX=/opt/retroarena/emulators/yabause/
+ ```
+ 
+ ### Build
+diff --git a/yabause/src/retro_arena/main.cpp b/yabause/src/retro_arena/main.cpp
+index 413282ab6..daf861d1a 100644
+--- a/yabause/src/retro_arena/main.cpp
++++ b/yabause/src/retro_arena/main.cpp
+@@ -381,7 +381,7 @@ int main(int argc, char** argv)
+   }
+ 
+   VIDCore->Resize(0,0,width,height,1,g_keep_aspect_rate);
+-  
++
+   SDL_GL_MakeCurrent(wnd,nullptr);
+ #if defined(__RP64__) || defined(__N2__)
+   YabThreadSetCurrentThreadAffinityMask(0x4);
+
+From 3f68d1d2aee01d3f08b145b91daebd984e0c3aba Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Mon, 26 Aug 2019 14:54:41 +0900
+Subject: [PATCH 15/20] Better frame skip. may be..
+
+# Conflicts:
+#	yabause/src/vdp2.c
+---
+ yabause/src/vdp2.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/yabause/src/vdp2.c b/yabause/src/vdp2.c
+index d9f92c091..7eec75a66 100644
+--- a/yabause/src/vdp2.c
++++ b/yabause/src/vdp2.c
+@@ -836,6 +836,7 @@ void vdp2VBlankOUT(void) {
+   static int framestoskip = 0;
+   static int framesskipped = 0;
+   static int skipnextframe = 0;
++  static int previous_skipped = 0;
+   static u64 curticks = 0;
+   static u64 diffticks = 0;
+   static u32 framecount = 0;
+@@ -857,6 +858,13 @@ void vdp2VBlankOUT(void) {
+ 
+   if (pre_swap_frame_buffer == 0 && skipnextframe && Vdp1External.swap_frame_buffer ){
+     skipnextframe = 0;
++    previous_skipped = 0;
++    framestoskip = 1;
++  }
++
++  if (previous_skipped != 0 && skipnextframe != 0) {
++    skipnextframe = 0;
++    previous_skipped = 0;
+     framestoskip = 1;
+   }
+ 
+@@ -868,9 +876,8 @@ void vdp2VBlankOUT(void) {
+     skipped_frame++;
+     saved = VIDCore;
+     //VIDCore = &VIDDummy;
+-
+-
+     
++    previous_skipped = 1;
+     VIDCore->Vdp2DrawStart = VIDDummy.Vdp2DrawStart;
+     VIDCore->Vdp2DrawEnd   = VIDDummy.Vdp2DrawEnd;
+     VIDCore->Vdp2DrawScreens = VIDDummy.Vdp2DrawScreens;
+@@ -878,6 +885,8 @@ void vdp2VBlankOUT(void) {
+   }
+   else if (saved && (!skipnextframe))
+   {
++    skipnextframe = 0;
++    previous_skipped = 0;
+     //VIDCore = saved;
+     if( saved != NULL ){
+ 
+@@ -955,7 +964,7 @@ void vdp2VBlankOUT(void) {
+    //if ((Vdp1Regs->FBCR & 2) && (Vdp1Regs->TVMR & 8))
+    //   Vdp1External.manualerase = 1;
+ 
+-   if (!skipnextframe)
++   if ( skipnextframe == 0)
+    {
+       framesskipped = 0;
+ 
+@@ -966,7 +975,7 @@ void vdp2VBlankOUT(void) {
+    {
+       framestoskip--;
+ 
+-      if (framestoskip < 1)
++      if (framestoskip < 1) 
+          skipnextframe = 0;
+       else
+          skipnextframe = 1;
+
+From 24818f091d3625f2482b023e927e946a0f89d0ee Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Sun, 25 Aug 2019 15:01:07 +0900
+Subject: [PATCH 16/20] double buffered glMapBufferRange
+
+# Conflicts:
+#	yabause/src/vidogl.c
+---
+ yabause/src/vidogl.c      |  10 +-
+ yabause/src/ygl.h         |  11 +-
+ yabause/src/ygles.c       | 209 ++++++++++++++++++++++----------------
+ yabause/src/yglshaderes.c |  28 ++---
+ 4 files changed, 150 insertions(+), 108 deletions(-)
+
+diff --git a/yabause/src/vidogl.c b/yabause/src/vidogl.c
+index 11bcd22b6..1cf6119d0 100644
+--- a/yabause/src/vidogl.c
++++ b/yabause/src/vidogl.c
+@@ -5436,11 +5436,11 @@ void VIDOGLVdp2DrawStart(void)
+     glClientWaitSync(_Ygl->sync, 0, GL_TIMEOUT_IGNORED);
+     glDeleteSync(_Ygl->sync);
+     _Ygl->sync = 0;
+-  if (_Ygl->frame_sync != 0) {
+-    glClientWaitSync(_Ygl->frame_sync, 0, GL_TIMEOUT_IGNORED);
+-    glDeleteSync(_Ygl->frame_sync);
+-    _Ygl->frame_sync = 0;
+-  }
++  //if (_Ygl->frame_sync != 0) {
++  //  glClientWaitSync(_Ygl->frame_sync, 0, GL_TIMEOUT_IGNORED);
++  //  glDeleteSync(_Ygl->frame_sync);
++  //  _Ygl->frame_sync = 0;
++  //}
+   YglTmPull(YglTM, 0);
+   YglTMReset(YglTM);
+   YglCacheReset(YglTM);
+diff --git a/yabause/src/ygl.h b/yabause/src/ygl.h
+index b7838d7b5..8b45d1df4 100644
+--- a/yabause/src/ygl.h
++++ b/yabause/src/ygl.h
+@@ -252,8 +252,15 @@ typedef struct {
+ 	YglCacheHash *HashTable[HASHSIZE];
+ 	YglCacheHash CashLink[HASHSIZE * 2];
+ 	u32 CashLink_index;
+-	GLuint textureID;
+-	GLuint pixelBufferID;
++
++	//GLuint textureID;
++	//GLuint pixelBufferID;
++
++  int current;
++  GLuint textureID_in[2];
++  GLuint pixelBufferID_in[2];
++  unsigned int * texture_in[2];
++
+ } YglTextureManager;
+ 
+ extern YglTextureManager * YglTM;
+diff --git a/yabause/src/ygles.c b/yabause/src/ygles.c
+index 875acc11d..cfbcfd3f3 100644
+--- a/yabause/src/ygles.c
++++ b/yabause/src/ygles.c
+@@ -493,38 +493,43 @@ YglTextureManager * YglTMInit(unsigned int w, unsigned int h) {
+   memset(tm, 0, sizeof(YglTextureManager));
+   tm->width = w;
+   tm->height = h;
++  tm->current = 0;
+ 
+   YglTMReset(tm);
+ 
+-  glGenBuffers(1, &tm->pixelBufferID);
+-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
+-  glBufferData(GL_PIXEL_UNPACK_BUFFER, tm->width * tm->height * 4, NULL, GL_DYNAMIC_DRAW);
+-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
++  for (int i = 0; i < 2; i++) {
+ 
+-  glGetError();
+-  glGenTextures(1, &tm->textureID);
+-  glBindTexture(GL_TEXTURE_2D, tm->textureID);
+-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tm->width, tm->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+-  if ((error = glGetError()) != GL_NO_ERROR)
+-  {
+-    YGLDEBUG("Fail to init YglTM->textureID %04X", error);
+-    abort();
+-  }
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
++    glGenBuffers(1, &tm->pixelBufferID_in[i]);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[i]);
++    glBufferData(GL_PIXEL_UNPACK_BUFFER, tm->width * tm->height * 4, NULL, GL_DYNAMIC_DRAW);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+ 
+-  glBindTexture(GL_TEXTURE_2D, tm->textureID);
+-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
+-  tm->texture = (unsigned int *)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT );
+-  if ((error = glGetError()) != GL_NO_ERROR)
+-  {
+-    YGLDEBUG("Fail to init YglTM->texture %04X", error);
+-    abort();
++    glGetError();
++    glGenTextures(1, &tm->textureID_in[i]);
++    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[i]);
++    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tm->width, tm->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
++    if ((error = glGetError()) != GL_NO_ERROR)
++    {
++      YGLDEBUG("Fail to init YglTM->textureID %04X", error);
++      abort();
++    }
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
++  
++    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[i]);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[i]);
++    tm->texture_in[i] = (unsigned int *)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
++    if ((error = glGetError()) != GL_NO_ERROR)
++    {
++      YGLDEBUG("Fail to init YglTM->texture %04X", error);
++      abort();
++    }
++   
+   }
++  tm->texture = tm->texture_in[tm->current];
+   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+-
+   YglGetColorRamPointer();
+ 
+   return tm;
+@@ -533,15 +538,19 @@ YglTextureManager * YglTMInit(unsigned int w, unsigned int h) {
+ //////////////////////////////////////////////////////////////////////////////
+ 
+ void YglTMDeInit(YglTextureManager * tm) {
+-  glBindTexture(GL_TEXTURE_2D, tm->textureID);
+-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+-  glBindTexture(GL_TEXTURE_2D, 0);
+-  glFinish();
+ 
+-  glDeleteTextures(1, &tm->textureID);
+-  tm->textureID = 0;
+-  glDeleteBuffers(1, &tm->pixelBufferID);
+-  tm->pixelBufferID = 0;
++  for (int i = 0; i < 2; i++) {
++    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[i]);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
++    glBindTexture(GL_TEXTURE_2D, 0);
++    glFinish();
++
++    glDeleteTextures(1, &tm->textureID_in[i]);
++    tm->textureID_in[i] = 0;
++    glDeleteBuffers(1, &tm->pixelBufferID_in[i]);
++    tm->pixelBufferID_in[i] = 0;
++  }
++
+   free(tm);
+ }
+ 
+@@ -570,9 +579,9 @@ void YglTMReserve(YglTextureManager * tm, unsigned int w, unsigned int h){
+ 
+ void YglTmPush(YglTextureManager * tm){
+   glActiveTexture(GL_TEXTURE0);
+-  glBindTexture(GL_TEXTURE_2D, tm->textureID);
++  glBindTexture(GL_TEXTURE_2D, tm->textureID_in[tm->current] );
+   if (tm->texture != NULL ) {
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[tm->current] );
+     glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tm->width, tm->yMax, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+@@ -582,88 +591,114 @@ void YglTmPush(YglTextureManager * tm){
+ 
+ void YglTmPull(YglTextureManager * tm, u32 flg){
+   if (tm->texture == NULL) {
++
++    int prev = tm->current;
++
++    if (tm->current == 0) {
++      tm->current = 1;
++    }
++    else {
++      tm->current = 0;
++    }
++
++    tm->texture = tm->texture_in[tm->current];
++
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, tm->textureID);
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
+-    tm->texture = (int*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | flg | GL_MAP_UNSYNCHRONIZED_BIT  );
+-    if (tm->texture == NULL){
++    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[prev]);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[prev]);
++    tm->texture_in[prev] = (int*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | flg | GL_MAP_UNSYNCHRONIZED_BIT  );
++    if (tm->texture_in[prev] == NULL){
+       abort();
+     }
+-	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
++	  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
++
++    glFlush();
++
++    glActiveTexture(GL_TEXTURE0);
++    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[tm->current]);
++
+   }
+ }
+ 
+ 
+ void YglTMRealloc(YglTextureManager * tm, unsigned int width, unsigned int height ){
+ 
+-  GLuint new_textureID;
+-  GLuint new_pixelBufferID;
+-  unsigned int * new_texture;
++  GLuint new_textureID[2];
++  GLuint new_pixelBufferID[2];
++  unsigned int * new_texture[2];
+   GLuint error;
+ 
+   Vdp2RgbTextureSync();
+ 
+-  if (tm->texture != NULL) {
++  if (tm->texture_in[tm->current] != NULL) {
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, tm->textureID);
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID);
++    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[tm->current] );
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[tm->current]);
+     glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+-    tm->texture = NULL;
++    tm->texture_in[tm->current] = NULL;
+   }
+ 
+   glGetError();
+ 
+-
+-  glGenTextures(1, &new_textureID);
+-  glBindTexture(GL_TEXTURE_2D, new_textureID);
++  for (int i = 0; i < 2; i++) {
++    glGenTextures(1, &new_textureID[i]);
++    glBindTexture(GL_TEXTURE_2D, new_textureID[i]);
+     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+-  if ((error = glGetError()) != GL_NO_ERROR){
+-    YGLDEBUG("Fail to init new_textureID %d, %04X(%d,%d)\n", new_textureID, error,width, height);
+-    abort();
+-  }
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
++    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
++    if ((error = glGetError()) != GL_NO_ERROR) {
++      YGLDEBUG("Fail to init new_textureID %d, %04X(%d,%d)\n", new_textureID, error, width, height);
++      abort();
++    }
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
++    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+ 
+ 
+-  glGenBuffers(1, &new_pixelBufferID);
+-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, new_pixelBufferID);
+-  glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height * 4, NULL, GL_DYNAMIC_DRAW);
++    glGenBuffers(1, &new_pixelBufferID[i]);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, new_pixelBufferID[i]);
++    glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height * 4, NULL, GL_DYNAMIC_DRAW);
+ 
+-  int dh = tm->height;
+-  if (dh > height) dh = height;
++    int dh = tm->height;
++    if (dh > height) dh = height;
+ 
+-  glBindBuffer(GL_COPY_READ_BUFFER, tm->pixelBufferID);
+-  glBindBuffer(GL_COPY_WRITE_BUFFER, new_pixelBufferID);
+-  glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, tm->width * dh * 4);
+-  if ((error = glGetError()) != GL_NO_ERROR){
+-    YGLDEBUG("Fail to init new_texture %04X", error);
+-    abort();
++    glBindBuffer(GL_COPY_READ_BUFFER, tm->pixelBufferID_in[tm->current]);
++    glBindBuffer(GL_COPY_WRITE_BUFFER, new_pixelBufferID[i]);
++    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, tm->width * dh * 4);
++    if ((error = glGetError()) != GL_NO_ERROR) {
++      YGLDEBUG("Fail to init new_texture %04X", error);
++      abort();
++    }
+   }
+ 
+   glBindBuffer(GL_COPY_READ_BUFFER, 0);
+   glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+ 
++  for (int i = 0; i < 2; i++) {
+ 
+-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, new_pixelBufferID);
+-  new_texture = (unsigned int *)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, width * height * 4, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT );
+-  if ((error = glGetError()) != GL_NO_ERROR){
+-    YGLDEBUG("Fail to init new_texture %04X", error);
+-    abort();
+-  }
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, new_pixelBufferID[i]);
++    new_texture[i] = (unsigned int *)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, width * height * 4, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
++    if ((error = glGetError()) != GL_NO_ERROR) {
++      YGLDEBUG("Fail to init new_texture %04X", error);
++      abort();
++    }
++
++    // Free textures
++    glDeleteTextures(1, &tm->textureID_in[i]);
++    glDeleteBuffers(1, &tm->pixelBufferID_in[i]);
++    
++    tm->texture_in[i] = new_texture[i];
++    tm->textureID_in[i] = new_textureID[i];
++    tm->pixelBufferID_in[i] = new_pixelBufferID[i];
+ 
+-  // Free textures
+-  glDeleteTextures(1, &tm->textureID);
+-  glDeleteBuffers(1, &tm->pixelBufferID);
++  }
+ 
+   // user new texture
+-    tm->width = width;
++  tm->width = width;
+   tm->height = height;
+-  tm->texture = new_texture;
+-  tm->textureID = new_textureID;
+-  tm->pixelBufferID = new_pixelBufferID;
++  tm->texture = tm->texture_in[tm->current];
++  //tm->textureID = new_textureID;
++  //tm->pixelBufferID = new_pixelBufferID;
+ 
+   return;
+ 
+@@ -2906,7 +2941,7 @@ void YglRenderVDP1(void) {
+   glViewport(0,0,_Ygl->width,_Ygl->height);
+   glScissor(0, 0, _Ygl->width, _Ygl->height);
+   glActiveTexture(GL_TEXTURE0);
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current] );
+ 
+   for( j=0;j<(level->prgcurrent+1); j++ ) {
+     if( level->prg[j].prgid != cprg ) {
+@@ -3568,7 +3603,7 @@ void YglRender(void) {
+    }
+    
+    if (_Ygl->texture_manager == NULL) goto render_finish;
+-   glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++   glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+ 
+    YglUpdateVdp2Reg();
+@@ -3610,7 +3645,7 @@ void YglRender(void) {
+         // clean up
+         cprg = -1;
+         glUseProgram(0);
+-        glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++        glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+                 glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+ 
+       }
+@@ -3946,7 +3981,7 @@ void YglRenderDestinationAlpha(void) {
+       // clean up
+       cprg = -1;
+       glUseProgram(0);
+-      glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++      glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+             glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+     }
+     glDisable(GL_STENCIL_TEST);
+diff --git a/yabause/src/yglshaderes.c b/yabause/src/yglshaderes.c
+index ba4df5be6..8cafdb44c 100644
+--- a/yabause/src/yglshaderes.c
++++ b/yabause/src/yglshaderes.c
+@@ -271,7 +271,7 @@ int Ygl_cleanupNormal(void * p)
+   prg = p;
+   if (prg->interuput_texture != 0) {
+ 	  glActiveTexture(GL_TEXTURE0);
+-	  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++	  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+   return 0;
+ }
+@@ -366,7 +366,7 @@ int Ygl_cleanupNormalCram(void * p)
+   prg = p;
+   glActiveTexture(GL_TEXTURE0);
+   if (prg->interuput_texture != 0) {
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+   return 0;
+ }
+@@ -556,7 +556,7 @@ int Ygl_uniformNormalCramLine(void * p)
+   glBindTexture(GL_TEXTURE_2D, _Ygl->cram_tex);
+ 
+   glActiveTexture(GL_TEXTURE2);
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+ 
+ 
+   // Disable blend mode if extend Color calcuration  is not enabled
+@@ -572,7 +572,7 @@ int Ygl_cleanupNormalCramLine(void * p)
+   YglProgram * prg = p;
+   glActiveTexture(GL_TEXTURE0);
+   if (prg->interuput_texture != 0) {
+-	  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++	  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+   return 0;
+ }
+@@ -633,7 +633,7 @@ int Ygl_uniformMosaic(void * p)
+     glBindTexture(GL_TEXTURE_2D, _Ygl->cram_tex);
+ 
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+ 
+   }
+   else {
+@@ -642,7 +642,7 @@ int Ygl_uniformMosaic(void * p)
+     glDisableVertexAttribArray(2);
+     glUniform1i(id_normal_s_texture, 0);
+     glUniform4fv(prg->color_offset, 1, prg->color_offset_val);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+ 
+   return 0;
+@@ -668,7 +668,7 @@ int Ygl_cleanupMosaic(void * p)
+   // call blit method
+   YglBlitMosaic(_Ygl->tmpfbotex, _Ygl->targetfbo, _Ygl->rwidth, _Ygl->rheight, prg->matrix, prg->mosaic);
+ 
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+ 
+   return 0;
+ }
+@@ -702,7 +702,7 @@ int Ygl_uniformPerLineAlpha(void * p)
+     glBindTexture(GL_TEXTURE_2D, _Ygl->cram_tex);
+ 
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+ 
+   }
+   else {
+@@ -711,7 +711,7 @@ int Ygl_uniformPerLineAlpha(void * p)
+     glDisableVertexAttribArray(2);
+     glUniform1i(id_normal_s_texture, 0);
+     glUniform4fv(prg->color_offset, 1, prg->color_offset_val);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+ 
+   if (prg->interuput_texture != 0) {
+@@ -752,10 +752,10 @@ int Ygl_cleanupPerLineAlpha(void * p)
+   // call blit method
+   YglBlitPerLineAlpha(_Ygl->tmpfbotex, _Ygl->targetfbo, _Ygl->rwidth, _Ygl->rheight, prg->matrix, prg->lineTexture);
+ 
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   glActiveTexture(GL_TEXTURE0);
+   if (prg->interuput_texture != 0) {
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+   return 0;
+ }
+@@ -787,7 +787,7 @@ int Ygl_uniformNormal_blur(void * p)
+     glBindTexture(GL_TEXTURE_2D, _Ygl->cram_tex);
+ 
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+ 
+   }
+   else {
+@@ -796,7 +796,7 @@ int Ygl_uniformNormal_blur(void * p)
+     glDisableVertexAttribArray(2);
+     glUniform1i(id_normal_s_texture, 0);
+     glUniform4fv(prg->color_offset, 1, prg->color_offset_val);
+-    glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++    glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+   }
+ 
+   //glEnableVertexAttribArray(prg->vertexp);
+@@ -837,7 +837,7 @@ int Ygl_cleanupNormal_blur(void * p)
+    // call blit method
+   YglBlitBlur(_Ygl->tmpfbotex, _Ygl->targetfbo, _Ygl->rwidth, _Ygl->rheight, prg->matrix);
+ 
+-  glBindTexture(GL_TEXTURE_2D, YglTM->textureID);
++  glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+ 
+   return 0;
+ }
+
+From e1626b5a3f708b2f90ff372ec961d0aa4716a833 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Mon, 26 Aug 2019 19:49:18 +0900
+Subject: [PATCH 17/20] Remove Ad completely
+
+# Conflicts:
+#	yabause/src/android/app/src/main/java/org/uoyabause/android/Yabause.java
+---
+ .../app/src/main/java/org/uoyabause/android/Yabause.java        | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/yabause/src/android/app/src/main/java/org/uoyabause/android/Yabause.java b/yabause/src/android/app/src/main/java/org/uoyabause/android/Yabause.java
+index 85e9380e5..70d9bd1e4 100644
+--- a/yabause/src/android/app/src/main/java/org/uoyabause/android/Yabause.java
++++ b/yabause/src/android/app/src/main/java/org/uoyabause/android/Yabause.java
+@@ -266,7 +266,7 @@ public void onDrawerStateChanged(int i) {
+         yabauseThread = new YabauseRunnable(this);
+ 
+         UiModeManager uiModeManager = (UiModeManager) getSystemService(Context.UI_MODE_SERVICE);
+-        if (uiModeManager.getCurrentModeType() != Configuration.UI_MODE_TYPE_TELEVISION) {
++    if (uiModeManager.getCurrentModeType() != Configuration.UI_MODE_TYPE_TELEVISION && !BuildConfig.BUILD_TYPE.equals("pro") ) {
+             SharedPreferences prefs = getSharedPreferences("private", Context.MODE_PRIVATE);
+             Boolean hasDonated = prefs.getBoolean("donated", false);
+             if( hasDonated ) {
+
+From 9373f67508603620c50cc398ecc7d2324dd6cc23 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Mon, 26 Aug 2019 22:22:35 +0900
+Subject: [PATCH 18/20] FIX: Burning Ranger swap buffer
+
+# Conflicts:
+#	yabause/src/vidogl.c
+---
+ yabause/src/vidogl.c  | 15 ++++++++++-----
+ yabause/src/yabause.c |  5 +++--
+ yabause/src/ygles.c   | 33 +++++++++++++++------------------
+ 3 files changed, 28 insertions(+), 25 deletions(-)
+
+diff --git a/yabause/src/vidogl.c b/yabause/src/vidogl.c
+index 1cf6119d0..ef677f0b9 100644
+--- a/yabause/src/vidogl.c
++++ b/yabause/src/vidogl.c
+@@ -3798,6 +3798,9 @@ int VIDOGLInit(void)
+   vdp1wratio = 1;
+   vdp1hratio = 1;
+ 
++  if (_Ygl->rbg_use_compute_shader) {
++    RBGGenerator_init(320, 224);
++  }
+ 
+   return 0;
+ }
+@@ -3902,7 +3905,7 @@ void VIDOGLVdp1DrawStart(void)
+     YglTMReset(YglTM);
+     YglCacheReset(YglTM);
+   }
+-  YglTmPull(YglTM, 0);
++  YglTmPull(YglTM, 1);
+ 
+   maxpri = 0x00;
+   minpri = 0x07;
+@@ -5432,15 +5435,17 @@ void VIDOGLVdp2DrawStart(void)
+     YglTM = YglTMInit(new_width, new_height);
+   }
+   YglReset();
+-  if (_Ygl->sync != 0) {
+-    glClientWaitSync(_Ygl->sync, 0, GL_TIMEOUT_IGNORED);
+-    glDeleteSync(_Ygl->sync);
+-    _Ygl->sync = 0;
++//  if (_Ygl->sync != 0) {
++    //glClientWaitSync(_Ygl->sync, 0, GL_TIMEOUT_IGNORED);
++//    glDeleteSync(_Ygl->sync);
++//    _Ygl->sync = 0;
++//  }
+   //if (_Ygl->frame_sync != 0) {
+   //  glClientWaitSync(_Ygl->frame_sync, 0, GL_TIMEOUT_IGNORED);
+   //  glDeleteSync(_Ygl->frame_sync);
+   //  _Ygl->frame_sync = 0;
+   //}
++
+   YglTmPull(YglTM, 0);
+   YglTMReset(YglTM);
+   YglCacheReset(YglTM);
+diff --git a/yabause/src/yabause.c b/yabause/src/yabause.c
+index 0c14e65ae..bb9097f52 100644
+--- a/yabause/src/yabause.c
++++ b/yabause/src/yabause.c
+@@ -238,6 +238,9 @@ int YabauseInit(yabauseinit_struct *init)
+ 
+    MappedMemoryInit();
+ 
++   VideoSetSetting(VDP_SETTING_RBG_USE_COMPUTESHADER, init->rbg_use_compute_shader);
++   VideoSetSetting(VDP_SETTING_RBG_RESOLUTION_MODE, init->rbg_resolution_mode);
++
+    if (VideoInit(init->vidcoretype) != 0)
+    {
+       YabSetError(YAB_ERR_CANNOTINIT, _("Video"));
+@@ -248,8 +251,6 @@ int YabauseInit(yabauseinit_struct *init)
+    VideoSetSetting(VDP_SETTING_FILTERMODE,init->video_filter_type);
+    VideoSetSetting(VDP_SETTING_POLYGON_MODE, init->polygon_generation_mode);
+    VideoSetSetting(VDP_SETTING_RESOLUTION_MODE, init->resolution_mode);
+-   VideoSetSetting(VDP_SETTING_RBG_RESOLUTION_MODE, init->rbg_resolution_mode);
+-   VideoSetSetting(VDP_SETTING_RBG_USE_COMPUTESHADER, init->rbg_use_compute_shader);
+    VideoSetSetting(VDP_SETTING_ROTATE_SCREEN, init->rotate_screen);
+ 
+ 
+diff --git a/yabause/src/ygles.c b/yabause/src/ygles.c
+index cfbcfd3f3..3066770b7 100644
+--- a/yabause/src/ygles.c
++++ b/yabause/src/ygles.c
+@@ -592,28 +592,25 @@ void YglTmPush(YglTextureManager * tm){
+ void YglTmPull(YglTextureManager * tm, u32 flg){
+   if (tm->texture == NULL) {
+ 
+-    int prev = tm->current;
+-
+-    if (tm->current == 0) {
+-      tm->current = 1;
+-    }
+-    else {
+-      tm->current = 0;
+-    }
+-
+-    tm->texture = tm->texture_in[tm->current];
+-
+     glActiveTexture(GL_TEXTURE0);
+-    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[prev]);
+-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[prev]);
+-    tm->texture_in[prev] = (int*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | flg | GL_MAP_UNSYNCHRONIZED_BIT  );
+-    if (tm->texture_in[prev] == NULL){
++    glBindTexture(GL_TEXTURE_2D, tm->textureID_in[tm->current]);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tm->pixelBufferID_in[tm->current]);
++    tm->texture_in[tm->current] = (int*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, tm->width * tm->height * 4, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
++    if (tm->texture_in[tm->current] == NULL) {
+       abort();
+     }
+-	  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
++    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+ 
+-    glFlush();
++    if (flg == 0) {
++      if (tm->current == 0) {
++        tm->current = 1;
++      }
++      else {
++        tm->current = 0;
++      }
++    }
+ 
++    tm->texture = tm->texture_in[tm->current];
+     glActiveTexture(GL_TEXTURE0);
+     glBindTexture(GL_TEXTURE_2D, tm->textureID_in[tm->current]);
+ 
+@@ -4476,7 +4473,7 @@ void YglOnScreenDebugMessage(char *string, ...) {
+ 
+ void VIDOGLSync(){
+   //YglTmPull(YglTM_vdp1);
+-  YglTmPull(YglTM, GL_MAP_INVALIDATE_BUFFER_BIT);
++  YglTmPull(YglTM, 0);
+   _Ygl->texture_manager = NULL;
+   RBGGenerator_onFinish();
+   //glFinish();
+
+From fad98406fd6d3409014c164f2a60b431d7f0908e Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Mon, 26 Aug 2019 22:35:55 +0900
+Subject: [PATCH 19/20] ver 2.7.4
+
+# Conflicts:
+#	.gitlab-ci.yml
+---
+ yabause/CMakeLists.txt               | 2 +-
+ yabause/src/android/app/build.gradle | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/yabause/CMakeLists.txt b/yabause/CMakeLists.txt
+index 467217672..13ee0f1ab 100644
+--- a/yabause/CMakeLists.txt
++++ b/yabause/CMakeLists.txt
+@@ -19,7 +19,7 @@ endif(YAB_FORCE_GLES20)
+ set(YAB_PACKAGE yabause)
+ set(YAB_VERSION_MAJOR 2)
+ set(YAB_VERSION_MINOR 7)
+-set(YAB_VERSION_PATCH 3)
++set(YAB_VERSION_PATCH 4)
+ set(YAB_VERSION "${YAB_VERSION_MAJOR}.${YAB_VERSION_MINOR}.${YAB_VERSION_PATCH}")
+ 
+ include(GetGitRevisionDescription)
+diff --git a/yabause/src/android/app/build.gradle b/yabause/src/android/app/build.gradle
+index 892e47031..433ea27f7 100644
+--- a/yabause/src/android/app/build.gradle
++++ b/yabause/src/android/app/build.gradle
+@@ -9,8 +9,8 @@ android {
+         minSdkVersion 19
+         targetSdkVersion 25
+         multiDexEnabled true
+-        versionCode 86
+-        versionName '2.7.3'
++        versionCode 87
++        versionName '2.7.4'
+         multiDexEnabled true
+         vectorDrawables.useSupportLibrary = true
+ 
+
+From 28f5b4f68a156caf12ed203863ec1346186d9d17 Mon Sep 17 00:00:00 2001
+From: devMiyax <smiyaxdev@gmail.com>
+Date: Mon, 26 Aug 2019 23:23:28 +0900
+Subject: [PATCH 20/20] update install document
+
+(cherry picked from commit fafc9d58172390c64b948ecc45fad963e32629f1)
+---
+ win_template/readme.txt       | 12 ++++++++++--
+ yabause/src/qt/CMakeLists.txt |  5 +++--
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/win_template/readme.txt b/win_template/readme.txt
+index 572339bcb..a029d48f5 100644
+--- a/win_template/readme.txt
++++ b/win_template/readme.txt
+@@ -1,2 +1,10 @@
+-uoYabause windows version
+-https://github.com/devmiyax/yabause
+\ No newline at end of file
++Yaba Sanshiro windows version
++
++Web site
++ http://www.uoyabause.org/
++
++Source
++ https://github.com/devmiyax/yabause
++
++Support
++ https://discordapp.com/invite/aRJhTBH
+\ No newline at end of file
+diff --git a/yabause/src/qt/CMakeLists.txt b/yabause/src/qt/CMakeLists.txt
+index 74e915828..655610f90 100644
+--- a/yabause/src/qt/CMakeLists.txt
++++ b/yabause/src/qt/CMakeLists.txt
+@@ -333,8 +333,9 @@ if (WIN32)
+ 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../AUTHORS    DESTINATION "." RENAME AUTHORS.txt)
+ 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../ChangeLog  DESTINATION "." RENAME ChangeLog.txt)
+ 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../COPYING    DESTINATION "." RENAME COPYING.txt)
+-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../README     DESTINATION "." RENAME README.txt)
+-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../README.WIN DESTINATION "." RENAME README.WIN.txt)
++	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../../win_template/readme.txt     DESTINATION "." RENAME README.txt)
++	#install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../README     DESTINATION "." RENAME README.txt)
++	#install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../README.WIN DESTINATION "." RENAME README.WIN.txt)
+ 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/donate.png DESTINATION "." )
+ 	
+ 	if (MINGW)
