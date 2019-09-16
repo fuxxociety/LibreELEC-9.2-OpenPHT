@@ -1,0 +1,11 @@
+--- a/meson_options.txt	2019-09-13 12:54:53.120314520 +0200
++++ b/meson_options.txt	2019-09-13 12:55:06.930610508 +0200
+@@ -43,7 +43,7 @@
+ option('setfont-path', type : 'string', description : 'path to setfont')
+ option('nologin-path', type : 'string', description : 'path to nologin')
+ 
+-option('debug-shell', type : 'string', value : '/bin/sh',
++option('debug-shell', type : 'string', value : '/bin/sh -l',
+        description : 'path to debug shell binary')
+ option('debug-tty', type : 'string', value : '/dev/tty9',
+        description : 'specify the tty device for debug shell')
