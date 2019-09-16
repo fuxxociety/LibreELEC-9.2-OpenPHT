@@ -3,15 +3,21 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="llvm"
-PKG_VERSION="8.0.0"
-PKG_SHA256="8872be1b12c61450cacc82b3d153eab02be2546ef34fa3580ed14137bb26224c"
+PKG_VERSION="b860b5e"
+PKG_SHA256="cbfc66ff2850afcc72e232446c73ebd781a32d5bced4b9aecc5b52453bb5543a"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
 PKG_SITE="http://llvm.org/"
-PKG_URL="http://llvm.org/releases/$PKG_VERSION/${PKG_NAME}-${PKG_VERSION}.src.tar.xz"
+PKG_URL="https://github.com/RPCS3/llvm/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_HOST="toolchain"
 PKG_DEPENDS_TARGET="toolchain llvm:host zlib"
 PKG_LONGDESC="Low-Level Virtual Machine (LLVM) is a compiler infrastructure."
+
+if [ "$LVM_SUPPORT" = "yes" ]; then
+  LLVM_TARGETS="AMDGPU;X86"
+else
+  LLVM_TARGETS="X86"
+fi
 
 PKG_CMAKE_OPTS_COMMON="-DLLVM_INCLUDE_TOOLS=ON \
                        -DLLVM_BUILD_TOOLS=OFF \
@@ -25,7 +31,7 @@ PKG_CMAKE_OPTS_COMMON="-DLLVM_INCLUDE_TOOLS=ON \
                        -DLLVM_INCLUDE_DOCS=OFF \
                        -DLLVM_ENABLE_DOXYGEN=OFF \
                        -DLLVM_ENABLE_SPHINX=OFF \
-                       -DLLVM_TARGETS_TO_BUILD="AMDGPU" \
+                       -DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS \
                        -DLLVM_ENABLE_TERMINFO=OFF \
                        -DLLVM_ENABLE_ASSERTIONS=OFF \
                        -DLLVM_ENABLE_WERROR=OFF \
@@ -41,7 +47,7 @@ PKG_CMAKE_OPTS_HOST="$PKG_CMAKE_OPTS_COMMON \
 
 pre_configure_target() {
   PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_COMMON \
-                         -DCMAKE_BUILD_TYPE=MinSizeRel \
+                         -DCMAKE_BUILD_TYPE=Release \
                          -DCMAKE_C_FLAGS="$CFLAGS" \
                          -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
                          -DLLVM_TARGET_ARCH="$TARGET_ARCH" \
@@ -49,7 +55,14 @@ pre_configure_target() {
 }
 
 make_host() {
-  ninja $NINJA_OPTS llvm-config llvm-tblgen
+  ninja $NINJA_OPTS llvm-config llvm-tblgen FileCheck
+}
+
+makeinstall_target() {
+  DESTDIR=$SYSROOT_PREFIX ninja install $PKG_MAKEINSTALL_OPTS_TARGET
+  if [ "$LVM_SUPPORT" = "yes" ]; then
+    DESTDIR=$INSTALL ninja install $PKG_MAKEINSTALL_OPTS_TARGET
+  fi
 }
 
 makeinstall_host() {
