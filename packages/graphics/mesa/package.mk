@@ -3,11 +3,10 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mesa"
-PKG_VERSION="19.2.0-rc2"
-PKG_SHA256="9329df625629b14e62c243aaf5a8e1c1ae9deda829ecef35617f985cea1c2082"
+PKG_VERSION="2bfcf04"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
-PKG_URL="https://github.com/mesa3d/mesa/archive/mesa-$PKG_VERSION.tar.gz"
+PKG_URL="https://cgit.freedesktop.org/mesa/mesa/snapshot/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain expat libdrm Mako:host"
 PKG_LONGDESC="Mesa is a 3-D graphics library with an API."
 PKG_TOOLCHAIN="meson"
