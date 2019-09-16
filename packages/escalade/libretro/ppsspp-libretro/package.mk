@@ -1,5 +1,5 @@
 PKG_NAME="ppsspp-libretro"
-PKG_VERSION="3356f94"
+PKG_VERSION="6d2be0d"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/hrydgard/ppsspp"
@@ -15,12 +15,16 @@ PKG_CMAKE_OPTS_TARGET="-DLIBRETRO=on -DUSE_SYSTEM_FFMPEG=on -DUSING_EGL=off -DUS
 case $PROJECT in
   Generic)
     PKG_CMAKE_OPTS_TARGET+=" -DUSING_GLES2=off"
-    PKG_DEPENDS_TARGET+=" glew"
+    PKG_DEPENDS_TARGET+=" glew glu"
     ;;
   OdroidXU3|RPi)
     PKG_CMAKE_OPTS_TARGET+=" -DARMV7=on -DUSING_GLES2=on -DARM_NO_VULKAN=on"
     ;;
 esac
+
+pre_make_target() {
+  sed -i "s:isystem :I:g" build.ninja
+}
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/share/retroarch/cores

@@ -7,16 +7,11 @@ PKG_ARCH="x86_64"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/dolphin"
 PKG_URL="https://github.com/aliaspider/dolphin/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="toolchain libXi"
 PKG_SHORTDESC="Dolphin Wii/Gamecube emulator - libretro port"
 PKG_BUILD_FLAGS="+lto-parallel"
 
 PKG_CMAKE_OPTS_TARGET="-DLIBRETRO=1"
-
-pre_configure_target() {
-  export CFLAGS=`echo $CFLAGS | sed -e "s|-O.|-O3|g"`
-  export CXXFLAGS=`echo $CFLAGS | sed -e "s|-O.|-O3|g"`
-}
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/share/retroarch/cores

@@ -48,7 +48,7 @@ post_install() {
     oem_bigcores emulationstation.service
   fi
   if [ ! "$PROJECT" = "Generic" ]; then
-    sed -i -e '/gamecube/d' -e '/wii/d' -e '/ps2/d' $INSTALL/usr/lib/tmpfiles.d/es_userdirs.conf
+    sed -i -e '/gamecube/d' -e '/wii/d' -e '/ps2/d' -e '/ps3/d' $INSTALL/usr/lib/tmpfiles.d/es_userdirs.conf
   fi
   enable_service es-firstrun.service
 }
