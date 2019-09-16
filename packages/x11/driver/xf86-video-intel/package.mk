@@ -3,8 +3,8 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="xf86-video-intel"
-PKG_VERSION="6afed33"
-PKG_SHA256="a1113368b082b49958999dc2dd26b76ee8b93f3969ce74de5b75d54c22cf7633"
+PKG_VERSION="6f4972d"
+PKG_SHA256="74b6542ca7d012f235e034a5eff7d46bbe437f32f68cd13388134d09926b7614"
 PKG_ARCH="x86_64"
 PKG_LICENSE="OSS"
 PKG_SITE="http://intellinuxgraphics.org/"
@@ -30,10 +30,10 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-backlight \
                            --disable-xvmc \
                            --disable-xaa \
                            --disable-dga \
-                           --disable-tear-free \
+                           --enable-tear-free \
                            --disable-create2 \
                            --disable-async-swap \
-                           --with-default-dri=2 \
+                           --with-default-dri=3 \
                            --with-xorg-module-dir=$XORG_PATH_MODULES"
 
 post_makeinstall_target() {
