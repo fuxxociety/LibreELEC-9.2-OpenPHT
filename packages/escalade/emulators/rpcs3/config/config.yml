@@ -7,12 +7,12 @@ Core:
   Max LLVM Compile Threads: 0
   Enable thread scheduler: false
   Set DAZ and FTZ: false
-  SPU Decoder: Recompiler (LLVM)
-  Lower SPU thread priority: false
+  SPU Decoder: Recompiler (ASMJIT)
+  Lower SPU thread priority: true
   SPU Debug: false
-  Preferred SPU Threads: 0
+  Preferred SPU Threads: 1
   SPU delay penalty: 3
-  SPU loop detection: true
+  SPU loop detection: false
   Max SPURS Threads: 6
   SPU Block Size: Safe
   Accurate GETLLAR: false
@@ -20,10 +20,10 @@ Core:
   SPU Verification: true
   SPU Cache: true
   Enable TSX: Enabled
-  Accurate xfloat: false
+  Accurate xfloat: true
   Approximate xfloat: true
   Debug Console Mode: false
-  Lib Loader: Load automatic and manual selection
+  Lib Loader: Load liblv2.sprx only
   Hook static functions: false
   Load libraries:
     []
@@ -44,10 +44,10 @@ VFS:
   Disk cache maximum size (MB): 5120
 Video:
   Renderer: Vulkan
-  Resolution: 1920x1080
+  Resolution: 1280x720
   Aspect ratio: 16:9
   Frame limit: Off
-  MSAA: Auto
+  MSAA: Disabled
   Write Color Buffers: false
   Write Depth Buffer: false
   Read Color Buffers: false
@@ -60,7 +60,7 @@ Video:
   Use GPU texture scaling: false
   Stretch To Display Area: false
   Force High Precision Z buffer: false
-  Strict Rendering Mode: false
+  Strict Rendering Mode: true
   Disable ZCull Occlusion Queries: false
   Disable Vertex Cache: false
   Disable FIFO Reordering: false
@@ -72,7 +72,7 @@ Video:
   Disable Asynchronous Shader Compiler: false
   Strict Texture Flushing: false
   Disable native float16 support: false
-  Multithreaded RSX: true
+  Multithreaded RSX: false
   Consecutive Frames To Draw: 1
   Consecutive Frames To Skip: 1
   Resolution Scale: 100
@@ -139,10 +139,10 @@ Net:
   IP address: 192.168.1.1
 Miscellaneous:
   Automatically start games after boot: true
-  Exit RPCS3 when process finishes: false
+  Exit RPCS3 when process finishes: true
   Start games in fullscreen mode: true
-  Show FPS counter in window title: true
-  Show trophy popups: true
+  Show FPS counter in window title: false
+  Show trophy popups: false
   Show shader compilation hint: true
   Use native user interface: true
   Port: 2345
