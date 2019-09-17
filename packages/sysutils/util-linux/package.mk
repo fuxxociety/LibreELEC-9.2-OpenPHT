@@ -11,7 +11,7 @@ PKG_DEPENDS_HOST="gcc:host pkg-config:host"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_DEPENDS_INIT="toolchain"
 PKG_LONGDESC="A large variety of low-level system utilities that are necessary for a Linux system to function."
-PKG_TOOLCHAIN="configure"
+PKG_TOOLCHAIN="autotools"
 PKG_BUILD_FLAGS="+pic:host"
 
 UTILLINUX_CONFIG_DEFAULT="--disable-gtk-doc \
