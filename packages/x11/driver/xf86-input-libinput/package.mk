@@ -3,12 +3,12 @@
 # Copyright (C) 2019-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="xf86-input-libinput"
-PKG_VERSION="0.28.2"
-PKG_SHA256="b8b346962c6b62b8069928c29c0db83b6f544863bf2fc6830f324de841de2820"
+PKG_VERSION="0.29.0"
+PKG_SHA256="c28b56a21754b972db31798e6a4cf4dc9d69208d08f8fe41701a94def5e94bee"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.freedesktop.org/wiki/Software/libinput/"
 PKG_URL="http://xorg.freedesktop.org/archive/individual/driver/$PKG_NAME-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS_TARGET="toolchain libinput"
+PKG_DEPENDS_TARGET="toolchain libinput xorg-server"
 PKG_LONGDESC="This is an X driver based on libinput."
 PKG_TOOLCHAIN="autotools"
 
