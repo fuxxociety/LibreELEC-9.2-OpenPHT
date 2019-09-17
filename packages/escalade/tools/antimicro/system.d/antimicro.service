@@ -1,0 +1,17 @@
+[Unit]
+Description=Antimicro controller mapping
+Requires=xorg.service
+After=xorg.service
+
+[Service]
+Environment=DISPLAY=:0
+Environment=HOME=/storage
+ExecStart=/bin/sh -c '/usr/bin/antimicro --hidden > /var/log/antimicro.log 2>&1'
+KillMode=process
+Restart=always
+RestartSec=1
+StartLimitInterval=0
+TimeoutStopSec=1s
+
+[Install]
+WantedBy=graphical.target
