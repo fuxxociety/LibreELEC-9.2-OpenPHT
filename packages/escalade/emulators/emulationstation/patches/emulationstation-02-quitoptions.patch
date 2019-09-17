@@ -1,6 +1,6 @@
---- a/es-app/src/guis/GuiMenu.cpp	2019-04-12 01:27:48.658967350 +0200
-+++ b/es-app/src/guis/GuiMenu.cpp	2019-04-12 01:44:50.826338595 +0200
-@@ -473,14 +473,15 @@
+--- a/es-app/src/guis/GuiMenu.cpp	2019-09-16 23:22:50.800740004 +0200
++++ b/es-app/src/guis/GuiMenu.cpp	2019-09-16 23:29:52.832571287 +0200
+@@ -473,40 +473,51 @@
  	if (UIModeController::getInstance()->isUIModeFull())
  	{
  		row.makeAcceptInputHandler([window] {
@@ -20,28 +20,46 @@
 +		row.addElement(std::make_shared<TextComponent>(window, "START RETROARCH", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
  		s->addRow(row);
  
++		row.elements.clear();
++		row.makeAcceptInputHandler([window] {
++			window->pushGui(new GuiMsgBox(window, "QUIT TO RPCS3?", "YES",
++				[] {
++				runSystemCommand("systemd-run /usr/bin/es-rpcs3.sh");
++				SDL_Event ev;
++				ev.type = SDL_QUIT;
++				SDL_PushEvent(&ev);
++				}, "NO", nullptr));
++		});
++		row.addElement(std::make_shared<TextComponent>(window, "START RPCS3", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
++		s->addRow(row);
  
-@@ -489,13 +490,15 @@
- 		{
- 			row.elements.clear();
- 			row.makeAcceptInputHandler([window] {
+-
+-		if(Settings::getInstance()->getBool("ShowExit"))
+-		{
+-			row.elements.clear();
+-			row.makeAcceptInputHandler([window] {
 -				window->pushGui(new GuiMsgBox(window, "REALLY QUIT?", "YES",
-+				window->pushGui(new GuiMsgBox(window, "QUIT TO TERMINAL?", "YES",
- 					[] {
+-					[] {
 -					Scripting::fireEvent("quit");
 -					quitES("");
-+					runSystemCommand("systemd-run /usr/bin/es-terminal.sh");
-+					SDL_Event ev;
-+					ev.type = SDL_QUIT;
-+					SDL_PushEvent(&ev);
++		row.elements.clear();
++		row.makeAcceptInputHandler([window] {
++			window->pushGui(new GuiMsgBox(window, "QUIT TO TERMINAL?", "YES",
++				[] {
++				runSystemCommand("systemd-run /usr/bin/es-terminal.sh");
++				SDL_Event ev;
++				ev.type = SDL_QUIT;
++				SDL_PushEvent(&ev);
  				}, "NO", nullptr));
- 			});
+-			});
 -			row.addElement(std::make_shared<TextComponent>(window, "QUIT EMULATIONSTATION", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
-+			row.addElement(std::make_shared<TextComponent>(window, "START TERMINAL", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
- 			s->addRow(row);
- 		}
+-			s->addRow(row);
+-		}
++		});
++		row.addElement(std::make_shared<TextComponent>(window, "START TERMINAL", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
++		s->addRow(row);
  	}
-@@ -503,10 +506,10 @@
+ 	row.elements.clear();
  	row.makeAcceptInputHandler([window] {
  		window->pushGui(new GuiMsgBox(window, "REALLY RESTART?", "YES",
  			[] {
@@ -56,7 +74,7 @@
  		}, "NO", nullptr));
  	});
  	row.addElement(std::make_shared<TextComponent>(window, "RESTART SYSTEM", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
-@@ -516,10 +519,10 @@
+@@ -516,10 +527,10 @@
  	row.makeAcceptInputHandler([window] {
  		window->pushGui(new GuiMsgBox(window, "REALLY SHUTDOWN?", "YES",
  			[] {
