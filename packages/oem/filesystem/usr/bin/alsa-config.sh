@@ -28,3 +28,5 @@ ctl.!default {
   device $DEVICE
 }
 EOF
+
+test -f /storage/.config/asound.conf || ln -s /storage/.config/asound.conf.hw /storage/.config/asound.conf
