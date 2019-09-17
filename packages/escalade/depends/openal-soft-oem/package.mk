@@ -17,7 +17,7 @@ PKG_CMAKE_OPTS_TARGET="-DALSOFT_EXAMPLES=off \
 		       -DALSOFT_UTILS=off \
 		       -DALSOFT_BACKEND_OSS=off \
 		       -DALSOFT_BACKEND_WAVE=off \
-		       -DALSOFT_BACKEND_PULSEAUDIO=on"
+		       -DALSOFT_REQUIRE_PULSEAUDIO=on"
 
 pre_make_target() {
   $HOST_CC ../native-tools/bin2h.c -o native-tools/bin2h
