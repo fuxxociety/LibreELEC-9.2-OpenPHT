@@ -1,0 +1,943 @@
+From 0c9e94a19f531a22cd079cd0c0a4b007a40e5f5f Mon Sep 17 00:00:00 2001
+From: Flyinghead <raphael.jean@gmail.com>
+Date: Thu, 19 Sep 2019 11:57:00 +0200
+Subject: [PATCH 1/3] reios: implement PLAY_SECTOR
+
+fixes Sega Rally 2 missing bgm music in hle mode (Issue #640)
+---
+ core/reios/gdrom_hle.cpp | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/core/reios/gdrom_hle.cpp b/core/reios/gdrom_hle.cpp
+index 03cf5e004..703d4fee1 100644
+--- a/core/reios/gdrom_hle.cpp
++++ b/core/reios/gdrom_hle.cpp
+@@ -29,7 +29,7 @@ static void GDROM_HLE_ReadSES()
+ 	u32 ba = gd_hle_state.params[2];
+ 	u32 bb = gd_hle_state.params[3];
+ 
+-	WARN_LOG(REIOS, "GDROM_HLE_ReadSES: doing nothing w/ %d, %d, %d, %d", s, b, ba, bb);
++	INFO_LOG(REIOS, "GDROM_HLE_ReadSES: doing nothing w/ %d, %d, %d, %d", s, b, ba, bb);
+ }
+ 
+ static void GDROM_HLE_ReadTOC()
+@@ -140,7 +140,7 @@ static void GDCC_HLE_GETSCD() {
+ 	u32 size = gd_hle_state.params[1];
+ 	u32 dest = gd_hle_state.params[2];
+ 
+-	INFO_LOG(REIOS, "GDROM: GETSCD format %x size %x dest %08x", format, size, dest);
++	DEBUG_LOG(REIOS, "GDROM: GETSCD format %x size %x dest %08x", format, size, dest);
+ 
+ 	if (cdda.playing)
+ 		gd_hle_state.cur_sector = cdda.CurrAddr.FAD;
+@@ -281,11 +281,23 @@ static void GD_HLE_Command(u32 cc)
+ 
+ 
+ 	case GDCC_PLAY_SECTOR:
+-		debugf("GDROM: CMD PLAYSEC?");
++		{
++			u32 start_fad = gd_hle_state.params[0];
++			u32 end_fad = gd_hle_state.params[1];
++			DEBUG_LOG(REIOS, "GDROM: CMD PLAYSEC from %d to %d repeats %d", start_fad, end_fad, gd_hle_state.params[2]);
++			cdda.playing = true;
++			cdda.StartAddr.FAD = start_fad;
++			cdda.EndAddr.FAD = end_fad;
++			cdda.repeats = gd_hle_state.params[2];
++			cdda.CurrAddr.FAD = start_fad;
++			SecNumber.Status = GD_PLAY;
++		}
+ 		break;
+ 
+ 	case GDCC_RELEASE:
+-		debugf("GDROM: CMD RELEASE?");
++		debugf("GDROM: CMD RELEASE");
++		cdda.playing = true;
++		SecNumber.Status = GD_PLAY;
+ 		break;
+ 
+ 	case GDCC_STOP:
+
+From 4f2abdd93f393f559dab4fff787b0707ebd12200 Mon Sep 17 00:00:00 2001
+From: Flyinghead <raphael.jean@gmail.com>
+Date: Thu, 19 Sep 2019 12:09:29 +0200
+Subject: [PATCH 2/3] reios: allow hle savestates to be loaded in non-hle mode
+
+Always initialize reios hooks during startup so hle savestates always work.
+---
+ core/hw/holly/sb_mem.cpp |  4 +++-
+ core/nullDC.cpp          |  1 +
+ core/reios/reios.cpp     | 38 ++++++++++++++++++--------------------
+ core/reios/reios.h       |  4 ++--
+ 4 files changed, 24 insertions(+), 23 deletions(-)
+
+diff --git a/core/hw/holly/sb_mem.cpp b/core/hw/holly/sb_mem.cpp
+index d618d234a..9a39a2cd1 100644
+--- a/core/hw/holly/sb_mem.cpp
++++ b/core/hw/holly/sb_mem.cpp
+@@ -258,7 +258,9 @@ bool LoadHle(const string& root) {
+ 		WARN_LOG(FLASHROM, "No nvmem loaded\n");
+ 	}
+ 
+-   return reios_init(sys_rom.data, &sys_nvmem_flash);
++   reios_reset(sys_rom.data, &sys_nvmem_flash);
++
++   return true;
+ }
+ 
+ u32 ReadFlash(u32 addr,u32 sz)
+diff --git a/core/nullDC.cpp b/core/nullDC.cpp
+index 5722f1fa4..5e911f73c 100644
+--- a/core/nullDC.cpp
++++ b/core/nullDC.cpp
+@@ -423,6 +423,7 @@ int dc_init(int argc,wchar* argv[])
+ 		ERROR_LOG(VMEM, "Failed to alloc mem");
+ 		return -1;
+ 	}
++	reios_init();
+ 
+ 	LoadSettings();
+ 
+diff --git a/core/reios/reios.cpp b/core/reios/reios.cpp
+index f3acf870d..00f101ad8 100644
+--- a/core/reios/reios.cpp
++++ b/core/reios/reios.cpp
+@@ -39,7 +39,6 @@
+ #define SYSINFO_ID_ADDR 0x8C001010
+ #define FONT_TABLE_ADDR 0xa0100020
+ 
+-static u8* biosrom;
+ static MemChip *flashrom;
+ static u32 base_fad = 45150;
+ static bool descrambl = false;
+@@ -612,7 +611,7 @@ static void reios_boot()
+ 	//Infinite loop for arm !
+ 	WriteMem32(0x80800000, 0xEAFFFFFE);
+ 
+-	if (settings.reios.ElfFile.size()) {
++	if (!settings.reios.ElfFile.empty()) {
+ 		if (!reios_loadElf(settings.reios.ElfFile)) {
+ 			msgboxf("Failed to open %s", MBX_ICONERROR, settings.reios.ElfFile.c_str());
+ 		}
+@@ -655,7 +654,7 @@ static void reios_boot()
+ static std::map<u32, hook_fp*> hooks;
+ static std::map<hook_fp*, u32> hooks_rev;
+ 
+-#define SYSCALL_ADDR_MAP(addr) ((addr & 0x1FFFFFFF) | 0x80000000)
++#define SYSCALL_ADDR_MAP(addr) (((addr) & 0x1FFFFFFF) | 0x80000000)
+ 
+ static void register_hook(u32 pc, hook_fp* fn) {
+ 	hooks[SYSCALL_ADDR_MAP(pc)] = fn;
+@@ -687,20 +686,10 @@ static u32 hook_addr(hook_fp* fn) {
+ 	}
+ }
+ 
+-bool reios_init(u8* rom, MemChip* flash) {
+-
++bool reios_init()
++{
+ 	INFO_LOG(REIOS, "reios: Init");
+ 
+-	biosrom = rom;
+-	flashrom = flash;
+-
+-	memset(rom, 0x00, 2048 * 1024);
+-	memset(GetMemPtr(0x8C000000, 0), 0, RAM_SIZE);
+-
+-	u16* rom16 = (u16*)rom;
+-
+-	rom16[0] = REIOS_OPCODE;
+-
+ 	register_hook(0xA0000000, reios_boot);
+ 
+ 	register_hook(0x8C001000, reios_sys_system);
+@@ -711,6 +700,20 @@ bool reios_init(u8* rom, MemChip* flash) {
+ 
+ 	register_hook(dc_bios_entrypoint_gd2, reios_sys_gd2);
+ 
++	return true;
++}
++
++void reios_reset(u8* rom, MemChip* flash)
++{
++	flashrom = flash;
++
++	memset(rom, 0x00, BIOS_SIZE);
++	memset(GetMemPtr(0x8C000000, 0), 0, RAM_SIZE);
++
++	u16* rom16 = (u16*)rom;
++
++	rom16[0] = REIOS_OPCODE;
++
+ 	u8 *pFont = rom + (FONT_TABLE_ADDR % BIOS_SIZE);
+ 
+ 	// 288 12 × 24 pixels (36 bytes) characters
+@@ -737,11 +740,6 @@ bool reios_init(u8* rom, MemChip* flash) {
+ 		else
+ 			INFO_LOG(REIOS, "font.bin: loaded %zd bytes", size);
+ 	}
+-
+-	return true;
+-}
+-
+-void reios_reset() {
+ }
+ 
+ void reios_term() {
+diff --git a/core/reios/reios.h b/core/reios/reios.h
+index 58734e241..a206d6cd4 100644
+--- a/core/reios/reios.h
++++ b/core/reios/reios.h
+@@ -4,9 +4,9 @@
+ #include "types.h"
+ #include "hw/flashrom/flashrom.h"
+ 
+-bool reios_init(u8* rom, MemChip *flash);
++bool reios_init();
+ 
+-void reios_reset();
++void reios_reset(u8* rom, MemChip *flash);
+ 
+ void reios_term();
+ 
+
+From 993590622fa1fc0e2207eff9548527b10912e3e9 Mon Sep 17 00:00:00 2001
+From: Flyinghead <raphael.jean@gmail.com>
+Date: Thu, 19 Sep 2019 14:05:59 +0200
+Subject: [PATCH 3/3] Add atomiswave rom keys to game list
+
+Remove key files from atomiswave roms
+Fix compatibility with MAME set 0.213
+---
+ core/hw/naomi/awcartridge.cpp |  59 ++++++++++----------
+ core/hw/naomi/awcartridge.h   |   4 +-
+ core/hw/naomi/naomi_roms.h    | 102 ++++++++++++----------------------
+ 3 files changed, 67 insertions(+), 98 deletions(-)
+
+diff --git a/core/hw/naomi/awcartridge.cpp b/core/hw/naomi/awcartridge.cpp
+index 71c32ffbb..c7a8663a8 100644
+--- a/core/hw/naomi/awcartridge.cpp
++++ b/core/hw/naomi/awcartridge.cpp
+@@ -242,41 +242,34 @@ void AWCartridge::WriteMem(u32 address, u32 data, u32 size)
+ }
+ 
+ /*
+-We are using 20 bits keys with the following subfields' structure:
+-bits 0-15 is a 16-bits XOR
+-bits 17-16 is a index to the sboxes table
+-bits 19-18 is a index to the permutation table
++We are using 8 bits keys with the following subfields' structure:
++bits 0-3 is a index of 16-bits XOR (only 11 was used in known games)
++bits 4-5 is a index to the sboxes table
++bits 6-7 is a index to the permutation table
+ 
+ These subfields could be differing from the "real" ones in the following ways:
++- Current keys equal to decrypted game code binary 8-bit sum (of each byte's swapped 4-bit nibbles)
+ - Every one of the index subfields could be suffering an arbitrary bitswap and XOR
+ - The 16-bits-XOR subfield could suffer an arbitrary XOR which could depend on the 4 index bits (that is: a different XOR per every index combination)
+ - Of course, the way in which we are mixing 3 subfields in one only key is arbitrary too.
+-
+-The keys are stored as 32-bits big-endian values in a file.
+ */
+ 
+ 
+ const u8 AWCartridge::permutation_table[4][16] =
+ {
++	{14,1,11,15,7,3,8,13,0,4,2,12,6,10,5,9},
+ 	{8,10,1,3,7,4,11,2,5,15,6,0,12,13,9,14},
+ 	{4,5,9,6,1,13,7,11,10,0,14,12,8,15,2,3},
+-	{12,7,11,2,0,5,15,6,1,8,14,4,9,13,3,10},
+-	{14,1,11,15,7,3,8,13,0,4,2,12,6,10,5,9}
++	{12,7,11,2,0,5,15,6,1,8,14,4,9,13,3,10}
+ };
+ 
+ const AWCartridge::sbox_set AWCartridge::sboxes_table[4] =
+ {
+ 	{
+-		{4,12,8,14,16,30,31,0,23,29,24,21,11,22,27,5,3,20,18,26,10,7,17,1,28,6,15,13,2,9,25,19},
+-		{13,1,0,9,5,12,4,14,3,15,2,10,11,6,8,7},
+-		{7,13,4,6,5,9,3,2,0,15,12,10,8,11,1,14},
+-		{4,0,1,2,5,7,3,6}
+-	},
+-	{
+-		{3,0,14,17,10,15,31,20,13,2,29,28,9,18,25,27,6,19,30,22,7,12,1,16,23,11,24,4,8,26,21,5},
+-		{2,10,6,9,11,13,4,5,3,15,7,14,12,1,0,8},
++		{11,8,6,25,2,7,23,28,5,10,21,20,1,26,17,19,14,27,22,30,15,4,9,24,31,3,16,12,0,18,29,13},
++		{13,5,9,6,4,2,11,10,12,0,8,1,3,14,15,7},
+ 		{1,13,11,3,8,7,9,10,12,15,4,14,0,5,6,2},
+-		{6,5,0,3,7,1,4,2}
++		{3,0,5,6,2,4,1,7}
+ 	},
+ 	{
+ 		{9,15,28,7,13,24,2,23,21,1,22,16,18,8,17,31,27,6,30,12,4,20,5,19,0,25,3,29,10,14,11,26},
+@@ -285,11 +278,22 @@ const AWCartridge::sbox_set AWCartridge::sboxes_table[4] =
+ 		{1,5,6,2,4,7,3,0}
+ 	},
+ 	{
+-		{17,3,31,2,28,10,9,29,6,25,24,8,13,1,19,15,22,0,14,20,16,7,21,4,18,26,27,5,12,23,11,30},
+-		{4,8,11,15,3,14,7,12,1,0,9,5,6,13,2,10},
+-		{14,0,9,11,4,1,7,5,13,6,8,12,2,3,10,15},
+-		{2,1,0,5,4,6,7,3}
++		{17,25,29,27,5,11,10,21,2,8,13,0,30,3,14,16,22,1,7,15,31,18,4,20,9,19,26,24,23,28,12,6},
++		{15,3,2,11,7,14,6,12,1,13,0,8,9,4,10,5},
++		{6,12,5,7,4,8,2,3,1,14,13,11,9,10,0,15},
++		{5,1,0,3,4,6,2,7}
+ 	},
++	{
++		{7,21,9,20,10,28,31,11,16,15,14,30,27,23,5,25,0,22,24,2,6,17,3,18,4,12,13,19,26,1,29,8},
++		{10,6,5,1,13,0,9,2,15,14,7,11,8,3,12,4},
++		{8,6,15,13,2,7,1,3,11,0,14,10,4,5,12,9},
++		{6,5,4,1,0,2,3,7}
++	}
++};
++
++const int AWCartridge::xor_table[16] =  // -1 = unknown/unused
++{
++	0x0000, -1, 0x97CF, 0x4BE3, 0x2255, 0x8DD6, -1, 0xC6A2,	0xA1E8, 0xB3BF, 0x3B1A, 0x547A, -1, 0x935F, -1, -1
+ };
+ 
+ static u16 bitswap16(u16 in, const u8* vec)
+@@ -301,12 +305,12 @@ static u16 bitswap16(u16 in, const u8* vec)
+   return ret;
+ }
+ 
+-u16 AWCartridge::decrypt(u16 cipherText, u32 address, const u32 key)
++u16 AWCartridge::decrypt(u16 cipherText, u32 address, const u8 key)
+ {
+ 	u8 b0,b1,b2,b3;
+ 	u16 aux;
+-	const u8* pbox = permutation_table[key>>18];
+-	const sbox_set* ss = &sboxes_table[(key>>16)&3];
++	const u8* pbox = permutation_table[key>>6];
++	const sbox_set* ss = &sboxes_table[(key>>4)&3];
+ 
+ 	const u8 text_swap_vec[] = {
+ 			pbox[15],pbox[14],pbox[13],pbox[12],pbox[11],pbox[10],pbox[9],pbox[8],
+@@ -325,21 +329,20 @@ u16 AWCartridge::decrypt(u16 cipherText, u32 address, const u32 key)
+ 	b2 = ss->S2[b2];
+ 	b3 = ss->S3[b3];
+ 
+-	return ((b3<<13)|(b2<<9)|(b1<<5)|b0)^(key&0xffff);
++	return ((b3<<13)|(b2<<9)|(b1<<5)|b0)^xor_table[key&0xf];
+ }
+ 
+ 
+ void AWCartridge::Init()
+ {
+ 	mpr_offset = decrypt16(0x58/2) | (decrypt16(0x5a/2) << 16);
+-	INFO_LOG(NAOMI, "AWCartridge::SetKey rombd_key %08x mpr_offset %08x", rombd_key, mpr_offset);
++	INFO_LOG(NAOMI, "AWCartridge::SetKey rombd_key %02x mpr_offset %08x", rombd_key, mpr_offset);
+ 	device_reset();
+ }
+ 
+ void AWCartridge::SetKey(u32 key)
+ {
+-	const u8 *krp = (u8 *)&key;
+-	rombd_key = (krp[0] << 24) | (krp[1] << 16) | (krp[2] << 8) | krp[3];
++	rombd_key = key;
+ }
+ 
+ void AWCartridge::device_reset()
+diff --git a/core/hw/naomi/awcartridge.h b/core/hw/naomi/awcartridge.h
+index 079be3b77..a8ddd047c 100644
+--- a/core/hw/naomi/awcartridge.h
++++ b/core/hw/naomi/awcartridge.h
+@@ -28,7 +28,6 @@ class AWCartridge: public Cartridge
+ 	virtual std::string GetGameId() override;
+ 
+ 	void SetKey(u32 key) override;
+-	void SetKeyData(u8 *key) override { SetKey(key[0] | (key[1] << 8) | (key[2] << 16) | (key[3] << 24)); }
+ 
+ private:
+ 	virtual void device_reset();
+@@ -52,7 +51,8 @@ class AWCartridge: public Cartridge
+ 
+ 	static const u8 permutation_table[4][16];
+ 	static const sbox_set sboxes_table[4];
+-	static u16 decrypt(u16 cipherText, u32 address, const u32 key);
++	static const int xor_table[16];
++	static u16 decrypt(u16 cipherText, u32 address, const u8 key);
+ 	u16 decrypt16(u32 address) { return decrypt(((u16 *)RomPtr)[address % (RomSize / 2)], address, rombd_key); }
+ 
+ 	void set_key();
+diff --git a/core/hw/naomi/naomi_roms.h b/core/hw/naomi/naomi_roms.h
+index 614ccccc0..e4a8c9247 100644
+--- a/core/hw/naomi/naomi_roms.h
++++ b/core/hw/naomi/naomi_roms.h
+@@ -5463,7 +5463,7 @@ Games[] =
+         "anmlbskt",
+         NULL,
+         0x4000000,
+-        0x0000000,
++        0x45,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5473,7 +5473,6 @@ Games[] =
+             { "vm2001f01.u4",  0x1000000, 0x800000 },
+             { "vm2001f01.u2",  0x1800000, 0x800000 },
+             { "vm2001f01.u15", 0x2000000, 0x800000 },
+-            { "vm2001f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5482,7 +5481,7 @@ Games[] =
+         "anmlbskta",
+         "anmlbskt",
+         0x4000000,
+-        0x0000000,
++        0x45,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5493,7 +5492,6 @@ Games[] =
+             { "u4",  0x2000000, 0x1000000 },
+             { "u2",  0x3000000, 0x1000000 },
+             // U14-U17 not populated
+-            { "vm2001f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5502,7 +5500,7 @@ Games[] =
+         "basschal",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0x2a,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5516,7 +5514,6 @@ Games[] =
+             { "vera.u17", 0x05000000, 0x01000000 },
+             { "vera.u14", 0x06000000, 0x01000000 },
+             { "vera.u16", 0x07000000, 0x01000000 },
+-            { "315-6248.bin", 0, 4, Key }, // simplified
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5525,7 +5522,7 @@ Games[] =
+         "basschalo",
+         "basschal",
+         0x8000000,
+-        0x0000000,
++        0x2a,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5539,7 +5536,6 @@ Games[] =
+             { "610-0811.u17", 0x05000000, 0x01000000 },
+             { "610-0811.u14", 0x06000000, 0x01000000 },
+             { "vera.u16",     0x07000000, 0x01000000 },
+-            { "315-6248.bin", 0, 4, Key }, // simplified
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5548,7 +5544,7 @@ Games[] =
+         "blokpong",
+         NULL,
+         0x4000000,
+-        0x0000000,
++        0x45,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5560,7 +5556,6 @@ Games[] =
+             //ROM_LOAD( "u2",  0x3000000, 0x1000000, CRC(b9162d97) SHA1(7f561617fa0538da554ad6f6c4d6a20e739491dc) ) // garbage data not used by this game, match anmlbskta U2
+             // U14-U17 not populated 
+             
+-            { "vm2001f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5569,7 +5564,7 @@ Games[] =
+         "claychal",
+         NULL,
+         0x8000100,
+-        0x0000000,
++        0x2a,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5583,7 +5578,6 @@ Games[] =
+             { "608-2161.u17", 0x5000000, 0x1000100 },
+             { "608-2161.u14", 0x6000000, 0x1000100 },
+             { "608-2161.u16", 0x7000000, 0x1000100 },
+-            { "315-6248.bin", 0, 4, Key }, // simplified
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5592,7 +5586,7 @@ Games[] =
+         "demofist",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0x90,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5606,7 +5600,6 @@ Games[] =
+             { "ax0605m01.ic15", 0x5000000, 0x1000000 },
+             { "ax0606m01.ic16", 0x6000000, 0x1000000 },
+             { "ax0607m01.ic17", 0x7000000, 0x1000000 },
+-            { "ax0601f01.bin", 0, 4, Key }, 
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5615,7 +5608,7 @@ Games[] =
+         "dirtypig",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0x2a,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5629,7 +5622,6 @@ Games[] =
+             { "695-0014.u17", 0x5000000, 0x1000000 },
+             { "695-0014.u14", 0x6000000, 0x1000000 },
+             { "695-0014.u16", 0x7000000, 0x1000000 },
+-            { "315-6248.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5638,7 +5630,7 @@ Games[] =
+         "dolphin",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0x40,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5650,7 +5642,6 @@ Games[] =
+             { "ax0403m01.ic13", 0x3000000, 0x1000000 },
+             { "ax0404m01.ic14", 0x4000000, 0x1000000 },
+             { "ax0405m01.ic15", 0x5000000, 0x1000000 },
+-            { "ax0401f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5659,7 +5650,7 @@ Games[] =
+         "fotns",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0xc2,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5673,7 +5664,6 @@ Games[] =
+             { "ax1905m01.ic15", 0x5000000, 0x1000000 },
+             { "ax1906m01.ic16", 0x6000000, 0x1000000 },
+             { "ax1907m01.ic17", 0x7000000, 0x1000000 },
+-            { "ax1901f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5682,7 +5672,7 @@ Games[] =
+         "ftspeed",
+         NULL,
+         0x9000000,
+-        0x0000000,
++        0x6b,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5695,7 +5685,6 @@ Games[] =
+             { "ax1704m01.ic14", 0x4000000, 0x1000000 },
+             { "ax1705m01.ic15", 0x5000000, 0x1000000 },
+             { "ax1706m01.ic16", 0x6000000, 0x1000000 },
+-            { "ax1701f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         },
+         NULL,
+@@ -5706,7 +5695,7 @@ Games[] =
+         "ggisuka",
+         NULL,
+         0x9000000,
+-        0x0000000,
++        0xed,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5721,7 +5710,6 @@ Games[] =
+             { "ax1206m01.ic15", 0x5000000, 0x1000000 },
+             { "ax1207m01.ic16", 0x6000000, 0x1000000 },
+             { "ax1208m01.ic17", 0x7000000, 0x1000000 },
+-            { "ax1201f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5730,7 +5718,7 @@ Games[] =
+         "ggx15",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0xc9,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5744,7 +5732,6 @@ Games[] =
+             { "ax0805m01.ic15", 0x5000000, 0x1000000 },
+             { "ax0806m01.ic16", 0x6000000, 0x1000000 },
+             { "ax0807m01.ic17", 0x7000000, 0x1000000 },
+-            { "ax0801f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5753,7 +5740,7 @@ Games[] =
+         "kofnw",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0x99,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5766,7 +5753,6 @@ Games[] =
+             { "ax2204m01.ic14",    0x4000000, 0x1000000 },
+             { "ax2205m01.ic15",    0x5000000, 0x1000000 },
+             { "ax2206m01.ic16",    0x6000000, 0x1000000 },
+-            { "ax2201f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5775,7 +5761,7 @@ Games[] =
+         "kofnwj",
+         "kofnw",
+         0x8000000,
+-        0x0000000,
++        0x99,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5789,7 +5775,6 @@ Games[] =
+             { "ax2204m01.ic14", 0x4000000, 0x1000000 },
+             { "ax2205m01.ic15", 0x5000000, 0x1000000 },
+             { "ax2206m01.ic16", 0x6000000, 0x1000000 },
+-            { "ax2201f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5798,7 +5783,7 @@ Games[] =
+         "kofxi",
+         NULL,
+         0x14000000,
+-        0x00000000,
++        0xd3,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5812,7 +5797,6 @@ Games[] =
+             { "ax3205m01.mrom5", 0x0c000000, 0x2000000 },
+             { "ax3206m01.mrom6", 0x0e000000, 0x2000000 },
+             { "ax3207m01.mrom7", 0x12000000, 0x2000000 },
+-            { "ax3201f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5821,7 +5805,7 @@ Games[] =
+         "kov7sprt",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0x35,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5835,7 +5819,6 @@ Games[] =
+             { "ax1301m05.ic15", 0x5000000, 0x1000000 },
+             { "ax1301m06.ic16", 0x6000000, 0x1000000 },
+             { "ax1301m07.ic17", 0x7000000, 0x1000000 },
+-            { "ax1301f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5844,7 +5827,7 @@ Games[] =
+         "maxspeed",
+         NULL,
+         0x9000000,
+-        0x0000000,
++        0x55,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5856,7 +5839,6 @@ Games[] =
+             { "ax0503m01.ic13", 0x3000000, 0x1000000 },
+             { "ax0504m01.ic14", 0x4000000, 0x1000000 },
+             { "ax0505m01.ic15", 0x5000000, 0x1000000 },
+-            { "ax0501f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         },
+         NULL,
+@@ -5867,7 +5849,7 @@ Games[] =
+         "mslug6",
+         NULL,
+         0xc000000,
+-        0x0000000,
++        0x82,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5878,7 +5860,6 @@ Games[] =
+             { "ax3002m01.mrom2", 0x4000000, 0x2000000 },
+             { "ax3003m01.mrom3", 0x6000000, 0x2000000 },
+             { "ax3004m01.mrom4", 0xa000000, 0x2000000 },
+-            { "ax3001f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5887,7 +5868,7 @@ Games[] =
+         "ngbc",
+         NULL,
+         0x14000000,
+-        0x00000000,
++        0xa0,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5901,7 +5882,6 @@ Games[] =
+             { "ax3305m01.mrom5",    0x0c000000, 0x2000000 },
+             { "ax3306m01.mrom6",    0x0e000000, 0x2000000 },
+             { "ax3307m01.mrom7",    0x12000000, 0x2000000 },
+-            { "ax3301f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5910,7 +5890,7 @@ Games[] =
+         "ngbcj",
+         "ngbc",
+         0x14000000,
+-        0x00000000,
++        0xa0,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5924,7 +5904,6 @@ Games[] =
+             { "ax3305m01.mrom5", 0x0c000000, 0x2000000 },
+             { "ax3306m01.mrom6", 0x0e000000, 0x2000000 },
+             { "ax3307m01.mrom7", 0x12000000, 0x2000000 },
+-            { "ax3301f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5933,7 +5912,7 @@ Games[] =
+         "rangrmsn",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0x88,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5945,7 +5924,6 @@ Games[] =
+             { "ax1603m01.ic13", 0x3000000, 0x1000000 },
+             { "ax1604m01.ic14", 0x4000000, 0x1000000 },
+             { "ax1605m01.ic15", 0x5000000, 0x1000000 },
+-            { "ax1601f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5954,7 +5932,7 @@ Games[] =
+         "rumblef",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0xaa,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5968,7 +5946,6 @@ Games[] =
+             { "ax1805m01.ic15", 0x5000000, 0x1000000 },
+             { "ax1806m01.ic16", 0x6000000, 0x1000000 },
+             { "ax1807m01.ic17", 0x7000000, 0x1000000 },
+-            { "ax1801f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -5977,7 +5954,7 @@ Games[] =
+         "rumblefp",
+         "rumblef",
+         0x8000000,
+-        0x0000000,
++        0x25,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -5999,7 +5976,6 @@ Games[] =
+             { "ic25", 0x06800000, 0x00800000 },
+             { "ic26", 0x07000000, 0x00800000 },
+             // IC27 populated, empty
+-            { "key.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -6008,7 +5984,7 @@ Games[] =
+         "rumblef2",
+         NULL,
+         0xe000000,
+-        0x0000000,
++        0x07,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -6020,7 +5996,6 @@ Games[] =
+             { "ax3403m01.mrom3", 0x6000000, 0x2000000 },
+             { "ax3404m01.mrom4", 0xa000000, 0x2000000 },
+             { "ax3405m01.mrom5", 0xc000000, 0x2000000 },
+-            { "ax3401f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -6029,7 +6004,7 @@ Games[] =
+         "rumblf2p",
+         "rumblef2",
+         0xe000000,
+-        0x0000000,
++        0x25,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -6051,7 +6026,6 @@ Games[] =
+             { "ic25", 0x06800000, 0x00800000 },
+             { "ic26", 0x07000000, 0x00800000 },
+             // IC27 populated, empty
+-            { "julie_dev.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -6060,7 +6034,7 @@ Games[] =
+         "salmankt",
+         NULL,
+         0x9000000,
+-        0x0000000,
++        0x77,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -6074,7 +6048,6 @@ Games[] =
+             { "ax1405m01.ic15", 0x5000000, 0x1000000 },
+             { "ax1406m01.ic16", 0x6000000, 0x1000000 },
+             { "ax1407m01.ic17", 0x7000000, 0x1000000 },
+-            { "ax1401f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -6083,7 +6056,7 @@ Games[] =
+         "samsptk",
+         NULL,
+         0x14000000,
+-        0x00000000,
++        0x1d,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -6097,7 +6070,6 @@ Games[] =
+             { "ax2905m01.mrom5", 0x0c000000, 0x2000000 },
+             { "ax2906m01.mrom6", 0x0e000000, 0x2000000 },
+             { "ax2907m01.mrom7", 0x12000000, 0x2000000 },
+-            { "ax2901f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -6106,7 +6078,7 @@ Games[] =
+         "sprtshot",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0x64,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -6117,7 +6089,6 @@ Games[] =
+             { "ax0102m01.ic12", 0x2000000, 0x1000000 },
+             { "ax0103m01.ic13", 0x3000000, 0x1000000 },
+             { "ax0104m01.ic14", 0x4000000, 0x1000000 },
+-            { "ax0101f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -6126,7 +6097,7 @@ Games[] =
+         "sushibar",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0x25,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -6138,7 +6109,6 @@ Games[] =
+             { "ic16", 0x02000000, 0x00800000 },
+             { "ic17", 0x02800000, 0x00800000 },
+             { "ic18", 0x03000000, 0x00800000 },
+-            { "julie_dev.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -6147,7 +6117,7 @@ Games[] =
+         "vfurlong",
+         NULL,
+         0x9000000,
+-        0x0000000,
++        0xdb,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -6161,7 +6131,6 @@ Games[] =
+             { "ax2005m01.ic15", 0x5000000, 0x1000000 },
+             { "ax2006m01.ic16", 0x6000000, 0x1000000 },
+             { "ax2007m01.ic17", 0x7000000, 0x1000000 },
+-            { "ax2001f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -6170,7 +6139,7 @@ Games[] =
+         "waidrive",
+         NULL,
+         0x4000000,
+-        0x0000000,
++        0x45,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -6178,7 +6147,6 @@ Games[] =
+         {
+             { "u3", 0x0000000, 0x1000000 },
+             { "u1", 0x1000000, 0x1000000 },
+-            { "vm2001f01.bin", 0, 4, Key },
+             { NULL, 0, 0 },
+         }
+     },
+@@ -6187,7 +6155,7 @@ Games[] =
+         "xtrmhunt",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0xe4,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -6200,7 +6168,6 @@ Games[] =
+             { "ax2404m01.ic14", 0x4000000, 0x1000000 },
+             { "ax2405m01.ic15", 0x5000000, 0x1000000 },
+             { "ax2406m01.ic16", 0x6000000, 0x1000000 },
+-            { "ax2401f01.bin", 0, 4, Key },
+         }
+     },
+     // Extreme Hunting 2
+@@ -6208,7 +6175,7 @@ Games[] =
+         "xtrmhnt2",
+         NULL,
+         0x8000000,
+-        0x0000000,
++        0x2a,
+         "awbios",
+         AW,
+         REGION_AUSTRALIA,
+@@ -6222,7 +6189,6 @@ Games[] =
+             { "610-0752.u17", 0x5000000, 0x1000000 },
+             { "610-0752.u14", 0x6000000, 0x1000000 },
+             { "610-0752.u16", 0x7000000, 0x1000000 },
+-            { "315-6248.bin", 0, 4, Key },
+             
+             //ROM_REGION( 0x1400000, "network", 0)    // network board
+             //ROM_LOAD( "fpr-24330a.ic2", 0x000000, 0x400000, CRC(8d89877e) SHA1(6caafc49114eb0358e217bc2d1a3ab58a93c8d19) )

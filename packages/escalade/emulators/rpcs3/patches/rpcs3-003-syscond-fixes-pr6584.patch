@@ -1,0 +1,181 @@
+From be11fe0e315b0f009a1fe079fbadbc0594258fe7 Mon Sep 17 00:00:00 2001
+From: Eladash <elad3356p@gmail.com>
+Date: Wed, 18 Sep 2019 20:24:06 +0300
+Subject: [PATCH] sys_cond Fixes
+
+sys_cond_wait is now signaled atomically (regression fix)
+Fix a corner case with sys_cond_wait and sys_cond_destroy EBSUY check (waiter count was inaccurate if thread is not the owner of mutex)
+Add not about EBUSY corner case (TODO)
+---
+ rpcs3/Emu/Cell/lv2/sys_cond.cpp | 94 +++++++++++++++++----------------
+ 1 file changed, 48 insertions(+), 46 deletions(-)
+
+diff --git a/rpcs3/Emu/Cell/lv2/sys_cond.cpp b/rpcs3/Emu/Cell/lv2/sys_cond.cpp
+index 688a267ea2..42c8eb1363 100644
+--- a/rpcs3/Emu/Cell/lv2/sys_cond.cpp
++++ b/rpcs3/Emu/Cell/lv2/sys_cond.cpp
+@@ -85,7 +85,13 @@ error_code sys_cond_signal(ppu_thread& ppu, u32 cond_id)
+ 
+ 			if (const auto cpu = cond.schedule<ppu_thread>(cond.sq, cond.mutex->protocol))
+ 			{
+-				cond.awake(cpu);
++				// TODO: Is EBUSY returned after reqeueing, on sys_cond_destroy?
++				cond.waiters--;
++
++				if (cond.mutex->try_own(*cpu, cpu->id))
++				{
++					cond.awake(cpu);
++				}
+ 			}
+ 		}
+ 	});
+@@ -106,21 +112,25 @@ error_code sys_cond_signal_all(ppu_thread& ppu, u32 cond_id)
+ 
+ 	const auto cond = idm::check<lv2_obj, lv2_cond>(cond_id, [](lv2_cond& cond)
+ 	{
+-		uint count = 0;
+-
+ 		if (cond.waiters)
+ 		{
+ 			std::lock_guard lock(cond.mutex->mutex);
+ 
++			cpu_thread* result = nullptr;
++
+ 			while (const auto cpu = cond.schedule<ppu_thread>(cond.sq, cond.mutex->protocol))
+ 			{
+-				lv2_obj::append(cpu);
+-				count++;
++				if (cond.mutex->try_own(*cpu, cpu->id))
++				{
++					verify(HERE), !std::exchange(result, cpu);
++				}
+ 			}
+ 
+-			if (count)
++			cond.waiters.release(0);
++
++			if (result)
+ 			{
+-				lv2_obj::awake_all();
++				lv2_obj::awake(result);
+ 			}
+ 		}
+ 	});
+@@ -155,7 +165,14 @@ error_code sys_cond_signal_to(ppu_thread& ppu, u32 cond_id, u32 thread_id)
+ 				if (cpu->id == thread_id)
+ 				{
+ 					verify(HERE), cond.unqueue(cond.sq, cpu);
+-					cond.awake(cpu);
++
++					cond.waiters--;
++
++					if (cond.mutex->try_own(*cpu, cpu->id))
++					{
++						cond.awake(cpu);
++					}
++
+ 					return 1;
+ 				}
+ 			}
+@@ -185,8 +202,11 @@ error_code sys_cond_wait(ppu_thread& ppu, u32 cond_id, u64 timeout)
+ 
+ 	const auto cond = idm::get<lv2_obj, lv2_cond>(cond_id, [&](lv2_cond& cond)
+ 	{
+-		// Add a "promise" to add a waiter
+-		cond.waiters++;
++		if (cond.mutex->owner >> 1 == ppu.id)
++		{
++			// Add a "promise" to add a waiter
++			cond.waiters++;
++		}
+ 
+ 		// Save the recursive value
+ 		return cond.mutex->lock_count.load();
+@@ -200,8 +220,6 @@ error_code sys_cond_wait(ppu_thread& ppu, u32 cond_id, u64 timeout)
+ 	// Verify ownership
+ 	if (cond->mutex->owner >> 1 != ppu.id)
+ 	{
+-		// Awww
+-		cond->waiters--;
+ 		return CELL_EPERM;
+ 	}
+ 	else
+@@ -237,17 +255,32 @@ error_code sys_cond_wait(ppu_thread& ppu, u32 cond_id, u64 timeout)
+ 		{
+ 			if (lv2_obj::wait_timeout(timeout, &ppu))
+ 			{
++				// Wait for rescheduling
++				if (ppu.check_state())
++				{
++					break;
++				}
++
+ 				std::lock_guard lock(cond->mutex->mutex);
+ 
+ 				// Try to cancel the waiting
+ 				if (cond->unqueue(cond->sq, &ppu))
+ 				{
++					// TODO: Is EBUSY returned after reqeueing, on sys_cond_destroy?
++					cond->waiters--;
++
+ 					ppu.gpr[3] = CELL_ETIMEDOUT;
+-					break;
++
++					// Own or requeue
++					if (!cond->mutex->try_own(ppu, ppu.id))
++					{
++						cond->mutex->sleep(ppu);
++						timeout = 0;
++						continue;
++					}
+ 				}
+ 
+-				timeout = 0;
+-				continue;
++				break;
+ 			}
+ 		}
+ 		else
+@@ -256,42 +289,11 @@ error_code sys_cond_wait(ppu_thread& ppu, u32 cond_id, u64 timeout)
+ 		}
+ 	}
+ 
+-	bool locked_ok = true;
+-
+-	// Schedule and relock
+-	if (ppu.check_state())
+-	{
+-		return 0;
+-	}
+-	else if (cond->mutex->try_lock(ppu.id) != CELL_OK)
+-	{
+-		std::lock_guard lock(cond->mutex->mutex);
+-
+-		// Own mutex or requeue
+-		if (!cond->mutex->try_own(ppu, ppu.id))
+-		{
+-			locked_ok = false;
+-			cond->mutex->sleep(ppu);
+-		}
+-	}
+-
+-	while (!locked_ok && !ppu.state.test_and_reset(cpu_flag::signal))
+-	{
+-		if (ppu.is_stopped())
+-		{
+-			return 0;
+-		}
+-
+-		thread_ctrl::wait();
+-	}
+-
+ 	// Verify ownership
+ 	verify(HERE), cond->mutex->owner >> 1 == ppu.id;
+ 
+ 	// Restore the recursive value
+ 	cond->mutex->lock_count = cond.ret;
+ 
+-	cond->waiters--;
+-
+ 	return not_an_error(ppu.gpr[3]);
+ }

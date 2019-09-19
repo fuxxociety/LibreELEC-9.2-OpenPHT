@@ -2,9 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="retroarch-overlays"
-PKG_VERSION="3e9102a"
-PKG_REV="1"
-PKG_ARCH="any"
+PKG_VERSION="c648ade"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/libretro/common-overlays"
 PKG_URL="https://github.com/libretro/common-overlays/archive/$PKG_VERSION.tar.gz"
@@ -14,11 +12,7 @@ PKG_SHORTDESC="RetroArch overlays"
 PKG_LONGDESC="Collection of overlay files for use with libretro frontends, such as RetroArch."
 PKG_TOOLCHAIN="manual"
 
-make_target() {
-  :
-}
-
 makeinstall_target() {
   mkdir -p $INSTALL/usr/share/retroarch/overlays
-  cp -r * $INSTALL/usr/share/retroarch/overlays
+  cp -r effects $INSTALL/usr/share/retroarch/overlays
 }
