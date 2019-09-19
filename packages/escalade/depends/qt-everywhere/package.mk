@@ -27,6 +27,7 @@ PKG_CONFIGURE_OPTS_TARGET="-prefix /usr
                            -system-libjpeg 
                            -system-zlib 
                            -system-pcre 
+                           -system-harfbuzz
                            -openssl
                            -glib
                            -silent 
@@ -48,7 +49,6 @@ PKG_CONFIGURE_OPTS_TARGET="-prefix /usr
                            -no-iconv
                            -no-evdev
                            -no-tslib
-                           -no-harfbuzz
                            -no-icu
                            -no-strip
                            -no-linuxfb 
