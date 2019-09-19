@@ -1,7 +1,7 @@
 [Unit]
 Description=Emulationstation
 Conflicts=kodi.service retroarch.service
-After=multi-user.target xorg.service windowmanager.service
+After=graphical.target
 
 [Service]
 EnvironmentFile=-/storage/.config/emulationstation.conf
