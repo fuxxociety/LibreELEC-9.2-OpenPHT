@@ -10,14 +10,17 @@ PKG_URL="http://kcat.strangesoft.net/openal-releases/openal-soft-$PKG_VERSION.ta
 PKG_DEPENDS_TARGET="toolchain alsa-lib"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="Open Audio Library"
-PKG_TOOLCHAIN="cmake-make"
 
 PKG_CMAKE_OPTS_TARGET="-DALSOFT_EXAMPLES=off \
 		       -DALSOFT_TESTS=off \
 		       -DALSOFT_UTILS=off \
 		       -DALSOFT_BACKEND_OSS=off \
-		       -DALSOFT_BACKEND_WAVE=off \
-		       -DALSOFT_REQUIRE_PULSEAUDIO=on"
+		       -DALSOFT_BACKEND_WAVE=off"
+
+if [ "${PULSEAUDIO_SUPPORT}" = "yes" ]; then
+  PKG_CMAKE_OPTS_TARGET+=" -DALSOFT_REQUIRE_PULSEAUDIO=on"
+  PKG_DEPENDS_TARGET+=" pulseaudio"
+fi
 
 pre_make_target() {
   $HOST_CC ../native-tools/bin2h.c -o native-tools/bin2h
