@@ -3,7 +3,7 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mesa"
-PKG_VERSION="99cbec0"
+PKG_VERSION="706c9f2"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
 PKG_URL="https://cgit.freedesktop.org/mesa/mesa/snapshot/$PKG_VERSION.tar.gz"
@@ -77,10 +77,3 @@ if [ "$OPENGLES_SUPPORT" = "yes" ]; then
 else
   PKG_MESON_OPTS_TARGET+=" -Dgles1=false -Dgles2=false"
 fi
-
-# Needed for LTO
-pre_configure_target() {
-  if [ "$DISPLAYSERVER" = "x11" ]; then
-    export LDFLAGS="$LDFLAGS -lGL"
-  fi
-}
