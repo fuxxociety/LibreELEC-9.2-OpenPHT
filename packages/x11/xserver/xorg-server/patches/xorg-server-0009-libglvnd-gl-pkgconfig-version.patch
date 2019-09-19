@@ -1,0 +1,11 @@
+--- a/configure	2019-05-30 20:27:44.000000000 +0200
++++ b/configure	2019-09-19 17:36:46.490880784 +0200
+@@ -26465,7 +26465,7 @@
+ $as_echo "#define DRI2 1" >>confdefs.h
+ 
+ 		DRI2=yes
+-		LIBGL="gl >= 9.2.0"
++		LIBGL="gl >= 1.2"
+ 		SDK_REQUIRED_MODULES="$SDK_REQUIRED_MODULES $DRI2PROTO"
+ 		;;
+ esac
