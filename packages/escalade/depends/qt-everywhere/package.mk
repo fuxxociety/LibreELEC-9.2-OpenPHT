@@ -7,7 +7,7 @@ PKG_SHA256="adf00266dc38352a166a9739f1a24a1e36f1be9c04bf72e16e142a256436974e"
 PKG_LICENSE="GPL"
 PKG_SITE="http://qt-project.org"
 PKG_URL="https://download.qt.io/archive/qt/5.13/$PKG_VERSION/single/qt-everywhere-src-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="pcre2 zlib sqlite libinput systemd fontconfig freetype libpng libjpeg-turbo openssl libxkbcommon xcb-util xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm zstd"
+PKG_DEPENDS_TARGET="pcre2 zlib sqlite libinput systemd fontconfig freetype libpng libjpeg-turbo openssl libxkbcommon xcb-util xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm zstd harfbuzz-oem"
 PKG_LONGDESC="A cross-platform application and UI framework."
 PKG_BUILDFLAGS="-lto"
 
