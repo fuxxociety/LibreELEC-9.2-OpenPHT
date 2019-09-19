@@ -17,7 +17,10 @@ post_makeinstall_target() {
     mkdir -p $INSTALL/usr/lib/systemd/system
     cp $PKG_DIR/system.d.opt/windowmanager.service $INSTALL/usr/lib/systemd/system
   fi
+  mkdir -p $INSTALL/usr/config/i3
+  cp $PKG_DIR/config/* $INSTALL/usr/config/i3/
 }
+
 post_install() {
   if [ "${WINDOWMANAGER}" = "i3" ]; then
     enable_service windowmanager.service
