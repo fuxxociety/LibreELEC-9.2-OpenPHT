@@ -182,14 +182,9 @@ if [ -d "${SOURCES}/${PKG_NAME}" -o -d "${PKG_DIR}/sources" ]; then
   fi
 fi
 
-<<<<<<< HEAD
-if [ "$PKG_SECTION" != "virtual" ]; then
-  mkdir -p "$PKG_BUILD"
-=======
 if [ "${PKG_SECTION}" != "virtual" ]; then
   mkdir -p "${PKG_BUILD}"
   echo "INFO_PKG_NAME=\"${PKG_NAME}\"" > "${PKG_BUILD}/.libreelec-package"
->>>>>>> 90be11322a... buildsystem: consistently use braces
 
   rm -f ${STAMPS}/${PKG_NAME}/build_*
 
