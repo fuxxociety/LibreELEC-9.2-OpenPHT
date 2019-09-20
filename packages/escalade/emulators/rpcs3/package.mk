@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Trond Haugland (trondah@gmail.com)
 
 PKG_NAME="rpcs3"
-PKG_VERSION="e0005ec"
+PKG_VERSION="caef52e"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://rpcs3.net"

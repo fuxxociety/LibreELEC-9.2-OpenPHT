@@ -110,7 +110,7 @@ Video:
     Darkening effect strength: 30
     Blur effect strength: 0
 Audio:
-  Renderer: PulseAudio
+  Renderer: OpenAL
   Dump to file: false
   Convert to 16 bit: false
   Downmix to Stereo: false
