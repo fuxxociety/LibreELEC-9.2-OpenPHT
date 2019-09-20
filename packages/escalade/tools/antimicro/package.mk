@@ -9,6 +9,7 @@ PKG_URL="https://github.com/juliagoda/antimicro/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain SDL2 qt-everywhere extra-cmake-modules libXext itstool:host"
 PKG_SECTION="escalade"
 PKG_SHORTDESC="Graphical program used to map keyboard buttons and mouse controls to a gamepad."
+PKG_BUILD_FLAGS="-lto +size"
 
 post_makeinstall_target() {
   mkdir -p $INSTALL/usr/config/antimicro

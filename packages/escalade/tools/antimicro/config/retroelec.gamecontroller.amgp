@@ -13,7 +13,6 @@
         <vdpadButtonAssociation axis="0" button="15" direction="2"/>
     </vdpadButtonAssociations>
     <names>
-        <buttonname index="6">Close app</buttonname>
         <controlstickname index="1">Stick 1</controlstickname>
         <controlstickname index="2">Stick 2</controlstickname>
     </names>
@@ -66,7 +65,7 @@
                 <throttle>normal</throttle>
             </trigger>
         </set>
-        <set index="7">
+        <set index="3">
             <stick index="1">
                 <calibrated>false</calibrated>
                 <summary></summary>
@@ -90,7 +89,7 @@
                 <throttle>normal</throttle>
             </trigger>
         </set>
-        <set index="8">
+        <set index="4">
             <stick index="1">
                 <calibrated>false</calibrated>
                 <summary></summary>
@@ -138,10 +137,9 @@
                 <throttle>normal</throttle>
             </trigger>
             <button index="6">
-                <actionname>ALT_L+F4</actionname>
                 <slots>
                     <slot>
-                        <code>0x1000023</code>
+                        <code>0x1000000</code>
                         <mode>keyboard</mode>
                     </slot>
                 </slots>
@@ -149,7 +147,7 @@
             <button index="8">
                 <slots>
                     <slot>
-                        <code>0x1000000</code>
+                        <code>0x1000023</code>
                         <mode>keyboard</mode>
                     </slot>
                 </slots>
@@ -179,7 +177,7 @@
                 <throttle>normal</throttle>
             </trigger>
         </set>
-        <set index="3">
+        <set index="7">
             <stick index="1">
                 <calibrated>false</calibrated>
                 <summary></summary>
@@ -203,7 +201,7 @@
                 <throttle>normal</throttle>
             </trigger>
         </set>
-        <set index="4">
+        <set index="8">
             <stick index="1">
                 <calibrated>false</calibrated>
                 <summary></summary>
