@@ -28,11 +28,11 @@ PKG_CONFIGURE_OPTS_TARGET="-prefix /usr
                            -system-zlib 
                            -system-pcre 
                            -system-harfbuzz
+                           -system-sqlite
                            -openssl
                            -glib
                            -silent 
                            -journald 
-                           -sqlite
                            -dbus
                            -fontconfig
                            -vulkan 
@@ -44,6 +44,7 @@ PKG_CONFIGURE_OPTS_TARGET="-prefix /usr
                            -no-rpath
                            -no-mtdev
                            -no-gif 
+                           -no-tiff
                            -no-libproxy
                            -no-cups
                            -no-iconv
