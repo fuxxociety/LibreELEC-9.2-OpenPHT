@@ -1,25 +1,28 @@
 --- a/es-app/src/guis/GuiMenu.cpp	2019-09-16 23:22:50.800740004 +0200
 +++ b/es-app/src/guis/GuiMenu.cpp	2019-09-16 23:29:52.832571287 +0200
-@@ -473,40 +473,51 @@
- 	if (UIModeController::getInstance()->isUIModeFull())
- 	{
- 		row.makeAcceptInputHandler([window] {
--			window->pushGui(new GuiMsgBox(window, "REALLY RESTART?", "YES",
+@@ -488,16 +488,44 @@
+ 
+ 		if(Settings::getInstance()->getBool("ShowExit"))
+ 		{
+-			row.elements.clear();
+-			row.makeAcceptInputHandler([window] {
+-				window->pushGui(new GuiMsgBox(window, "REALLY QUIT?", "YES",
+-					[] {
+-					Scripting::fireEvent("quit");
+-					quitES();
++		row.elements.clear();
++		row.makeAcceptInputHandler([window] {
 +			window->pushGui(new GuiMsgBox(window, "QUIT TO RETROARCH?", "YES",
- 				[] {
--				Scripting::fireEvent("quit");
--				if(quitES("/tmp/es-restart") != 0)
--					LOG(LogWarning) << "Restart terminated with non-zero result!";
++				[] {
 +				runSystemCommand("systemd-run /usr/bin/es-retroarch.sh");
 +				SDL_Event ev;
 +				ev.type = SDL_QUIT;
 +				SDL_PushEvent(&ev);
- 			}, "NO", nullptr));
- 		});
--		row.addElement(std::make_shared<TextComponent>(window, "RESTART EMULATIONSTATION", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
++			}, "NO", nullptr));
++		});
 +		row.addElement(std::make_shared<TextComponent>(window, "START RETROARCH", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
- 		s->addRow(row);
- 
++		s->addRow(row);
++
 +		row.elements.clear();
 +		row.makeAcceptInputHandler([window] {
 +			window->pushGui(new GuiMsgBox(window, "QUIT TO RPCS3?", "YES",
@@ -32,16 +35,7 @@
 +		});
 +		row.addElement(std::make_shared<TextComponent>(window, "START RPCS3", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
 +		s->addRow(row);
- 
--
--		if(Settings::getInstance()->getBool("ShowExit"))
--		{
--			row.elements.clear();
--			row.makeAcceptInputHandler([window] {
--				window->pushGui(new GuiMsgBox(window, "REALLY QUIT?", "YES",
--					[] {
--					Scripting::fireEvent("quit");
--					quitES("");
++
 +		row.elements.clear();
 +		row.makeAcceptInputHandler([window] {
 +			window->pushGui(new GuiMsgBox(window, "QUIT TO TERMINAL?", "YES",
@@ -54,38 +48,9 @@
 -			});
 -			row.addElement(std::make_shared<TextComponent>(window, "QUIT EMULATIONSTATION", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
 -			s->addRow(row);
--		}
 +		});
 +		row.addElement(std::make_shared<TextComponent>(window, "START TERMINAL", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
 +		s->addRow(row);
+ 		}
  	}
  	row.elements.clear();
- 	row.makeAcceptInputHandler([window] {
- 		window->pushGui(new GuiMsgBox(window, "REALLY RESTART?", "YES",
- 			[] {
--			Scripting::fireEvent("quit", "reboot");
--			Scripting::fireEvent("reboot");
--			if (quitES("/tmp/es-sysrestart") != 0)
--				LOG(LogWarning) << "Restart terminated with non-zero result!";
-+			runSystemCommand("systemctl reboot");
-+			SDL_Event ev;
-+			ev.type = SDL_QUIT;
-+			SDL_PushEvent(&ev);
- 		}, "NO", nullptr));
- 	});
- 	row.addElement(std::make_shared<TextComponent>(window, "RESTART SYSTEM", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
-@@ -516,10 +527,10 @@
- 	row.makeAcceptInputHandler([window] {
- 		window->pushGui(new GuiMsgBox(window, "REALLY SHUTDOWN?", "YES",
- 			[] {
--			Scripting::fireEvent("quit", "shutdown");
--			Scripting::fireEvent("shutdown");
--			if (quitES("/tmp/es-shutdown") != 0)
--				LOG(LogWarning) << "Shutdown terminated with non-zero result!";
-+			runSystemCommand("systemctl poweroff");
-+			SDL_Event ev;
-+			ev.type = SDL_QUIT;
-+			SDL_PushEvent(&ev);
- 		}, "NO", nullptr));
- 	});
- 	row.addElement(std::make_shared<TextComponent>(window, "SHUTDOWN SYSTEM", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);

@@ -1,24 +1,26 @@
-From cf5b652a60d69fccb4d295a45a8b5c3f9104a9f3 Mon Sep 17 00:00:00 2001
+From e54c663725987827158b976ef6de2e1e6508387f Mon Sep 17 00:00:00 2001
 From: John Rassa <john@rassaonline.net>
 Date: Sat, 6 Jul 2019 10:50:50 -0400
-Subject: [PATCH] Grid updates.  Animate scrolling, autoLayout option, center
- selection option, scroll loop option
+Subject: [PATCH] Grid updates. Animate scrolling option, autoLayout option,
+ center selection option, scroll loop option, image source option
 
 ---
- THEMES.md                                    |  15 +-
- es-app/src/CollectionSystemManager.cpp       |   4 +-
- es-core/src/ThemeData.cpp                    |  29 +-
- es-core/src/ThemeData.h                      |   5 +
- es-core/src/components/GridTileComponent.cpp | 271 +++++++++----
- es-core/src/components/GridTileComponent.h   |  20 +-
- es-core/src/components/ImageComponent.h      |   2 +
- es-core/src/components/ImageGridComponent.h  | 390 ++++++++++++++-----
- es-core/src/utils/StringUtil.cpp             |  20 +-
- es-core/src/utils/StringUtil.h               |  33 +-
- 10 files changed, 599 insertions(+), 190 deletions(-)
+ THEMES.md                                     |  19 +-
+ es-app/src/CollectionSystemManager.cpp        |   4 +-
+ .../src/views/gamelist/GridGameListView.cpp   |  14 +-
+ es-app/src/views/gamelist/GridGameListView.h  |   1 +
+ es-core/src/ThemeData.cpp                     |  31 +-
+ es-core/src/ThemeData.h                       |   5 +
+ es-core/src/components/GridTileComponent.cpp  | 271 ++++++++---
+ es-core/src/components/GridTileComponent.h    |  20 +-
+ es-core/src/components/ImageComponent.h       |   2 +
+ es-core/src/components/ImageGridComponent.h   | 420 ++++++++++++++----
+ es-core/src/utils/StringUtil.cpp              |  14 +-
+ es-core/src/utils/StringUtil.h                |  33 +-
+ 12 files changed, 646 insertions(+), 188 deletions(-)
 
 diff --git a/THEMES.md b/THEMES.md
-index fc4ff063b..57c2fc1d7 100644
+index fc4ff063b..d8c8b4d81 100644
 --- a/THEMES.md
 +++ b/THEMES.md
 @@ -538,6 +538,7 @@ Reference
@@ -29,7 +31,7 @@ index fc4ff063b..57c2fc1d7 100644
  * PATH - a path.  If the first character is a `~`, it will be expanded into the environment variable for the home path (`$HOME` for Linux or `%HOMEPATH%` for Windows).  If the first character is a `.`, it will be expanded to the theme file's directory, allowing you to specify resources relative to the theme file, like so: `./../general_art/myfont.ttf`.
  * BOOLEAN - `true`/`1` or `false`/`0`.
  * COLOR - a hexidecimal RGB or RGBA color (6 or 8 digits).  If 6 digits, will assume the alpha channel is `FF` (not transparent).
-@@ -584,13 +585,25 @@ Can be created as an extra.
+@@ -584,13 +585,29 @@ Can be created as an extra.
  * `pos` - type: NORMALIZED_PAIR.
  * `size` - type: NORMALIZED_PAIR.
      - The size of the grid. Take care the selected tile can go out of the grid size, so don't position the grid too close to another element or the screen border.
@@ -45,19 +47,23 @@ index fc4ff063b..57c2fc1d7 100644
      - The default image used for games which doesn't have an image.
  * `folderImage` - type: PATH.
      - The default image used for folders which doesn't have an image.
++* `imageSource` - type: STRING.
++    - Selects the image to display. `thumbnail` by default, can also be set to `image` or `marquee`. 
  * `scrollDirection` - type: STRING.
      - `vertical` by default, can also be set to `horizontal`. Not that in `horizontal` mod, the tiles are ordered from top to bottom, then from left to right.
 +* `centerSelection` - type: BOOLEAN.
 +    - `false` by default, when `true` the selected tile will be locked to the center of the grid.
 +* `scrollLoop` - type: BOOLEAN.
 +    - `false` by default, when `true` the grid will seamlessly loop around when scrolling reaches the end of the list.  Only works when `centerSelection` is `true`.
++* `animate` - type : BOOLEAN.
++    - `true` by default, when  `false` the grid scrolling will not be animated.
 +* `zIndex` - type: FLOAT.
 +    - z-index value for component.  Components will be rendered in order of z-index value from low to high.
  
  #### gridtile
  
 diff --git a/es-app/src/CollectionSystemManager.cpp b/es-app/src/CollectionSystemManager.cpp
-index 0ccdd9ee1..6e2b90698 100644
+index 6b665df78..bdc9916b9 100644
 --- a/es-app/src/CollectionSystemManager.cpp
 +++ b/es-app/src/CollectionSystemManager.cpp
 @@ -144,7 +144,7 @@ void CollectionSystemManager::loadCollectionSystems()
@@ -78,8 +84,52 @@ index 0ccdd9ee1..6e2b90698 100644
  
  	// iterate the map
  	for(std::map<std::string, CollectionSystemData>::iterator it = mCustomCollectionSystemsData.begin() ; it != mCustomCollectionSystemsData.end() ; it++ )
+diff --git a/es-app/src/views/gamelist/GridGameListView.cpp b/es-app/src/views/gamelist/GridGameListView.cpp
+index 91f9c08b0..799330961 100644
+--- a/es-app/src/views/gamelist/GridGameListView.cpp
++++ b/es-app/src/views/gamelist/GridGameListView.cpp
+@@ -110,6 +110,18 @@ bool GridGameListView::input(InputConfig* config, Input input)
+ 	return ISimpleGameListView::input(config, input);
+ }
+ 
++const std::string GridGameListView::getImagePath(FileData* file)
++{
++	ImageSource src = mGrid.getImageSource();
++
++	if (src == ImageSource::IMAGE)
++		return file->getImagePath();
++	else if (src == ImageSource::MARQUEE)
++		return file->getMarqueePath();
++
++	return file->getThumbnailPath();
++}
++
+ void GridGameListView::populateList(const std::vector<FileData*>& files)
+ {
+ 	mGrid.clear();
+@@ -118,7 +130,7 @@ void GridGameListView::populateList(const std::vector<FileData*>& files)
+ 	{
+ 		for (auto it = files.cbegin(); it != files.cend(); it++)
+ 		{
+-			mGrid.add((*it)->getName(), (*it)->getThumbnailPath(), *it);
++			mGrid.add((*it)->getName(), getImagePath(*it), *it);
+ 		}
+ 	}
+ 	else
+diff --git a/es-app/src/views/gamelist/GridGameListView.h b/es-app/src/views/gamelist/GridGameListView.h
+index da09c8790..ac109890a 100644
+--- a/es-app/src/views/gamelist/GridGameListView.h
++++ b/es-app/src/views/gamelist/GridGameListView.h
+@@ -36,6 +36,7 @@ class GridGameListView : public ISimpleGameListView
+ 
+ private:
+ 	void updateInfoPanel();
++	const std::string getImagePath(FileData* file);
+ 
+ 	void initMDLabels();
+ 	void initMDValues();
 diff --git a/es-core/src/ThemeData.cpp b/es-core/src/ThemeData.cpp
-index cf2548089..b2cf2da11 100644
+index ce55194b3..07702c87e 100644
 --- a/es-core/src/ThemeData.cpp
 +++ b/es-core/src/ThemeData.cpp
 @@ -3,6 +3,7 @@
@@ -99,7 +149,7 @@ index cf2548089..b2cf2da11 100644
  		{ "rotationOrigin", NORMALIZED_PAIR },
  		{ "path", PATH },
  		{ "default", PATH },
-@@ -29,9 +30,14 @@ std::map<std::string, std::map<std::string, ThemeData::ElementPropertyType>> The
+@@ -29,9 +30,16 @@ std::map<std::string, std::map<std::string, ThemeData::ElementPropertyType>> The
  		{ "pos", NORMALIZED_PAIR },
  		{ "size", NORMALIZED_PAIR },
  		{ "margin", NORMALIZED_PAIR },
@@ -109,13 +159,15 @@ index cf2548089..b2cf2da11 100644
  		{ "gameImage", PATH },
  		{ "folderImage", PATH },
 -		{ "scrollDirection", STRING } } },
++		{ "imageSource", STRING },
 +		{ "scrollDirection", STRING },
 +		{ "centerSelection", BOOLEAN },
-+		{ "scrollLoop", BOOLEAN }, } },
++		{ "scrollLoop", BOOLEAN },
++		{ "zIndex", FLOAT } } },
  	{ "gridtile", {
  		{ "size", NORMALIZED_PAIR },
  		{ "padding", NORMALIZED_PAIR },
-@@ -397,6 +403,25 @@ void ThemeData::parseElement(const pugi::xml_node& root, const std::map<std::str
+@@ -397,6 +405,25 @@ void ThemeData::parseElement(const pugi::xml_node& root, const std::map<std::str
  
  		switch(typeIt->second)
  		{
@@ -142,7 +194,7 @@ index cf2548089..b2cf2da11 100644
  		{
  			size_t divider = str.find(' ');
 diff --git a/es-core/src/ThemeData.h b/es-core/src/ThemeData.h
-index 4fc9faa74..39209c9cc 100644
+index b6cc6fb90..3f766e775 100644
 --- a/es-core/src/ThemeData.h
 +++ b/es-core/src/ThemeData.h
 @@ -3,6 +3,7 @@
@@ -172,7 +224,7 @@ index 4fc9faa74..39209c9cc 100644
  			else if(std::is_same<T, unsigned int>::value) return *(const T*)&properties.at(prop).i;
  			else if(std::is_same<T, float>::value)        return *(const T*)&properties.at(prop).f;
  			else if(std::is_same<T, bool>::value)         return *(const T*)&properties.at(prop).b;
-+			else if (std::is_same<T, Vector4f>::value)    return *(const T*)&properties.at(prop).r;
++			else if(std::is_same<T, Vector4f>::value)     return *(const T*)&properties.at(prop).r;
  			return T();
  		}
  
@@ -185,7 +237,7 @@ index 4fc9faa74..39209c9cc 100644
  		PATH,
  		STRING,
 diff --git a/es-core/src/components/GridTileComponent.cpp b/es-core/src/components/GridTileComponent.cpp
-index 745fede1a..5c9f7a40e 100644
+index 842c268b2..889076ed4 100644
 --- a/es-core/src/components/GridTileComponent.cpp
 +++ b/es-core/src/components/GridTileComponent.cpp
 @@ -1,5 +1,6 @@
@@ -194,8 +246,8 @@ index 745fede1a..5c9f7a40e 100644
 +#include "animations/LambdaAnimation.h"
  #include "resources/TextureResource.h"
  #include "ThemeData.h"
- #include "Renderer.h"
-@@ -30,7 +31,9 @@ GridTileComponent::GridTileComponent(Window* window) : GuiComponent(window), mBa
+ 
+@@ -29,7 +30,9 @@ GridTileComponent::GridTileComponent(Window* window) : GuiComponent(window), mBa
  	addChild(&mBackground);
  	addChild(&(*mImage));
  
@@ -206,7 +258,7 @@ index 745fede1a..5c9f7a40e 100644
  	setVisible(true);
  }
  
-@@ -43,90 +46,74 @@ void GridTileComponent::render(const Transform4x4f& parentTrans)
+@@ -42,90 +45,74 @@ void GridTileComponent::render(const Transform4x4f& parentTrans)
  }
  
  // Update all the tile properties to the new status (selected or default)
@@ -341,7 +393,7 @@ index 745fede1a..5c9f7a40e 100644
  }
  
  // Made this a static function because the ImageGridComponent need to know the default tile size
-@@ -148,6 +135,11 @@ bool GridTileComponent::isSelected() const
+@@ -147,6 +134,11 @@ bool GridTileComponent::isSelected() const
  	return mSelected;
  }
  
@@ -353,7 +405,7 @@ index 745fede1a..5c9f7a40e 100644
  void GridTileComponent::setImage(const std::string& path)
  {
  	mImage->setImage(path);
-@@ -164,9 +156,80 @@ void GridTileComponent::setImage(const std::shared_ptr<TextureResource>& texture
+@@ -163,9 +155,80 @@ void GridTileComponent::setImage(const std::shared_ptr<TextureResource>& texture
  	resize();
  }
  
@@ -435,7 +487,7 @@ index 745fede1a..5c9f7a40e 100644
  }
  
  void GridTileComponent::setVisible(bool visible)
-@@ -176,14 +239,86 @@ void GridTileComponent::setVisible(bool visible)
+@@ -175,14 +238,86 @@ void GridTileComponent::setVisible(bool visible)
  
  void GridTileComponent::resize()
  {
@@ -583,10 +635,10 @@ index c191ce94a..69ea962f8 100644
  
  #endif // ES_CORE_COMPONENTS_GRID_TILE_COMPONENT_H
 diff --git a/es-core/src/components/ImageComponent.h b/es-core/src/components/ImageComponent.h
-index 7a93a0d85..f08c17509 100644
+index 9d3121c51..1f2323b8d 100644
 --- a/es-core/src/components/ImageComponent.h
 +++ b/es-core/src/components/ImageComponent.h
-@@ -74,6 +74,8 @@ class ImageComponent : public GuiComponent
+@@ -73,6 +73,8 @@ class ImageComponent : public GuiComponent
  	virtual void applyTheme(const std::shared_ptr<ThemeData>& theme, const std::string& view, const std::string& element, unsigned int properties) override;
  
  	virtual std::vector<HelpPrompt> getHelpPrompts() override;
@@ -596,10 +648,10 @@ index 7a93a0d85..f08c17509 100644
  	Vector2f mTargetSize;
  
 diff --git a/es-core/src/components/ImageGridComponent.h b/es-core/src/components/ImageGridComponent.h
-index 65b329adc..be14557bc 100644
+index 65b329adc..bc863c378 100644
 --- a/es-core/src/components/ImageGridComponent.h
 +++ b/es-core/src/components/ImageGridComponent.h
-@@ -3,10 +3,13 @@
+@@ -3,16 +3,26 @@
  #define ES_CORE_COMPONENTS_IMAGE_GRID_COMPONENT_H
  
  #include "Log.h"
@@ -613,7 +665,28 @@ index 65b329adc..be14557bc 100644
  enum ScrollDirection
  {
  	SCROLL_VERTICALLY,
-@@ -56,14 +59,15 @@ class ImageGridComponent : public IList<ImageGridData, T>
+ 	SCROLL_HORIZONTALLY
+ };
+ 
++enum ImageSource
++{
++	THUMBNAIL,
++	IMAGE,
++	MARQUEE
++};
++
+ struct ImageGridData
+ {
+ 	std::string texturePath;
+@@ -50,20 +60,23 @@ class ImageGridComponent : public IList<ImageGridData, T>
+ 	void onSizeChanged() override;
+ 	inline void setCursorChangedCallback(const std::function<void(CursorState state)>& func) { mCursorChangedCallback = func; }
+ 
++	ImageSource	getImageSource() { return mImageSource; };
++
+ protected:
+ 	virtual void onCursorChanged(const CursorState& state) override;
+ 
  private:
  	// TILES
  	void buildTiles();
@@ -634,7 +707,7 @@ index 65b329adc..be14557bc 100644
  	bool mEntriesDirty;
  	int mLastCursor;
  	std::string mDefaultGameTexture;
-@@ -71,13 +75,24 @@ class ImageGridComponent : public IList<ImageGridData, T>
+@@ -71,14 +84,27 @@ class ImageGridComponent : public IList<ImageGridData, T>
  
  	// TILES
  	bool mLastRowPartial;
@@ -654,12 +727,15 @@ index 65b329adc..be14557bc 100644
 +	float mCameraDirection;
 +
  	// MISCELLANEOUS
++	bool mAnimate;
 +	bool mCenterSelection;
 +	bool mScrollLoop;
  	ScrollDirection mScrollDirection;
++	ImageSource mImageSource;
  	std::function<void(CursorState state)> mCursorChangedCallback;
  };
-@@ -87,6 +102,14 @@ ImageGridComponent<T>::ImageGridComponent(Window* window) : IList<ImageGridData,
+ 
+@@ -87,6 +113,14 @@ ImageGridComponent<T>::ImageGridComponent(Window* window) : IList<ImageGridData,
  {
  	Vector2f screen = Vector2f((float)Renderer::getScreenWidth(), (float)Renderer::getScreenHeight());
  
@@ -674,19 +750,22 @@ index 65b329adc..be14557bc 100644
  	mEntriesDirty = true;
  	mLastCursor = 0;
  	mDefaultGameTexture = ":/cartridge.svg";
-@@ -94,8 +117,11 @@ ImageGridComponent<T>::ImageGridComponent(Window* window) : IList<ImageGridData,
+@@ -94,9 +128,14 @@ ImageGridComponent<T>::ImageGridComponent(Window* window) : IList<ImageGridData,
  
  	mSize = screen * 0.80f;
  	mMargin = screen * 0.07f;
 +	mPadding = Vector4f::Zero();
  	mTileSize = GridTileComponent::getDefaultTileSize();
  
++	mAnimate = true;
 +	mCenterSelection = false;
 +	mScrollLoop = false;
  	mScrollDirection = SCROLL_VERTICALLY;
++	mImageSource = THUMBNAIL;
  }
  
-@@ -116,19 +142,24 @@ bool ImageGridComponent<T>::input(InputConfig* config, Input input)
+ template<typename T>
+@@ -116,19 +155,24 @@ bool ImageGridComponent<T>::input(InputConfig* config, Input input)
  {
  	if(input.value != 0)
  	{
@@ -716,7 +795,7 @@ index 65b329adc..be14557bc 100644
  			return true;
  		}
  	}else{
-@@ -144,16 +175,23 @@ bool ImageGridComponent<T>::input(InputConfig* config, Input input)
+@@ -144,16 +188,23 @@ bool ImageGridComponent<T>::input(InputConfig* config, Input input)
  template<typename T>
  void ImageGridComponent<T>::update(int deltaTime)
  {
@@ -741,7 +820,7 @@ index 65b329adc..be14557bc 100644
  
  	if(mEntriesDirty)
  	{
-@@ -180,14 +218,14 @@ void ImageGridComponent<T>::render(const Transform4x4f& parentTrans)
+@@ -180,14 +231,14 @@ void ImageGridComponent<T>::render(const Transform4x4f& parentTrans)
  		if(tile->isSelected())
  			selectedTile = tile;
  		else
@@ -758,7 +837,7 @@ index 65b329adc..be14557bc 100644
  
  	listRenderTitleOverlay(trans);
  
-@@ -211,9 +249,26 @@ void ImageGridComponent<T>::applyTheme(const std::shared_ptr<ThemeData>& theme,
+@@ -211,9 +262,44 @@ void ImageGridComponent<T>::applyTheme(const std::shared_ptr<ThemeData>& theme,
  		if (elem->has("margin"))
  			mMargin = elem->get<Vector2f>("margin") * screen;
  
@@ -771,6 +850,19 @@ index 65b329adc..be14557bc 100644
 +		if (elem->has("autoLayoutSelectedZoom"))
 +			mAutoLayoutZoom = elem->get<float>("autoLayoutSelectedZoom");
 +
++		if (elem->has("imageSource"))
++		{
++			auto direction = elem->get<std::string>("imageSource");
++			if (direction == "image")
++				mImageSource = IMAGE;
++			else if (direction == "marquee")
++				mImageSource = MARQUEE;
++			else
++				mImageSource = THUMBNAIL;
++		}
++		else
++			mImageSource = THUMBNAIL;
++
  		if (elem->has("scrollDirection"))
  			mScrollDirection = (ScrollDirection)(elem->get<std::string>("scrollDirection") == "horizontal");
  
@@ -782,10 +874,15 @@ index 65b329adc..be14557bc 100644
 +				mScrollLoop = (elem->get<bool>("scrollLoop"));
 +		}
 +
++		if (elem->has("animate"))
++			mAnimate = (elem->get<bool>("animate"));
++		else
++			mAnimate = true;
++
  		if (elem->has("gameImage"))
  		{
  			std::string path = elem->get<std::string>("gameImage");
-@@ -283,39 +338,192 @@ void ImageGridComponent<T>::onSizeChanged()
+@@ -283,39 +369,191 @@ void ImageGridComponent<T>::onSizeChanged()
  template<typename T>
  void ImageGridComponent<T>::onCursorChanged(const CursorState& state)
  {
@@ -794,7 +891,8 @@ index 65b329adc..be14557bc 100644
 +	{
 +		if (state == CURSOR_STOPPED && mCursorChangedCallback)
 +			mCursorChangedCallback(state);
-+
+ 
+-	if(mCursorChangedCallback)
 +		return;
 +	}
 +
@@ -830,44 +928,43 @@ index 65b329adc..be14557bc 100644
 +		updateTiles(direction, false, false);
 +	}
 +
-+	std::shared_ptr<GridTileComponent> oldTile = nullptr;
-+	std::shared_ptr<GridTileComponent> newTile = nullptr;
++	if (mAnimate) {
 +
-+	int oldIdx = mLastCursor - mStartPosition + (dimOpposite * EXTRAITEMS);
-+	if (oldIdx >= 0 && oldIdx < mTiles.size())
-+		oldTile = mTiles[oldIdx];
++		std::shared_ptr<GridTileComponent> oldTile = nullptr;
++		std::shared_ptr<GridTileComponent> newTile = nullptr;
 +
-+	int newIdx = mCursor - mStartPosition + (dimOpposite * EXTRAITEMS);
-+	if (isScrollLoop())
-+	{
-+		if (newIdx < 0)
-+			newIdx += mEntries.size();
-+		else if (newIdx >= mTiles.size())
-+			newIdx -= mEntries.size();
-+	}
++		int oldIdx = mLastCursor - mStartPosition + (dimOpposite * EXTRAITEMS);
++		if (oldIdx >= 0 && oldIdx < mTiles.size())
++			oldTile = mTiles[oldIdx];
 +
-+	if (newIdx >= 0 && newIdx < mTiles.size())
-+		newTile = mTiles[newIdx];
-+
-+	for (auto it = mTiles.begin(); it != mTiles.end(); it++)
-+	{
-+		if ((*it)->isSelected() && *it != oldTile && *it != newTile)
-+		{
-+			startPos = 0;
-+			(*it)->setSelected(false, false, nullptr);
++		int newIdx = mCursor - mStartPosition + (dimOpposite * EXTRAITEMS);
++		if (isScrollLoop()) {
++			if (newIdx < 0)
++				newIdx += mEntries.size();
++			else if (newIdx >= mTiles.size())
++				newIdx -= mEntries.size();
 +		}
++
++		if (newIdx >= 0 && newIdx < mTiles.size())
++			newTile = mTiles[newIdx];
++
++		for (auto it = mTiles.begin(); it != mTiles.end(); it++) {
++			if ((*it)->isSelected() && *it != oldTile && *it != newTile) {
++				startPos = 0;
++				(*it)->setSelected(false, false, nullptr);
++			}
++		}
++
++		Vector3f oldPos = Vector3f::Zero();
++
++		if (oldTile != nullptr && oldTile != newTile) {
++			oldPos = oldTile->getBackgroundPosition();
++			oldTile->setSelected(false, true, nullptr, true);
++		}
++
++		if (newTile != nullptr)
++			newTile->setSelected(true, true, oldPos == Vector3f::Zero() ? nullptr : &oldPos, true);
 +	}
-+
-+	Vector3f oldPos = Vector3f::Zero();
-+
-+	if (oldTile != nullptr && oldTile != newTile)
-+	{
-+		oldPos = oldTile->getBackgroundPosition();
-+		oldTile->setSelected(false, true, nullptr, true);
-+	}
-+
-+	if (newTile != nullptr)
-+		newTile->setSelected(true, true, oldPos == Vector3f::Zero() ? nullptr : &oldPos, true);
 +
 +	int firstVisibleCol = mStartPosition / dimOpposite;
 +
@@ -896,17 +993,16 @@ index 65b329adc..be14557bc 100644
 +	mCameraDirection = direction ? -1.0f : 1.0f;
 +	mCamera = 0;
 +
-+	if (lastCursor < 0)
++	if (lastCursor < 0 || !mAnimate)
 +	{
-+		updateTiles(direction, lastCursor >= 0 || isScrollLoop());
++		updateTiles(direction, mAnimate && (lastCursor >= 0 || isScrollLoop()));
 +
 +		if (mCursorChangedCallback)
 +			mCursorChangedCallback(state);
 +
 +		return;
 +	}
- 
--	if(mCursorChangedCallback)
++
 +	if (mCursorChangedCallback)
  		mCursorChangedCallback(state);
 +
@@ -987,7 +1083,7 @@ index 65b329adc..be14557bc 100644
  
  			tile->setPosition(X * tileDistance.x() + startPosition.x(), Y * tileDistance.y() + startPosition.y());
  			tile->setOrigin(0.5f, 0.5f);
-@@ -324,13 +532,16 @@ void ImageGridComponent<T>::buildTiles()
+@@ -324,13 +562,16 @@ void ImageGridComponent<T>::buildTiles()
  			if (mTheme)
  				tile->applyTheme(mTheme, "grid", "gridtile", ThemeFlags::ALL);
  
@@ -1005,7 +1101,7 @@ index 65b329adc..be14557bc 100644
  {
  	if (!mTiles.size())
  		return;
-@@ -349,104 +560,91 @@ void ImageGridComponent<T>::updateTiles()
+@@ -349,104 +590,91 @@ void ImageGridComponent<T>::updateTiles()
  		return;
  	}
  
@@ -1023,11 +1119,7 @@ index 65b329adc..be14557bc 100644
  	// If going up, update from bottom to top
 -	int ti = scrollDirection == 1 ? 0 : (int)mTiles.size() - 1;
 -	int end = scrollDirection == 1 ? (int)mTiles.size() : -1;
-+	int scrollDirection = ascending ? 1 : -1;
-+	int ti = ascending ? 0 : (int)mTiles.size() - 1;
-+	int end = ascending ? (int)mTiles.size() : -1;
-+	int img = mStartPosition + ti;
- 
+-
 -	int img = getStartPosition();
 -	if (scrollDirection == -1)
 -		img += (int)mTiles.size() - 1;
@@ -1035,7 +1127,11 @@ index 65b329adc..be14557bc 100644
 -	// Calculate buffer size depending on scroll speed and direction
 -	int bufferBehind = (texBuffersForward[3] - texBuffersBehind[mScrollTier]) * mGridDimension.x();
 -	int bufferForward = (texBuffersForward[3] - texBuffersForward[mScrollTier]) * mGridDimension.x();
--
++	int scrollDirection = ascending ? 1 : -1;
++	int ti = ascending ? 0 : (int)mTiles.size() - 1;
++	int end = ascending ? (int)mTiles.size() : -1;
++	int img = mStartPosition + ti;
+ 
 -	int bufferTop = scrollDirection == 1 ? bufferBehind : bufferForward;
 -	int bufferBot = scrollDirection == 1 ? bufferForward : bufferBehind;
 +	img -= EXTRAITEMS * (isVertical() ? mGridDimension.x() : mGridDimension.y());
@@ -1158,7 +1254,7 @@ index 65b329adc..be14557bc 100644
  }
  
  // Calculate how much tiles of size mTileSize we can fit in a grid of size mSize using a margin of size mMargin
-@@ -457,24 +655,34 @@ void ImageGridComponent<T>::calcGridDimension()
+@@ -457,24 +685,34 @@ void ImageGridComponent<T>::calcGridDimension()
  	// <=> COLUMNS = (GRID_SIZE + MARGIN) / (TILE_SIZE + MARGIN)
  	Vector2f gridDimension = (mSize + mMargin) / (mTileSize + mMargin);
  
@@ -1201,7 +1297,7 @@ index 65b329adc..be14557bc 100644
  
  #endif // ES_CORE_COMPONENTS_IMAGE_GRID_COMPONENT_H
 diff --git a/es-core/src/utils/StringUtil.cpp b/es-core/src/utils/StringUtil.cpp
-index 8d35f9701..fdb737842 100644
+index b9ba8cbe6..97b4616d4 100644
 --- a/es-core/src/utils/StringUtil.cpp
 +++ b/es-core/src/utils/StringUtil.cpp
 @@ -222,24 +222,30 @@ namespace Utils
@@ -1239,21 +1335,8 @@ index 8d35f9701..fdb737842 100644
  		} // commaStringToVector
  
  		std::string vectorToCommaString(stringVector _vector)
-@@ -284,9 +290,9 @@ namespace Utils
- 		std::string scramble(const std::string& _input, const std::string& key)
- 		{
- 			std::string buffer = _input;
--
--			for (size_t i = 0; i < _input.size(); ++i) 
--			{               
-+
-+			for (size_t i = 0; i < _input.size(); ++i)
-+			{
- 				buffer[i] = _input[i] ^ key[i];
- 			}
- 
 diff --git a/es-core/src/utils/StringUtil.h b/es-core/src/utils/StringUtil.h
-index 5fffa1d76..7639d9cab 100644
+index 39fd9559d..7639d9cab 100644
 --- a/es-core/src/utils/StringUtil.h
 +++ b/es-core/src/utils/StringUtil.h
 @@ -11,22 +11,23 @@ namespace Utils
@@ -1274,7 +1357,7 @@ index 5fffa1d76..7639d9cab 100644
 -		std::string  removeParenthesis  (const std::string& _string);
 -		stringVector commaStringToVector(const std::string& _string);
 -		std::string  vectorToCommaString(stringVector _vector);
--		std::string  format             (const char* _string, ...);      
+-		std::string  format             (const char* _string, ...);
 -		std::string  scramble           (const std::string& _input, const std::string& key);
 +		unsigned int chars2Unicode          (const std::string& _string, size_t& _cursor);
 +		std::string  unicode2Chars          (const unsigned int _unicode);

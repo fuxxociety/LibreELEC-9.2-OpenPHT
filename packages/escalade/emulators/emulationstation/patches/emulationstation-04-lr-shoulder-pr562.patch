@@ -1,7 +1,7 @@
 From d8bcfcb7c813d67db56511e3deb30c7cc82f1998 Mon Sep 17 00:00:00 2001
 From: PixelGordo <webpixelgordo@gmail.com>
 Date: Thu, 9 May 2019 09:54:46 +0100
-Subject: [PATCH 1/2] Changed pageup/pagedown to leftshoulder/rightshoulder for
+Subject: [PATCH 1/3] Changed pageup/pagedown to leftshoulder/rightshoulder for
  consistency and also to fix a controls configuration bug.
 
 ---
@@ -16,7 +16,7 @@ diff --git a/es-app/src/components/TextListComponent.h b/es-app/src/components/T
 index c90329883..f6cdbd474 100644
 --- a/es-app/src/components/TextListComponent.h
 +++ b/es-app/src/components/TextListComponent.h
-@@ -262,20 +262,20 @@ bool TextListComponent<T>::input(InputConfig* config, Input input)
+@@ -269,20 +269,20 @@
  				listInput(-1);
  				return true;
  			}
@@ -34,7 +34,7 @@ index c90329883..f6cdbd474 100644
  				return true;
  			}
  		}else{
- 			if(config->isMappedLike("down", input) || config->isMappedLike("up", input) || 
+ 			if(config->isMappedLike("down", input) || config->isMappedLike("up", input) ||
 -				config->isMappedTo("pagedown", input) || config->isMappedTo("pageup", input))
 +				config->isMappedTo("rightshoulder", input) || config->isMappedTo("leftshoulder", input))
  			{
@@ -111,7 +111,7 @@ index d4b6636a3..ccb2c3da3 100644
 From 333492440a4adc11043113cfa07289397f05f772 Mon Sep 17 00:00:00 2001
 From: PixelGordo <webpixelgordo@gmail.com>
 Date: Sat, 1 Jun 2019 13:26:59 +0100
-Subject: [PATCH 2/2] Unneeded comments removed from GridGameListView.
+Subject: [PATCH 2/3] Unneeded comments removed from GridGameListView.
 
 ---
  es-app/src/views/gamelist/GridGameListView.cpp | 4 ++--
@@ -136,3 +136,4 @@ index 74676221d..3c87e49fc 100644
  }
  
  bool GridGameListView::input(InputConfig* config, Input input)
+

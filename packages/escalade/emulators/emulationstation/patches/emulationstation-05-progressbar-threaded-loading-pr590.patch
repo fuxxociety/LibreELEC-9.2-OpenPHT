@@ -1,4 +1,4 @@
-From 380f38ea3c478d0274afbc6ebd09a22465159d95 Mon Sep 17 00:00:00 2001
+From d8fafdbd383589d2089e0a3c047abf26ac2ef0b4 Mon Sep 17 00:00:00 2001
 From: Fabrice CARUSO <fabrice.caruso@free.fr>
 Date: Sat, 17 Aug 2019 10:56:59 +0200
 Subject: [PATCH] Added a progressbar during loading + threaded loading when
@@ -9,7 +9,7 @@ Subject: [PATCH] Added a progressbar during loading + threaded loading when
  es-app/src/CollectionSystemManager.h   |   2 +-
  es-app/src/SystemData.cpp              | 230 ++++++++++++++++++-------
  es-app/src/SystemData.h                |   9 +-
- es-app/src/main.cpp                    |  14 +-
+ es-app/src/main.cpp                    |   8 +-
  es-app/src/views/ViewController.cpp    |  16 +-
  es-core/CMakeLists.txt                 |   2 +
  es-core/src/Settings.cpp               |   2 +
@@ -20,12 +20,12 @@ Subject: [PATCH] Added a progressbar during loading + threaded loading when
  es-core/src/utils/FileSystemUtil.cpp   |   5 +
  es-core/src/utils/ThreadPool.cpp       |  93 ++++++++++
  es-core/src/utils/ThreadPool.h         |  32 ++++
- 15 files changed, 355 insertions(+), 90 deletions(-)
+ 15 files changed, 354 insertions(+), 85 deletions(-)
  create mode 100644 es-core/src/utils/ThreadPool.cpp
  create mode 100644 es-core/src/utils/ThreadPool.h
 
 diff --git a/es-app/src/CollectionSystemManager.cpp b/es-app/src/CollectionSystemManager.cpp
-index ea3f629da..bd0e31dba 100644
+index 6b665df78..ac017da66 100644
 --- a/es-app/src/CollectionSystemManager.cpp
 +++ b/es-app/src/CollectionSystemManager.cpp
 @@ -124,7 +124,7 @@ void CollectionSystemManager::saveCustomCollection(SystemData* sys)
@@ -63,7 +63,7 @@ index 23afe1932..50a113c36 100644
  	void updateSystemsList();
  
 diff --git a/es-app/src/SystemData.cpp b/es-app/src/SystemData.cpp
-index d6e72cfd3..52211299e 100644
+index 65c4fc975..4ab437f0d 100644
 --- a/es-app/src/SystemData.cpp
 +++ b/es-app/src/SystemData.cpp
 @@ -10,11 +10,12 @@
@@ -358,7 +358,7 @@ index d6e72cfd3..52211299e 100644
  	return true;
  }
 diff --git a/es-app/src/SystemData.h b/es-app/src/SystemData.h
-index ad0456b3c..e0625b341 100644
+index 63bf667fe..b098a8dda 100644
 --- a/es-app/src/SystemData.h
 +++ b/es-app/src/SystemData.h
 @@ -8,9 +8,12 @@
@@ -402,10 +402,10 @@ index ad0456b3c..e0625b341 100644
  
  	FileData* mRootFolder;
 diff --git a/es-app/src/main.cpp b/es-app/src/main.cpp
-index 6c1fe80ef..15c395a83 100644
+index dd6538b8f..f6a938bfa 100644
 --- a/es-app/src/main.cpp
 +++ b/es-app/src/main.cpp
-@@ -197,11 +197,11 @@ bool verifyHomeFolderExists()
+@@ -214,11 +214,11 @@ bool verifyHomeFolderExists()
  }
  
  // Returns true if everything is OK,
@@ -419,19 +419,16 @@ index 6c1fe80ef..15c395a83 100644
  	{
  		LOG(LogError) << "Error while parsing systems configuration file!";
  		*errorString = "IT LOOKS LIKE YOUR SYSTEMS CONFIGURATION FILE HAS NOT BEEN SET UP OR IS INVALID. YOU'LL NEED TO DO THIS BY HAND, UNFORTUNATELY.\n\n"
-@@ -309,17 +309,13 @@ int main(int argc, char* argv[])
- 		std::string glExts = (const char*)glGetString(GL_EXTENSIONS);
- 		LOG(LogInfo) << "Checking available OpenGL extensions...";
- 		LOG(LogInfo) << " ARB_texture_non_power_of_two: " << (glExts.find("ARB_texture_non_power_of_two") != std::string::npos ? "ok" : "MISSING");
-+
- 		if(splashScreen)
--		{
--			std::string progressText = "Loading...";
--			if (splashScreenProgress)
--				progressText = "Loading system config...";
--			window.renderLoadingScreen(progressText);
--		}
-+			window.renderLoadingScreen("Loading...");		
+@@ -323,7 +323,7 @@ int main(int argc, char* argv[])
+ 			return 1;
+ 		}
+ 
+-		if(splashScreen)
++		if (splashScreen)
+ 		{
+ 			std::string progressText = "Loading...";
+ 			if (splashScreenProgress)
+@@ -333,7 +333,7 @@ int main(int argc, char* argv[])
  	}
  
  	const char* errorMsg = NULL;
@@ -441,10 +438,10 @@ index 6c1fe80ef..15c395a83 100644
  		// something went terribly wrong
  		if(errorMsg == NULL)
 diff --git a/es-app/src/views/ViewController.cpp b/es-app/src/views/ViewController.cpp
-index ada681e26..68939f131 100644
+index 3489628f6..f0865d2a1 100644
 --- a/es-app/src/views/ViewController.cpp
 +++ b/es-app/src/views/ViewController.cpp
-@@ -429,17 +429,19 @@ void ViewController::render(const Transform4x4f& parentTrans)
+@@ -430,17 +430,19 @@ void ViewController::render(const Transform4x4f& parentTrans)
  
  void ViewController::preload()
  {
@@ -472,10 +469,10 @@ index ada681e26..68939f131 100644
  
  		(*it)->getIndex()->resetFilters();
 diff --git a/es-core/CMakeLists.txt b/es-core/CMakeLists.txt
-index 9e4302f1e..19f47e8e3 100644
+index 050305557..5d6cb9831 100644
 --- a/es-core/CMakeLists.txt
 +++ b/es-core/CMakeLists.txt
-@@ -74,6 +74,7 @@ set(CORE_HEADERS
+@@ -76,6 +76,7 @@ set(CORE_HEADERS
  	# Utils
  	${CMAKE_CURRENT_SOURCE_DIR}/src/utils/FileSystemUtil.h
  	${CMAKE_CURRENT_SOURCE_DIR}/src/utils/StringUtil.h
@@ -483,7 +480,7 @@ index 9e4302f1e..19f47e8e3 100644
  	${CMAKE_CURRENT_SOURCE_DIR}/src/utils/TimeUtil.h
  )
  
-@@ -147,6 +148,7 @@ set(CORE_SOURCES
+@@ -152,6 +153,7 @@ set(CORE_SOURCES
  	# Utils
  	${CMAKE_CURRENT_SOURCE_DIR}/src/utils/FileSystemUtil.cpp
  	${CMAKE_CURRENT_SOURCE_DIR}/src/utils/StringUtil.cpp
@@ -492,10 +489,10 @@ index 9e4302f1e..19f47e8e3 100644
  )
  
 diff --git a/es-core/src/Settings.cpp b/es-core/src/Settings.cpp
-index 455bea453..3cf404069 100644
+index 3ad7f6586..42f622c9a 100644
 --- a/es-core/src/Settings.cpp
 +++ b/es-core/src/Settings.cpp
-@@ -78,6 +78,8 @@ void Settings::setDefaults()
+@@ -77,6 +77,8 @@ void Settings::setDefaults()
  	mBoolMap["MoveCarousel"] = true;
  	mBoolMap["SaveGamelistsOnExit"] = true;
  
@@ -505,10 +502,10 @@ index 455bea453..3cf404069 100644
  	mBoolMap["DebugGrid"] = false;
  	mBoolMap["DebugText"] = false;
 diff --git a/es-core/src/ThemeData.cpp b/es-core/src/ThemeData.cpp
-index cf2548089..1355fead8 100644
+index 32faf12bb..15edeb76b 100644
 --- a/es-core/src/ThemeData.cpp
 +++ b/es-core/src/ThemeData.cpp
-@@ -175,9 +175,7 @@ unsigned int getHexColor(const char* str)
+@@ -188,9 +188,7 @@ unsigned int getHexColor(const char* str)
  	return val;
  }
  
@@ -520,10 +517,10 @@ index cf2548089..1355fead8 100644
  	std::string inStr(in);
  
 diff --git a/es-core/src/ThemeData.h b/es-core/src/ThemeData.h
-index 4fc9faa74..d3b142071 100644
+index 45c12d5e1..c6169b4b9 100644
 --- a/es-core/src/ThemeData.h
 +++ b/es-core/src/ThemeData.h
-@@ -175,6 +175,9 @@ class ThemeData
+@@ -176,6 +176,9 @@ class ThemeData
  	void parseElement(const pugi::xml_node& elementNode, const std::map<std::string, ElementPropertyType>& typeMap, ThemeElement& element);
  
  	std::map<std::string, ThemeView> mViews;
@@ -534,10 +531,10 @@ index 4fc9faa74..d3b142071 100644
  
  #endif // ES_CORE_THEME_DATA_H
 diff --git a/es-core/src/Window.cpp b/es-core/src/Window.cpp
-index 0f33e5e24..526b720d7 100644
+index c51bf9ff5..c1fde7c5b 100644
 --- a/es-core/src/Window.cpp
 +++ b/es-core/src/Window.cpp
-@@ -10,6 +10,7 @@
+@@ -9,6 +9,7 @@
  #include "Scripting.h"
  #include <algorithm>
  #include <iomanip>
@@ -545,7 +542,7 @@ index 0f33e5e24..526b720d7 100644
  
  Window::Window() : mNormalizeNextUpdate(false), mFrameTimeElapsed(0), mFrameCountElapsed(0), mAverageDeltaTime(10),
  	mAllowSleep(true), mSleeping(false), mTimeSinceLastInput(0), mScreenSaver(NULL), mRenderScreenSaver(false), mInfoPopup(NULL)
-@@ -298,12 +299,26 @@ void Window::setAllowSleep(bool sleep)
+@@ -297,12 +298,26 @@ void Window::setAllowSleep(bool sleep)
  	mAllowSleep = sleep;
  }
  
@@ -554,7 +551,7 @@ index 0f33e5e24..526b720d7 100644
  {
  	Transform4x4f trans = Transform4x4f::Identity();
  	Renderer::setMatrix(trans);
- 	Renderer::drawRect(0, 0, Renderer::getScreenWidth(), Renderer::getScreenHeight(), 0x000000FF);
+ 	Renderer::drawRect(0.0f, 0.0f, Renderer::getScreenWidth(), Renderer::getScreenHeight(), 0x000000FF, 0x000000FF);
  
 +	if (percent >= 0)
 +	{
@@ -566,14 +563,14 @@ index 0f33e5e24..526b720d7 100644
 +		float x = Renderer::getScreenWidth() / 2 - w / 2;
 +		float y = Renderer::getScreenHeight() - (Renderer::getScreenHeight() * 3 * baseHeight);
 +
-+		Renderer::drawRect(x, y, w, h, 0x25252500 | opacity);
-+		Renderer::drawRect(x, y, (w*percent), h, 0x006C9E00 | opacity); // 0xFFFFFFFF
++		Renderer::drawRect(x, y, w, h, 0x25252500 | opacity, 0x25252500 | opacity);
++		Renderer::drawRect(x, y, (w*percent), h, 0x006C9E00 | opacity, 0x006C9E00 | opacity); // 0xFFFFFFFF
 +	}
 +
  	ImageComponent splash(this, true);
  	splash.setResize(Renderer::getScreenWidth() * 0.6f, 0.0f);
  	splash.setImage(":/splash.svg");
-@@ -314,13 +329,19 @@ void Window::renderLoadingScreen(std::string text)
+@@ -313,13 +328,19 @@ void Window::renderLoadingScreen(std::string text)
  	TextCache* cache = font->buildTextCache(text, 0, 0, 0x656565FF);
  
  	float x = Math::round((Renderer::getScreenWidth() - cache->metrics.size.x()) / 2.0f);
@@ -608,10 +605,10 @@ index 3f104c648..b8e53b06a 100644
  	void renderHelpPromptsEarly(); // used to render HelpPrompts before a fade
  	void setHelpPrompts(const std::vector<HelpPrompt>& prompts, const HelpStyle& style);
 diff --git a/es-core/src/utils/FileSystemUtil.cpp b/es-core/src/utils/FileSystemUtil.cpp
-index 5a0a351c9..f31496432 100644
+index a30d0ca2d..44bfeac17 100644
 --- a/es-core/src/utils/FileSystemUtil.cpp
 +++ b/es-core/src/utils/FileSystemUtil.cpp
-@@ -10,6 +10,7 @@
+@@ -9,6 +9,7 @@
  // because windows...
  #include <direct.h>
  #include <Windows.h>
@@ -619,8 +616,8 @@ index 5a0a351c9..f31496432 100644
  #define getcwd _getcwd
  #define mkdir(x,y) _mkdir(x)
  #define snprintf _snprintf
-@@ -28,6 +29,8 @@ namespace Utils
- 	{
+@@ -29,6 +30,8 @@ namespace Utils
+ 		static std::string exePath  = "";
  
  #if defined(_WIN32)
 +		std::mutex mFileMutex; // Avoids enumerating N folders at the same time in threaded loadings
@@ -628,7 +625,7 @@ index 5a0a351c9..f31496432 100644
  		static std::string convertFromWideString(const std::wstring wstring)
  		{
  			int         numBytes = WideCharToMultiByte(CP_UTF8, 0, wstring.c_str(), (int)wstring.length(), nullptr, 0, nullptr, nullptr);
-@@ -51,6 +54,8 @@ namespace Utils
+@@ -52,6 +55,8 @@ namespace Utils
  			{
  
  #if defined(_WIN32)
