@@ -16,6 +16,8 @@ PKG_TOOLCHAIN="configure"
 # package specific configure options
 PKG_CONFIGURE_OPTS_TARGET="LIBPNG_CFLAGS=-I$SYSROOT_PREFIX/usr/include \
                            LIBPNG_LDFLAGS=-L$SYSROOT_PREFIX/usr/lib \
+                           --without-harfbuzz \
+			   --without-bzip2 \
                            --with-zlib"
 
 pre_configure_target() {
