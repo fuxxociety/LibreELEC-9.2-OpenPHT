@@ -44,7 +44,7 @@ floating_modifier $mod
 bindsym $mod+Return exec i3-sensible-terminal
 
 # kill focused window
-bindsym $mod+Shift+q kill
+bindsym $mod+Escape kill
 
 # start dmenu (a program launcher)
 bindsym $mod+d exec dmenu_run
@@ -174,4 +174,8 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-for_window [class=".*"] border pixel 0
+for_window [class=".*"] border pixel 1
+
+bar {
+    workspace_buttons no
+}
