@@ -1,6 +1,6 @@
 [Unit]
 Description=Configure ALSA
-After=pulseaudio.service
+After=multi-user.target
 Before=frontend.service
 
 [Service]
