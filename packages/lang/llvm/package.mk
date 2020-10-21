@@ -13,11 +13,11 @@ PKG_DEPENDS_HOST="toolchain"
 PKG_DEPENDS_TARGET="toolchain llvm:host zlib"
 PKG_LONGDESC="Low-Level Virtual Machine (LLVM) is a compiler infrastructure."
 
-if [ "$LVM_SUPPORT" = "yes" ]; then
+#if [ "$LVM_SUPPORT" = "yes" ]; then
   LLVM_TARGETS="AMDGPU;X86"
-else
-  LLVM_TARGETS="X86"
-fi
+#else
+#  LLVM_TARGETS="X86"
+#fi
 
 PKG_CMAKE_OPTS_COMMON="-DLLVM_INCLUDE_TOOLS=ON \
                        -DLLVM_BUILD_TOOLS=OFF \
