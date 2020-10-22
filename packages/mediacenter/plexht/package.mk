@@ -269,7 +269,7 @@ fi
 
 make_target() {
 # setup skin dir from default skin
-  SKIN_DIR="skin.`tolower $SKIN_DEFAULT`"
+  SKIN_DIR="skin.`echo $SKIN_DEFAULT | tr [:upper:] [:lower:]`"
 
 # setup default skin inside the sources
   sed -i -e "s|skin.confluence|$SKIN_DIR|g" $PKG_BUILD/xbmc/settings/Settings.h
