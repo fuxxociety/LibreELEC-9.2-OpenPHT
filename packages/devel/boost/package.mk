@@ -47,6 +47,7 @@ makeinstall_target() {
                           --with-chrono \
                           --with-date_time \
                           --with-filesystem \
+                          --with-timer \
                           --with-iostreams \
                           --with-python \
                           --with-random \
