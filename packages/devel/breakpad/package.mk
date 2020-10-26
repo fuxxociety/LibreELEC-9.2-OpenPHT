@@ -31,6 +31,11 @@ PKG_AUTORECONF="yes"
 PKG_CONFIGURE_OPTS_HOST="--enable-selftest"
 PKG_CONFIGURE_OPTS_TARGET="--disable-processor --disable-tools"
 
+pre_configure_target() {
+  export CFLAGS="$CFLAGS -fpermissive"
+  export CXXFLAGS="$CXXFLAGS -fpermissive"
+}
+
 post_makeinstall_target() {
   rm -rf $INSTALL/usr/bin
 }
